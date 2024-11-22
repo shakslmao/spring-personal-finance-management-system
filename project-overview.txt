@@ -1,0 +1,72 @@
+Personal Finance Management System
+
+Microservices to Create
+01. User Service: Handles user Authentication, Authorisation, and Profile Management
+02. Transaction Service: Manages transaction records, Categories (e.g., groceries, bills), entertainment, and tagging.
+03. Budget Service: Allows users to set monthly/weekly budgets and provides alerts when thresholds are crossed.
+04. Savings Service: Tracks savings goals and progress, including automated saving calculations.
+05. Reporting Service: Generates detailed financial reports, graphs, and insights for users based on their transactions.
+06. Notification Service: Sends reminders, budget alerts, and monthly summaries via email or SMS.
+07. Investment Service: racks investments like stocks, bonds, or mutual funds with API integration for live updates.
+08. Currency Exchange Service: Fetches and applies real-time currency conversion rates for international transactions.
+09. Loan Service: Provides loan options, EMI calculators, and repayment schedules for users.
+10. Audit Service: Logs and monitors critical actions for compliance and debugging purposes.
+
+Enterprise-Grade Technologies to Implement
+Backend Libraries:
+    - Spring Boot: Core Backend Framework
+    - Spring Batch: For processing large datasets like financial transactions.
+    - Spring Security: For user authentication and authorisation.
+
+Service Coordination:
+    - Eureka: Service Discovery and Registration
+    - Ribbon: Load Balancer
+    - Feign: REST Client
+    - Resilience4j: Circuit Breaker
+    - API Gateway - Spring Cloud Gateway
+
+Asynchronous Communication:
+    - RabbitMQ: Message Broker
+    - Kafka: Distributed Streaming Platform
+
+Database:
+    - MongoDB: For flexible document storage
+    - PostgresSQL: For Relational Data
+    - TimescaleDB: A time-series database for tracking transactions overtime
+
+Caching:
+    - Redis: In-memory data store for caching frequently accessed data
+
+Data Visualisation:
+    - Grafana: For creating dashboards and visualising financial data
+    - Kibana: For log analysis and monitoring
+
+Authentication:
+    - OAuth2: For secure user authentication and authorisation
+    - JWT: For stateless authentication
+    - Keycloak
+
+Payment API:
+    - Stripe: For processing payments and subscriptions
+
+DevOps:
+    - Docker: Containerisation
+    - Kubernetes: Container Orchestration
+    - GitHub Actions or Jenkins: CI/CD Pipeline
+    - Prometheus: Monitoring and Alerting
+    - ELK Stack: Log Management
+
+Security:
+    - Vault by HashiCorp: For secure management of sensitive data (e.g., API keys, passwords)
+
+Monitoring and Logging:
+    - Zipkin: Distributed Tracing
+
+Testing:
+    - JUnit: For unit testing
+    - Mockito: For mocking dependencies
+    - Postman: For API testing
+
+
+
+
