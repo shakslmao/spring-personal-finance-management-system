@@ -2,11 +2,11 @@ spring:
   profiles:
     active: native
   application:
-    name: configuration-server
+    name: configuration-service
   cloud:
     config:
       server:
         native:
           search-locations: classpath:/configurations
 server:
-  port: 8888 # Configuration Server Port.
+  port: 8888 # Configuration Service Port.
