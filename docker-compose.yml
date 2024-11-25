@@ -209,10 +209,36 @@ services:
             configuration-service:
                 condition: service_healthy
         healthcheck:
-            test: [ "CMD", "curl", "-f", "http://localhost:8761/actuator/health" ]
+            test: [ "CMD", "curl", "-f", "http://discovery-service:8761/actuator/health" ]
             interval: 10s
             timeout: 5s
             retries: 5
+
+    apigateway-service:
+        build:
+            context: ./services/apigateway-service
+        image: apigateway-service
+        ports:
+            - 8222:8222
+        environment:
+                - SPRING_CLOUD_CONFIG_URI=http://configuration-service:8888
+                - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI=http://keycloak:9098/realms/finance-microservice
+                - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-service:8761/eureka/
+        networks:
+            - personal-finance-microservice
+        depends_on:
+            configuration-service:
+                condition: service_healthy
+            discovery-service:
+                condition: service_healthy
+        healthcheck:
+            test: [ "CMD", "curl", "-f", "http://apigateway-service:8222/actuator/health" ]
+            interval: 10s
+            timeout: 5s
+            retries: 5
+
+
+
 
 
 networks:
