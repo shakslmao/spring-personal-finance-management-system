@@ -1,0 +1,12 @@
+global:
+  scrape_interval: 15s  # How often to scrape targets by default.
+  evaluation_interval: 15s # How often to evaluate rules.
+
+scrape_configs:
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  - job_name: 'docker'
+    static_configs:
+      - targets: ['']   # Fill Later with Service Name and Port

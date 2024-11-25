@@ -14,96 +14,121 @@ Phase 1: Foundational Setup
     - Define schemas for User Service (users, roles) and Transaction Service (transaction records, categories).
 
 Phase 2: User Service & Authentication
-1.Authentication & Authorisation
-    - Implement Spring Security with OAuth2 and JWT for authentication.
-    - Integrate Keycloak for identity and access management.
-    - Enable user registration, login, and profile management endpoints.
-2. User Data
-    - Create APIs for user profile updates and role-based access control.
-    - Integrate with a PostgreSQL database for storing user data.
-3. Audit Service
-    - Implement logging for all user actions (e.g., logins, updates).
-    - Configure Kafka to send audit logs to the Audit Service.
+    1.Authentication & Authorisation
+        - Implement Spring Security with OAuth2 and JWT for authentication.
+        - Integrate Keycloak for identity and access management.
+        - Enable user registration, login, and profile management endpoints.
+    2. User Data
+        - Create APIs for user profile updates and role-based access control.
+        - Integrate with a PostgreSQL database for storing user data.
+    3. Audit Service
+        - Implement logging for all user actions (e.g., logins, updates).
+        - Configure Kafka to send audit logs to the Audit Service.
 
 Phase 3: Transaction Service
-1. Core Features
-    - Implement CRUD operations for transaction records.
-    - Define categories (e.g., groceries, bills, entertainment).
-    - Add tagging capabilities for transactions.
-2. Database
-    - Use PostgreSQL to store transaction data.
-    - Consider TimescaleDB for tracking transaction trends over time.
-3. Real-Time Insights
-    - Integrate RabbitMQ for asynchronous updates on transactions.
-    - Use Grafana for transaction visualisation dashboards.
+    1. Core Features
+        - Implement CRUD operations for transaction records.
+        - Define categories (e.g., groceries, bills, entertainment).
+        - Add tagging capabilities for transactions.
+    2. Database
+        - Use PostgreSQL to store transaction data.
+        - Consider TimescaleDB for tracking transaction trends over time.
+    3. Real-Time Insights
+        - Integrate RabbitMQ for asynchronous updates on transactions.
+        - Use Grafana for transaction visualisation dashboards.
+    4. Concurrency and Multi-threading:
+       - Thread Pool Configurations
+       - Async Operation Patterns
+       - Concurrent Collections
+       - Parallel Processing Strategies
+       - Thread Safety Implementations
 
 Phase 4: Budget & Savings Services
-1. Budget Service
-    - Allow users to set monthly/weekly budgets.
-    - Implement threshold alerts using RabbitMQ or Kafka.
-    - Store budget data in PostgreSQL.
-2. Savings Service
-    - Track savings goals and progress.
-    - Implement automatic savings suggestions using a calculation engine.
-    - Use MongoDB for storing flexible savings data.
-3. Notifications
-    - Notify users when they approach/exceed budget thresholds.
-    - Use RabbitMQ for sending budget alerts to the Notification Service
+    1. Budget Service
+        - Allow users to set monthly/weekly budgets.
+        - Implement threshold alerts using RabbitMQ or Kafka.
+        - Store budget data in PostgreSQL.
+    2. Savings Service
+        - Track savings goals and progress.
+        - Implement automatic savings suggestions using a calculation engine.
+        - Use MongoDB for storing flexible savings data.
+    3. Notifications
+        - Notify users when they approach/exceed budget thresholds.
+        - Use RabbitMQ for sending budget alerts to the Notification Service
+    4. Concurrency and Multi-threading:
+        - Thread Pool Configurations
+        - Async Operation Patterns
+        - Concurrent Collections
+        - Parallel Processing Strategies
+        - Thread Safety Implementations
 
 Phase 5: Reporting Service
-1. Financial Reports
-    - Generate detailed reports (monthly/weekly/annual).
-    - Implement APIs for retrieving summarised insights.
-    - Use Grafana for user-facing financial graphs.
-2. Back-End Reporting
-    - Use Spring Batch for processing large datasets (e.g., transaction history).
+    1. Financial Reports
+        - Generate detailed reports (monthly/weekly/annual).
+        - Implement APIs for retrieving summarised insights.
+        - Use Grafana for user-facing financial graphs.
+    2. Back-End Reporting
+        - Use Spring Batch for processing large datasets (e.g., transaction history).
+    3. Concurrency and Multi-threading:
+       - Thread Pool Configurations
+       - Async Operation Patterns
+       - Concurrent Collections
+       - Parallel Processing Strategies
+       - Thread Safety Implementations
 
 Phase 6: Investment & Currency Exchange Services
-1. Investment Service
-    - Track user investments (e.g., stocks, bonds, mutual funds).
-    - Integrate APIs like Alpha Vantage for live investment updates.
-    - Store investment data in PostgreSQL.
-2. Currency Exchange Service
-    - Fetch real-time exchange rates via an external API (e.g., Open Exchange Rates).
-    - Provide conversion tools for international transactions.
+    1. Investment Service
+        - Track user investments (e.g., stocks, bonds, mutual funds).
+        - Integrate APIs like Alpha Vantage for live investment updates.
+        - Store investment data in PostgreSQL.
+    2. Currency Exchange Service
+        - Fetch real-time exchange rates via an external API (e.g., Open Exchange Rates).
+        - Provide conversion tools for international transactions.
+    3. Concurrency and Multi-threading:
+       - Thread Pool Configurations
+       - Async Operation Patterns
+       - Concurrent Collections
+       - Parallel Processing Strategies
+       - Thread Safety Implementations
+
 
 Phase 7: Loan Service
-1.Loan Calculators
-    - Implement APIs for EMI calculations and repayment schedules.
-    - Store loan data in MongoDB for flexible modeling.
-2. Loan Options
-    - Integrate with third-party APIs for loan offers or eligibility checks.
+    1.Loan Calculators
+        - Implement APIs for EMI calculations and repayment schedules.
+        - Store loan data in MongoDB for flexible modeling.
+    2. Loan Options
+        - Integrate with third-party APIs for loan offers or eligibility checks.
 
 Phase 8: Notification Service
-1. Core Features
-    - Send email and SMS notifications (e.g., Twilio or AWS SES).
-    - Schedule reminders for bills or savings goals.
-    - Use RabbitMQ for asynchronous communication.
-2. Database
-    - Store notification logs in MongoDB for quick access.
+    1. Core Features
+        - Send email and SMS notifications (e.g., Twilio or AWS SES).
+        - Schedule reminders for bills or savings goals.
+        - Use RabbitMQ for asynchronous communication.
+    2. Database
+        - Store notification logs in MongoDB for quick access.
 
 Phase 9: Monitoring, Security, and DevOps
-1. Monitoring
-    - Configure Prometheus for application metrics.
-    - Use ELK Stack (Elasticsearch, Logstash, Kibana) for log management.
-    - Set up Zipkin for distributed tracing.
-2. Caching
-    - Use Redis to cache frequently accessed data (e.g., user profiles, budgets).
-3. CI/CD Pipeline
-    - Set up a CI/CD pipeline with GitHub Actions or Jenkins.
-    - Define workflows for building, testing, and deploying services.
-4. Security
-    - Use Vault by HashiCorp for managing sensitive data (e.g., API keys, credentials).
-5. Kubernetes
-    - Deploy all services on Kubernetes for scalability.
-    - Use Helm charts for managing Kubernetes configurations.
+    1. Monitoring
+        - Configure Prometheus for application metrics.
+        - Use ELK Stack (Elasticsearch, Logstash, Kibana) for log management.
+        - Set up Zipkin for distributed tracing.
+    2. Caching
+        - Use Redis to cache frequently accessed data (e.g., user profiles, budgets).
+    3. CI/CD Pipeline
+        - Set up a CI/CD pipeline with GitHub Actions or Jenkins.
+        - Define workflows for building, testing, and deploying services.
+    4. Security
+        - Use Vault by HashiCorp for managing sensitive data (e.g., API keys, credentials).
+    5. Kubernetes
+        - Deploy all services on Kubernetes for scalability.
+        - Use Helm charts for managing Kubernetes configurations.
 
 Phase 10: Testing and Refinements
-1. Unit Testing
-    - Write test cases using JUnit and Mockito.
-2. API Testing
-    - Use Postman to test REST APIs.
-    - Automate API tests with Newman or similar tools.
-3. Load Testing
-    - Perform load testing to evaluate system performance under high traffic.
+    1. Unit Testing
+        - Write test cases using JUnit and Mockito.
+    2. API Testing
+        - Use Postman to test REST APIs.
+        - Automate API tests with Newman or similar tools.
+    3. Load Testing
+        - Perform load testing to evaluate system performance under high traffic.
 
