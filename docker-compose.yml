@@ -185,10 +185,11 @@ networks:
       driver: bridge
 
 volumes:
-    postgres:
+    timescaledb:
     pgadmin:
     mongo:
     zipkin:
+    rabbitmq_data:
     keycloak:
     redis:
     prometheus_data:

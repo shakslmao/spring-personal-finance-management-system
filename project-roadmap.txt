@@ -19,7 +19,7 @@ Phase 2: User Service & Authentication
         - Integrate Keycloak for identity and access management.
         - Enable user registration, login, and profile management endpoints.
     2. User Data
-        - Create APIs for user profile updates and role-based access control.
+        - Create APIs for user profile updates
         - Integrate with a PostgreSQL database for storing user data.
     3. Audit Service
         - Implement logging for all user actions (e.g., logins, updates).
