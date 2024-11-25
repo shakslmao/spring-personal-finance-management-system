@@ -139,17 +139,17 @@ services:
             - redis:/data
         restart: unless-stopped
 
-    prometheus:
-        container_name: prometheus-ms
-        image: prom/prometheus:latest
-        ports:
-            - 9090:9090
-        volumes:
-            - prometheus_data:/prometheus
-            - ./prometheus.yml:/etc/prometheus/prometheus.yml
-        networks:
-            - personal-finance-microservice
-        restart: unless-stopped
+    #prometheus:
+        #container_name: prometheus-ms
+        #image: prom/prometheus:latest
+        #ports:
+        #    - 9090:9090
+        #volumes:
+        #    - prometheus_data:/prometheus
+         #   - ./prometheus.yml:/etc/prometheus/prometheus.yml
+        #networks:
+       #     - personal-finance-microservice
+       # restart: unless-stopped
 
     grafana:
         container_name: grafana-ms
@@ -179,6 +179,23 @@ services:
             - personal-finance-microservice
         restart: unless-stopped
 
+    # Microservices
+    configuration-service:
+        build:
+            context: ./services/configuration-service
+        image: configuration-service
+        environment:
+            - SPRING_CLOUD_CONFIG_URI=http://configuration-service:8888
+        ports:
+            -   8888:8888
+        networks:
+            - personal-finance-microservice
+        healthcheck:
+            test: ["CMD", "curl", "-f", "http://configuration-service:8888/actuator/health"]
+            interval: 10s
+            timeout: 10s
+            retries: 5
+            start_period: 20s
 
 networks:
     personal-finance-microservice:
