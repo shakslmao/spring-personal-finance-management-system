@@ -100,14 +100,14 @@ services:
             - personal-finance-microservice
         restart: unless-stopped
 
-    #mail-dev:
+        #mail-dev:
         #container_name: maildev-ms
         #image: maildev/maildev
         #ports:
         #    - 1080:1080
         #    - 1025:1025
 
-    #zipkin:
+        #zipkin:
         #container_name: zipkin-ms
         #image: openzipkin/zipkin
         #ports:
@@ -128,122 +128,123 @@ services:
         command:
             - "start-dev"
 
-    #redis:
-        #container_name: redis-ms
-        #image: redis:latest
-        #ports:
-        #    - 6379:6379
-        #networks:
-        #    - personal-finance-microservice
-        #volumes:
-        #    - redis:/data
-        #restart: unless-stopped
+            #redis:
+            #container_name: redis-ms
+            #image: redis:latest
+            #ports:
+            #    - 6379:6379
+            #networks:
+            #    - personal-finance-microservice
+            #volumes:
+            #    - redis:/data
+            #restart: unless-stopped
 
-    #prometheus:
-        #container_name: prometheus-ms
-        #image: prom/prometheus:latest
-        #ports:
-        #    - 9090:9090
-        #volumes:
-        #    - prometheus_data:/prometheus
-         #   - ./prometheus.yml:/etc/prometheus/prometheus.yml
-        #networks:
-       #     - personal-finance-microservice
-       # restart: unless-stopped
+            #prometheus:
+            #container_name: prometheus-ms
+            #image: prom/prometheus:latest
+            #ports:
+            #    - 9090:9090
+            #volumes:
+            #    - prometheus_data:/prometheus
+            #   - ./prometheus.yml:/etc/prometheus/prometheus.yml
+            #networks:
+            #     - personal-finance-microservice
+            # restart: unless-stopped
 
-    #grafana:
-        #container_name: grafana-ms
-        #image: grafana/grafana:latest
-        #ports:
-        #    - 3000:3000
-        #volumes:
-        #    - grafana_data:/var/lib/grafana
-        #environment:
-        #    - GF_SECURITY_ADMIN_USER=${GF_SECURITY_ADMIN_USER}
-        #    - GF_SECURITY_ADMIN_PASSWORD=${GF_SECURITY_ADMIN_PASSWORD}
-        #networks:
-        #    - personal-finance-microservice
-        #restart: unless-stopped
+            #grafana:
+            #container_name: grafana-ms
+            #image: grafana/grafana:latest
+            #ports:
+            #    - 3000:3000
+            #volumes:
+            #    - grafana_data:/var/lib/grafana
+            #environment:
+            #    - GF_SECURITY_ADMIN_USER=${GF_SECURITY_ADMIN_USER}
+            #    - GF_SECURITY_ADMIN_PASSWORD=${GF_SECURITY_ADMIN_PASSWORD}
+            #networks:
+            #    - personal-finance-microservice
+            #restart: unless-stopped
 
-    #elasticsearch:
-        #container_name: elasticsearch-ms
-        #image: docker.elastic.co/elasticsearch/elasticsearch:8.3.2
-        #environment:
-        #    - discovery.type=single-node
-        #    - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}  # Secure password for the admin
-        #ports:
-        #    - 9200:9200
-        #volumes:
-        #    - elasticsearch_data:/usr/share/elasticsearch/data
-        #networks:
-        #    - personal-finance-microservice
-        #restart: unless-stopped
+            #elasticsearch:
+            #container_name: elasticsearch-ms
+            #image: docker.elastic.co/elasticsearch/elasticsearch:8.3.2
+            #environment:
+            #    - discovery.type=single-node
+            #    - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}  # Secure password for the admin
+            #ports:
+            #    - 9200:9200
+            #volumes:
+            #    - elasticsearch_data:/usr/share/elasticsearch/data
+            #networks:
+            #    - personal-finance-microservice
+            #restart: unless-stopped
 
-    # Microservices
-    configuration-service:
-        build:
-            context: ./services/configuration-service
-        image: configuration-service
-        ports:
-            - 8888:8888
-        networks:
-            - personal-finance-microservice
-        healthcheck:
-            test: [ "CMD", "curl", "-f", "http://localhost:8888/actuator/health" ]
-            interval: 10s
-            timeout: 5s
-            retries: 5
+            # Microservices
+            # configuration-service:
+            # build:
+            # context: ./services/configuration-service
+            # image: configuration-service
+            # ports:
+            # - 8888:8888
+        # networks:
+        # - personal-finance-microservice
+        # healthcheck:
+        # test: ["CMD", "curl", "-f", "http://configuration-service:8888/actuator/health"]
+        # interval: 10s
+        # timeout: 5s
+        # retries: 5
 
-    discovery-service:
-        build:
-            context: ./services/discovery-service
-        image: discovery-service
-        ports:
-            - 8761:8761
-        environment:
-             - SPRING_CLOUD_CONFIG_URI=http://configuration-service:8888
-             - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-service:8761/eureka/
-        networks:
-            - personal-finance-microservice
-        depends_on:
-            configuration-service:
-                condition: service_healthy
-        healthcheck:
-            test: [ "CMD", "curl", "-f", "http://discovery-service:8761/actuator/health" ]
-            interval: 10s
-            timeout: 5s
-            retries: 5
+    # discovery-service:
+    # build:
+    # context: ./services/discovery-service
+    # image: discovery-service
+    # ports:
+    # - 8761:8761
+    # environment:
+    # - SPRING_CLOUD_CONFIG_URI=http://configuration-service:8888
+    # - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-service:8761/eureka/
+    # networks:
+    # - personal-finance-microservice
+    # depends_on:
+    # configuration-service:
+    # condition: service_healthy
+    # healthcheck:
+    # test: ["CMD", "curl", "-f", "http://discovery-service:8761/actuator/health"]
+    # interval: 10s
+    # timeout: 5s
+    # retries: 5
 
-    apigateway-service:
-        build:
-            context: ./services/apigateway-service
-        image: apigateway-service
-        ports:
-            - 8222:8222
-        environment:
-                - SPRING_CLOUD_CONFIG_URI=http://configuration-service:8888
-                - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI=http://keycloak:9098/realms/finance-microservice
-                - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-service:8761/eureka/
-        networks:
-            - personal-finance-microservice
-        depends_on:
-            configuration-service:
-                condition: service_healthy
-            discovery-service:
-                condition: service_healthy
-        healthcheck:
-            test: [ "CMD", "curl", "-f", "http://apigateway-service:8222/actuator/health" ]
-            interval: 10s
-            timeout: 5s
-            retries: 5
-
-
-
-
+    # apigateway-service:
+    # build:
+    # context: ./services/apigateway-service
+    # image: apigateway-service
+    # ports:
+    # - 8222:8222
+    # environment:
+    # - SPRING_CLOUD_CONFIG_URI=http://configuration-service:8888
+    # - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI=http://keycloak:9098/realms/finance-microservice
+    # - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-service:8761/eureka/
+    # - EUREKA_INSTANCE_HOSTNAME=apigateway-service
+    # - EUREKA_INSTANCE_PREFER_IP_ADDRESS=true
+    # - SERVER_PORT=8222
+    # - EUREKA_CLIENT_REGISTER_WITH_EUREKA=true
+    # - EUREKA_CLIENT_FETCH_REGISTRY=true
+    # networks:
+    # - personal-finance-microservice
+    # depends_on:
+    # discovery-service:
+    # condition: service_healthy
+    # configuration-service:
+    # condition: service_healthy
+    # healthcheck:
+    # test: ["CMD", "curl", "-f", "http://apigateway-service:8222/actuator/health"]
+    # interval: 10s
+    # timeout: 5s
+    # retries: 5
 
 networks:
     personal-finance-microservice:
-      driver: bridge
+        driver: bridge
 
 volumes:
     timescaledb:
