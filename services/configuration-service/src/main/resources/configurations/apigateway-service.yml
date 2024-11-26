@@ -1,26 +1,16 @@
-eureka:
-  client:
-    serviceUrl:
-      defaultZone: http://discovery-service:8761/eureka/
-
 spring:
-  security:
-    oauth2:
-      resourceserver:
-        jwt:
-          issuer-uri: http://keycloak:9098/realms/finance-microservice
+    security:
+        oauth2:
+            resourceserver:
+                jwt:
+                    issuer-uri: http://localhost:9098/realms/finance-microservice
 
-  cloud:
-    gateway:
-      discovery:
-        locator:
-          enabled: true
-      routes:
+    cloud:
+        gateway:
+            discovery:
+                locator:
+                    enabled: true
+            routes:
 
 server:
-  port: 8222
-
-logging:
-  level:
-    com.netflix: DEBUG
-    org.springframework.cloud: DEBUG
+    port: 8222
