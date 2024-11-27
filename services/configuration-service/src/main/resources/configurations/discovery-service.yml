@@ -1,12 +1,11 @@
 eureka:
     instance:
-        hostname: localhost
+        hostname: discovery-service
+        preferIpAddress: false  # Use hostname for registration
     client:
-        registerWithEureka: false
-        fetchRegistry: false
+        registerWithEureka: false  # Discovery server doesn't register itself
+        fetchRegistry: false  # It doesn't fetch its own registry
         serviceUrl:
-            defaultZone: http://${eureka.instance.hostname}/${server.port}/eureka/
-
+            defaultZone: http://discovery-service:8761/eureka/
 server:
-    port: 8761 # Discovery Server Port.
-
+    port: 8761

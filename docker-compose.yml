@@ -179,68 +179,65 @@ services:
             #    - personal-finance-microservice
             #restart: unless-stopped
 
-            # Microservices
-            # configuration-service:
-            # build:
-            # context: ./services/configuration-service
-            # image: configuration-service
-            # ports:
-            # - 8888:8888
-        # networks:
-        # - personal-finance-microservice
-        # healthcheck:
-        # test: ["CMD", "curl", "-f", "http://configuration-service:8888/actuator/health"]
-        # interval: 10s
-        # timeout: 5s
-        # retries: 5
+    # Microservices
+    configuration-service:
+        build:
+            context: ./services/configuration-service
+        image: configuration-service
+        ports:
+             - 8888:8888
+        networks:
+            - personal-finance-microservice
+        healthcheck:
+            test: ["CMD", "curl", "-f", "http://configuration-service:8888/actuator/health"]
+            interval: 10s
+            timeout: 5s
+            retries: 5
 
-    # discovery-service:
-    # build:
-    # context: ./services/discovery-service
-    # image: discovery-service
-    # ports:
-    # - 8761:8761
-    # environment:
-    # - SPRING_CLOUD_CONFIG_URI=http://configuration-service:8888
-    # - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-service:8761/eureka/
-    # networks:
-    # - personal-finance-microservice
-    # depends_on:
-    # configuration-service:
-    # condition: service_healthy
-    # healthcheck:
-    # test: ["CMD", "curl", "-f", "http://discovery-service:8761/actuator/health"]
-    # interval: 10s
-    # timeout: 5s
-    # retries: 5
+    discovery-service:
+        build:
+            context: ./services/discovery-service
+        image: discovery-service
+        ports:
+            - 8761:8761
+        environment:
+            - SPRING_PROFILES_ACTIVE=docker
+            - SPRING_CLOUD_CONFIG_URI=http://configuration-service:8888
+            - EUREKA_INSTANCE_HOSTNAME=discovery-service
+            - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-service:8761/eureka/
+        networks:
+            - personal-finance-microservice
+        depends_on:
+            configuration-service:
+                condition: service_healthy
+        healthcheck:
+            test: ["CMD", "curl", "-f", "http://discovery-service:8761/actuator/health"]
+            interval: 10s
+            timeout: 5s
+            retries: 5
 
-    # apigateway-service:
-    # build:
-    # context: ./services/apigateway-service
-    # image: apigateway-service
-    # ports:
-    # - 8222:8222
-    # environment:
-    # - SPRING_CLOUD_CONFIG_URI=http://configuration-service:8888
-    # - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI=http://keycloak:9098/realms/finance-microservice
-    # - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-service:8761/eureka/
-    # - EUREKA_INSTANCE_HOSTNAME=apigateway-service
-    # - EUREKA_INSTANCE_PREFER_IP_ADDRESS=true
-    # - SERVER_PORT=8222
-    # - EUREKA_CLIENT_REGISTER_WITH_EUREKA=true
-    # - EUREKA_CLIENT_FETCH_REGISTRY=true
-    # networks:
-    # - personal-finance-microservice
-    # depends_on:
-    # discovery-service:
-    # condition: service_healthy
-    # configuration-service:
-    # condition: service_healthy
-    # healthcheck:
-    # test: ["CMD", "curl", "-f", "http://apigateway-service:8222/actuator/health"]
-    # interval: 10s
-    # timeout: 5s
-    # retries: 5
+    apigateway-service:
+        build:
+            context: ./services/apigateway-service
+        image: apigateway-service
+        ports:
+            - 8222:8222
+        environment:
+            - SPRING_PROFILES_ACTIVE=docker
+            - SPRING_CLOUD_CONFIG_URI=http://configuration-service:8888
+            - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-service:8761/eureka/
+        networks:
+            - personal-finance-microservice
+        depends_on:
+         discovery-service:
+             condition: service_healthy
+         configuration-service:
+             condition: service_healthy
+        healthcheck:
+             test: ["CMD", "curl", "-f", "http://apigateway-service:8222/actuator/health"]
+             interval: 10s
+             timeout: 5s
+             retries: 5
 
 networks:
     personal-finance-microservice:
