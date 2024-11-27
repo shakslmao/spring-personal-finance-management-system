@@ -1,16 +1,16 @@
 spring:
-    security:
-        oauth2:
-            resourceserver:
-                jwt:
-                    issuer-uri: http://localhost:9098/realms/finance-microservice
-
     cloud:
         gateway:
             discovery:
                 locator:
                     enabled: true
-            routes:
 
+eureka:
+    client:
+        serviceUrl:
+            defaultZone: http://discovery-service:8761/eureka/  # Use Docker container name
+    instance:
+        hostname: apigateway-service
+        preferIpAddress: false  # Use hostname for Eureka registration
 server:
     port: 8222
