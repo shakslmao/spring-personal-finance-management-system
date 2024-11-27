@@ -100,20 +100,21 @@ services:
             - personal-finance-microservice
         restart: unless-stopped
 
-        #mail-dev:
+    #zipkin:
+     #   container_name: zipkin-ms
+      #  image: openzipkin/zipkin
+       # ports:
+        #    - 9411:9411
+       # networks:
+        #    - personal-finance-microservice
+        #restart: unless-stopped
+
+    #mail-dev:
         #container_name: maildev-ms
         #image: maildev/maildev
         #ports:
         #    - 1080:1080
         #    - 1025:1025
-
-        #zipkin:
-        #container_name: zipkin-ms
-        #image: openzipkin/zipkin
-        #ports:
-        #    - 9411:9411
-        #networks:
-        #    - personal-finance-microservice
 
     keycloak:
         container_name: keycloak-ms
