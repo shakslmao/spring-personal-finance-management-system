@@ -13,6 +13,11 @@ services:
         networks:
             - personal-finance-microservice
         restart: unless-stopped
+        healthcheck:
+            test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -h localhost"]
+            interval: 10s
+            timeout: 5s
+            retries: 3
 
     pgadmin:
         container_name: pgadmin-ms
@@ -234,11 +239,40 @@ services:
              condition: service_healthy
          configuration-service:
              condition: service_healthy
+         # user-service:
         healthcheck:
              test: ["CMD", "curl", "-f", "http://apigateway-service:8222/actuator/health"]
              interval: 10s
              timeout: 5s
              retries: 5
+
+    user-service:
+        build:
+            context: ./services/user-service
+        image: user-service
+        ports:
+            - 8090:8090
+        environment:
+            - SPRING_PROFILES_ACTIVE=docker
+            - SPRING_CLOUD_CONFIG_URI=http://configuration-service:8888
+            - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-service:8761/eureka/
+            - SPRING_DATASOURCE_URL=jdbc:postgresql://timescaledb:5432/userdb
+            - SPRING_DATASOURCE_USERNAME=${POSTGRES_USER}
+            - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
+        networks:
+            - personal-finance-microservice
+        depends_on:
+            discovery-service:
+                condition: service_healthy
+            configuration-service:
+                condition: service_healthy
+            timescaledb:
+                condition: service_healthy
+        healthcheck:
+            test: ["CMD", "curl", "-f", "http://user-service:8090/actuator/health"]
+            interval: 10s
+            timeout: 5s
+            retries: 5
 
 networks:
     personal-finance-microservice:

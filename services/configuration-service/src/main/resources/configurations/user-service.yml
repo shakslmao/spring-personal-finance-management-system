@@ -1,16 +1,27 @@
 spring:
-  datasource:
-    url: jdbc:postgresql://timescaledb:5432/userdb
-    username: ${POSTGRES_USER}
-    password: ${POSTGRES_PASSWORD}
-    driver-class-name: org.postgresql.Driver
-  jpa:
-    hibernate:
+    cloud:
+        gateway:
+            discovery:
+                locator:
+                    enabled: true
+    datasource:
+        url: jdbc:postgresql://timescaledb:5432/userdb
+        username: ${POSTGRES_USER}
+        password: ${POSTGRES_PASSWORD}
+        driver-class-name: org.postgresql.Driver
+    jpa:
+        hibernate:
         ddl-auto: update
-    database: timescaledb
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
+        database: timescaledb
+        database-platform: org.hibernate.dialect.PostgreSQLDialect
 
   #kafka:
-
+eureka:
+    client:
+        serviceUrl:
+            defaultZone: http://discovery-service:8761/eureka/
+    instance:
+        hostname: user-service
+        preferIpAddress: false
 server:
   port: 8090
