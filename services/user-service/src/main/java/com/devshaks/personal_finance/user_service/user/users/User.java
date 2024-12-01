@@ -1,7 +1,6 @@
-package com.devshaks.personal_finance.user_service.user;
+package com.devshaks.personal_finance.user_service.user.users;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Pattern;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -24,6 +23,8 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    private String firstname;
 
     @Column(nullable = false, unique = true, length = 6) // Pin Format Username
     private String username;
