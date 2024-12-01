@@ -5,12 +5,13 @@ spring:
                 locator:
                     enabled: true
 
-eureka:
-    client:
-        serviceUrl:
-            defaultZone: http://discovery-service:8761/eureka/  # Use Docker container name
-    instance:
-        hostname: apigateway-service
-        preferIpAddress: false  # Use hostname for Eureka registration
+#eureka:
+#   client:
+#      serviceUrl:
+#         defaultZone: http://localhost:8761/eureka/ # Use Docker container name
+#instance:
+#hostname: apigateway-service
+#preferIpAddress: false # Use hostname for Eureka registration
+
 server:
     port: 8222
