@@ -1,13 +1,13 @@
 spring:
     datasource:
-        url: jdbc:postgresql://timescaledb:5432/userdb
+        url: jdbc:postgresql://localhost:5432/userdb
         username: ${POSTGRES_USER}
         password: ${POSTGRES_PASSWORD}
         driver-class-name: org.postgresql.Driver
     jpa:
         hibernate:
             ddl-auto: update
-        database: POSTGRESQL
+        database: postgresql
         database-platform: org.hibernate.dialect.PostgreSQLDialect
         show-sql: true
 

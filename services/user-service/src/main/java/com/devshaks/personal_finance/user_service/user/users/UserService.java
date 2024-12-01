@@ -27,6 +27,7 @@ public class UserService {
             String generatedUsername = usernameGenerator.generateUsername(user.getDateOfBirth().getYear());
             user.setUsername(generatedUsername);
             user.setPassword(passwordEncoder.encode(user.getPassword()));
+            log.info("Generated Username: {}", generatedUsername);
             return userRepository.save(user);
         } catch (IllegalArgumentException e) {
             throw e;
