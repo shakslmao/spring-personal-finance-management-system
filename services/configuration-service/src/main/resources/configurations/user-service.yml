@@ -1,9 +1,4 @@
 spring:
-    cloud:
-        gateway:
-            discovery:
-                locator:
-                    enabled: true
     datasource:
         url: jdbc:postgresql://timescaledb:5432/userdb
         username: ${POSTGRES_USER}
@@ -11,17 +6,17 @@ spring:
         driver-class-name: org.postgresql.Driver
     jpa:
         hibernate:
-        ddl-auto: update
-        database: timescaledb
+            ddl-auto: update
+        database: POSTGRESQL
         database-platform: org.hibernate.dialect.PostgreSQLDialect
+        show-sql: true
 
-  #kafka:
-eureka:
-    client:
-        serviceUrl:
-            defaultZone: http://discovery-service:8761/eureka/
-    instance:
-        hostname: user-service
-        preferIpAddress: false
 server:
-  port: 8090
+    port: 8090
+#eureka:
+#   client:
+#        serviceUrl:
+#            defaultZone: http://discovery-service:8761/eureka/ # Use Docker container name
+#    instance:
+#        hostname: user-service
+#        preferIpAddress: false # Use hostname for Eureka registration
