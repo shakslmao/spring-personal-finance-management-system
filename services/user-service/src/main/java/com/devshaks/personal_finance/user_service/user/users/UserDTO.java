@@ -1,7 +1,6 @@
 package com.devshaks.personal_finance.user_service.user.users;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 public record UserDTO(
         Long id,
