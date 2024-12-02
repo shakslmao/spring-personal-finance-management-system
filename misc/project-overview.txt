@@ -29,6 +29,9 @@ Asynchronous Communication:
     - RabbitMQ: Message Broker
     - Kafka: Distributed Streaming Platform
 
+OpenAPI Specification:
+    - Swagger: For API Documentation and Testing
+
 Database:
     - MongoDB: For flexible document storage
     - PostgresSQL: For Relational Data
@@ -61,6 +64,7 @@ Security:
 
 Monitoring and Logging:
     - Zipkin: Distributed Tracing
+
 
 Testing:
     - JUnit: For unit testing
