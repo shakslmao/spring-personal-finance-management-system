@@ -23,14 +23,14 @@ public class UserController {
 
     @Operation(summary = "Register a new User")
     @PostMapping("/register")
-    public ResponseEntity<User> registerUser(@RequestBody @Valid UserRegistrationRequest userRegistrationRequest) {
-        User user = userService.registerUser(userRegistrationRequest);
+    public ResponseEntity<UserDTO> registerUser(@RequestBody @Valid UserRegistrationRequest userRegistrationRequest) {
+        UserDTO user = userService.registerUser(userRegistrationRequest);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}")
-                .buildAndExpand(user.getId())
+                .buildAndExpand(user.id())
                 .toUri();
         return ResponseEntity.created(location).body(user);
     }
-    
+
 }
 

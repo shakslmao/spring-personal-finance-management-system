@@ -19,4 +19,18 @@ public class UserMapper {
                 .roles(UserRoles.USER)
                 .build();
         }
+
+    public UserDTO toUserDTO(User user) {
+        if (user == null) {
+            throw new IllegalArgumentException("User is Required");
+        }
+        return new UserDTO(
+                user.getId(),
+                user.getFirstname(),
+                user.getUsername(),
+                user.getEmail(),
+                user.getDateOfBirth(),
+                user.getRoles()
+        );
+    }
 }
