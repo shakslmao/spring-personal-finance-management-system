@@ -1,5 +1,7 @@
 package com.devshaks.personal_finance.user_service.user.users;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,9 +17,11 @@ import java.net.URI;
 @RequestMapping("/api/v1/users")
 @RestController
 @RequiredArgsConstructor
+@Tag(name = "User Controller", description = "Handles User-Related Operations")
 public class UserController {
     private final UserService userService;
 
+    @Operation(summary = "Register a new User")
     @PostMapping("/register")
     public ResponseEntity<User> registerUser(@RequestBody @Valid UserRegistrationRequest userRegistrationRequest) {
         User user = userService.registerUser(userRegistrationRequest);
@@ -27,5 +31,6 @@ public class UserController {
                 .toUri();
         return ResponseEntity.created(location).body(user);
     }
+    
 }
 
