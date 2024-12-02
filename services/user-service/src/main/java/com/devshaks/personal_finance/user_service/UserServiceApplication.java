@@ -9,11 +9,10 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 @EnableJpaAuditing
 public class UserServiceApplication {
 
-	public static void main(String[] args) {
-		Dotenv dotenv = Dotenv.load();
-		System.setProperty("POSTGRES_USER", dotenv.get("POSTGRES_USER"));
-		System.setProperty("POSTGRES_PASSWORD", dotenv.get("POSTGRES_PASSWORD"));
-		SpringApplication.run(UserServiceApplication.class, args);
-	}
-
+    public static void main(String[] args) {
+        Dotenv dotenv = Dotenv.load();
+        System.setProperty("POSTGRES_USER", dotenv.get("POSTGRES_USER"));
+        System.setProperty("POSTGRES_PASSWORD", dotenv.get("POSTGRES_PASSWORD"));
+        SpringApplication.run(UserServiceApplication.class, args);
+    }
 }

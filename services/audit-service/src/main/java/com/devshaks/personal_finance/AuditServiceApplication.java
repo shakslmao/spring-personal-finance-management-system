@@ -2,13 +2,12 @@ package com.devshaks.personal_finance;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.cloud.config.server.EnableConfigServer;
 
 @SpringBootApplication
-@EnableConfigServer
-public class ConfigurationServiceApplication {
+public class AuditServiceApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(ConfigurationServiceApplication.class, args);
+		SpringApplication.run(AuditServiceApplication.class, args);
 	}
+
 }
