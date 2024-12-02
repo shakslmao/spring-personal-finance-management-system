@@ -6,6 +6,10 @@ import com.devshaks.personal_finance.user_service.user.utility.UsernameGenerator
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import java.time.LocalDate;
+import java.time.Period;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -40,19 +44,27 @@ public class UserService {
 
     /**
      * Register a new User with provided details.
+     * 
      * @param userRegistrationRequest The details for the new user registration.
      * @return The registered user details.
      * @throws UnauthorizedException If the request is unauthorized.
-     * @throws RuntimeException If an error occurs while registering the user.
+     * @throws RuntimeException      If an error occurs while registering the user.
      */
     @Transactional
     public UserDTO registerUser(@Valid UserRegistrationRequest userRegistrationRequest) {
         try {
             validateUserRegistrationRequest(userRegistrationRequest);
+
+            LocalDate dateOfBirth = userRegistrationRequest.dateOfBirth();
+            if (!isUserAdult(dateOfBirth)) {
+                throw new UserRegistrationException("User must be 18 years or older");
+            }
             User user = userMapper.toUserRegistration(userRegistrationRequest);
             String generatedUsername = usernameGenerator.generateUsername(user.getDateOfBirth().getYear());
+
             user.setUsername(generatedUsername);
             String encodedPassword = passwordEncoder.encode(user.getPassword());
+
             user.setPassword(encodedPassword);
             User savedUser = userRepository.save(user);
             return userMapper.toUserDTO(savedUser);
@@ -64,6 +76,18 @@ public class UserService {
         } catch (Exception ex) {
             throw new RuntimeException("Error registering user", ex);
         }
+    }
+
+    /**
+     * Check if the user is 18 years or older.
+     * 
+     * @param dateOfBirth
+     * @return True if the user is 18 or Older, False otherwise.
+     */
+    private boolean isUserAdult(LocalDate dateOfBirth) {
+        LocalDate today = LocalDate.now();
+        Period age = Period.between(dateOfBirth, today);
+        return age.getYears() >= 18;
     }
 
 }
