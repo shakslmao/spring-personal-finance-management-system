@@ -118,6 +118,48 @@ services:
         command:
             - "start-dev"
 
+    elasticsearch:
+        container_name: elasticsearch-ms
+        image: docker.elasticsearch.co/elasticsearch/elasticsearch:8.10.2
+        ports:
+            - 9200:9200
+        environment:
+            - discovery.type=single-node
+            - bootstrap.memory_lock=true
+            - xpack.security.enabled=false
+        ulimits:
+            memlock:
+                soft: -1
+                hard: -1
+        volumes:
+            - elassticsearch_data:/usr/share/elasticsearch/data
+        networks:
+            - personal-finance-microservice
+        restart: unless-stopped
+        healthcheck:
+            test: ["CMD-SHELL", "curl -f http://localhost:9200 || exit 1"]
+            interval: 30s
+            timeout: 10s
+            retries: 5
+
+    kibana:
+        image: docker.elastic.co/kibana/kibana:8.10.2
+        container_name: kibana-ms
+        ports:
+            - 5601:5601
+        environment:
+            - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+        depends_on:
+            - elasticsearch
+        networks:
+            - personal-finance-microservice
+        restart: unless-stopped
+        healthcheck:
+            test: ["CMD-SHELL", "curl -f http://localhost:5601/api/status || exit 1"]
+            interval: 30s
+            timeout: 10s
+            retries: 5
+
         # Microservices
         #configuration-service:
         #   build:
