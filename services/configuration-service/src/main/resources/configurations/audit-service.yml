@@ -1,32 +1,11 @@
 spring:
-    data:
-        elasticsearch:
-            client:
-                rest:
-                    uris: http://elasticsearch-ms:9200
-                    connection-timeout: 1000
-                    socket-timeout: 3000
-                    username:
-                    password:
-
-    jackson:
-        serialization:
-            WRITE_DATES_AS_TIMESTAMPS: false
+  data:
+    mongodb:
+      host: localhost
+      username: root
+      password: root
+      port: 27017
+      database: auditdb
 
 server:
-    port: 8085
-
-management:
-    endpoints:
-        web:
-            exposure:
-                include: "*"
-    health:
-        elasticsearch:
-            enabled: true
-
-logging:
-    level:
-        root: INFO
-        org.springframework.data.elasticsearch: DEBUG 
-
+  port: 8080
