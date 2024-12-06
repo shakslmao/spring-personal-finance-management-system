@@ -2,12 +2,16 @@ package com.devshaks.personal_finance.user_service.user.users;
 
 import com.devshaks.personal_finance.user_service.user.exceptions.UserRegistrationException;
 import com.devshaks.personal_finance.user_service.user.handlers.UnauthorizedException;
+import com.devshaks.personal_finance.user_service.user.kafka.AuditEvent;
+import com.devshaks.personal_finance.user_service.user.kafka.AuditEventProducer;
+import com.devshaks.personal_finance.user_service.user.kafka.EventType;
 import com.devshaks.personal_finance.user_service.user.utility.UsernameGenerator;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.Period;
 
 import org.springframework.http.HttpStatus;
@@ -24,6 +28,7 @@ public class UserService {
     private final UserMapper userMapper;
     private final UsernameGenerator usernameGenerator;
     private final PasswordEncoder passwordEncoder;
+    private final AuditEventProducer auditEventProducer;
 
     private void validateUserRegistrationRequest(@Valid UserRegistrationRequest registrationRequest) {
         if (registrationRequest == null) {
@@ -67,6 +72,19 @@ public class UserService {
 
             user.setPassword(encodedPassword);
             User savedUser = userRepository.save(user);
+
+            try {
+                auditEventProducer.sendAuditEvent(new AuditEvent(
+                        EventType.USER_REGISTERED,
+                        "User Service",
+                        savedUser.getId(),
+                        "User Registered Successfully",
+                        LocalDateTime.now()
+                ));
+
+            } catch (Exception kafkaError) {
+                throw new UserRegistrationException(kafkaError.getMessage());
+            }
             return userMapper.toUserDTO(savedUser);
         } catch (HttpClientErrorException exception) {
             if (exception.getStatusCode() == HttpStatus.UNAUTHORIZED) {
