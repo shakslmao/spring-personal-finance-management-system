@@ -11,13 +11,13 @@ import java.time.LocalDateTime;
 @Setter
 @Builder
 @Document(collation = "audit_logs")
-public class AuditLog {
+public class Audit {
 
     @Id
     private String id;
-    private String eventType; // The type of Event
+    private EventType eventType; // The type of Event
     private String serviceName; // The name of the service that generated the Event
-    private String userId; // Associated User ID.
+    private Long userId; // Associated User ID.
     private String description; // Details about the Event.
     private LocalDateTime timestamp; // Timestamp of when the event occurred.
     private String ipAddress; // IP address associated with the event.
