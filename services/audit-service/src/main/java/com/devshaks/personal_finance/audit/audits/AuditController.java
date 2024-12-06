@@ -26,7 +26,7 @@ public class AuditController {
     @GetMapping("/user/{userId}")
     @Operation(summary = "Retrieves All Audit Logs for User")
     public ResponseEntity<List<AuditDTO>> getUserAuditLogs(
-            @PathVariable("userId") String userId,
+            @PathVariable("userId") Long userId,
             @PageableDefault(size = 10) Pageable pageable) {
         return ResponseEntity.ok(auditService.getUserAuditLogs(userId, pageable));
     }
@@ -34,7 +34,7 @@ public class AuditController {
     @GetMapping("/event/{eventType}")
     @Operation(summary = "Retrieves All Event Audit Logs")
     public ResponseEntity<List<AuditDTO>> getEventAuditLogs(
-            @PathVariable("eventType") String eventType,
+            @PathVariable("eventType") EventType eventType,
             @PageableDefault(size = 10) Pageable pageable) {
         return ResponseEntity.ok(auditService.getEventAuditLogs(eventType, pageable));
     }
@@ -50,8 +50,8 @@ public class AuditController {
     @GetMapping("/search")
     @Operation(summary = "Search audit logs based on filters")
     public ResponseEntity<List<AuditDTO>> searchAuditLogs(
-            @RequestParam(required = false) String userId,
-            @RequestParam(required = false) String eventType,
+            @RequestParam(required = false) Long userId,
+            @RequestParam(required = false) EventType eventType,
             @RequestParam(required = false) String serviceName,
             @PageableDefault(size = 10) Pageable pageable) {
         return ResponseEntity.ok(auditService.searchAuditLogs(userId, eventType, serviceName, pageable));
