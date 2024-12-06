@@ -16,7 +16,7 @@ import java.util.List;
 public class AuditCustomRepository {
     private final MongoTemplate mongoTemplate;
 
-    public Page<AuditLog> findAll(String serviceName, String userId, String eventType, Pageable pageable) {
+    public Page<Audit> findAll(String serviceName, Long userId, EventType eventType, Pageable pageable) {
         Criteria criteria = new Criteria();
 
         if (serviceName != null) {
@@ -32,8 +32,8 @@ public class AuditCustomRepository {
         }
 
         Query query = new Query(criteria).with(pageable);
-        List<AuditLog> auditLogs = mongoTemplate.find(query, AuditLog.class);
-        long count = mongoTemplate.count(query.skip(0).limit(0), AuditLog.class);
-        return new PageImpl<>(auditLogs, pageable, count);
+        List<Audit> audit = mongoTemplate.find(query, Audit.class);
+        long count = mongoTemplate.count(query.skip(0).limit(0), Audit.class);
+        return new PageImpl<>(audit, pageable, count);
     }
 }
