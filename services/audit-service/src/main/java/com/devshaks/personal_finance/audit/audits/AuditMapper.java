@@ -4,13 +4,13 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class AuditMapper {
-    public AuditDTO toAuditDTO(AuditLog auditLog) {
+    public AuditDTO toAuditDTO(Audit audit) {
         return new AuditDTO(
-                auditLog.getEventType(),
-                auditLog.getServiceName(),
-                auditLog.getUserId(),
-                auditLog.getDescription(),
-                auditLog.getTimestamp()
+                audit.getEventType(),
+                audit.getServiceName(),
+                audit.getUserId(),
+                audit.getDescription(),
+                audit.getTimestamp()
         );
     }
 }
