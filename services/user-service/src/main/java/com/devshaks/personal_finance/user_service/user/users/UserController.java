@@ -14,9 +14,9 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.net.URI;
 
 @Slf4j
-@RequestMapping("/api/v1/users")
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/api/v1/users")
 @Tag(name = "User Controller", description = "Handles User-Related Operations")
 public class UserController {
     private final UserService userService;
