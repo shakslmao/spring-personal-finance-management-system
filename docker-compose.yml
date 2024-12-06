@@ -19,21 +19,6 @@ services:
             timeout: 5s
             retries: 3
 
-    pgadmin:
-        container_name: pgadmin-ms
-        image: dpage/pgadmin4
-        environment:
-            PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
-            PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
-            PGADMIN_CONFIG_SERVER_MODE: "False"
-        volumes:
-            - pgadmin:/var/lib/pgadmin
-        ports:
-            - 5050:80
-        networks:
-            - personal-finance-microservice
-        restart: unless-stopped
-
     mongodb:
         container_name: mongodb-ms
         image: mongo
@@ -42,8 +27,8 @@ services:
         volumes:
             - mongo:/data/db
         environment:
-            MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
-            MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+            MONGO_INITDB_ROOT_USERNAME: root
+            MONGO_INITDB_ROOT_PASSWORD: root
         networks:
             - personal-finance-microservice
 
@@ -90,21 +75,6 @@ services:
         networks:
             - personal-finance-microservice
 
-    rabbitmq:
-        container_name: rabbitmq-ms
-        image: rabbitmq:management
-        ports:
-            - 5672:5672
-            - 15672:15672
-        environment:
-            RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
-            RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
-        volumes:
-            - rabbitmq_data:/var/lib/rabbitmq
-        networks:
-            - personal-finance-microservice
-        restart: unless-stopped
-
     keycloak:
         container_name: keycloak-ms
         image: quay.io/keycloak/keycloak:24.0.2
@@ -118,47 +88,21 @@ services:
         command:
             - "start-dev"
 
-    elasticsearch:
-        container_name: elasticsearch-ms
-        image: docker.elasticsearch.co/elasticsearch/elasticsearch:8.10.2
-        ports:
-            - 9200:9200
-        environment:
-            - discovery.type=single-node
-            - bootstrap.memory_lock=true
-            - xpack.security.enabled=false
-        ulimits:
-            memlock:
-                soft: -1
-                hard: -1
-        volumes:
-            - elassticsearch_data:/usr/share/elasticsearch/data
-        networks:
-            - personal-finance-microservice
-        restart: unless-stopped
-        healthcheck:
-            test: ["CMD-SHELL", "curl -f http://localhost:9200 || exit 1"]
-            interval: 30s
-            timeout: 10s
-            retries: 5
+networks:
+    personal-finance-microservice:
+        driver: bridge
 
-    kibana:
-        image: docker.elastic.co/kibana/kibana:8.10.2
-        container_name: kibana-ms
-        ports:
-            - 5601:5601
-        environment:
-            - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
-        depends_on:
-            - elasticsearch
-        networks:
-            - personal-finance-microservice
-        restart: unless-stopped
-        healthcheck:
-            test: ["CMD-SHELL", "curl -f http://localhost:5601/api/status || exit 1"]
-            interval: 30s
-            timeout: 10s
-            retries: 5
+volumes:
+    timescaledb:
+    pgadmin:
+    mongo:
+    zipkin:
+    rabbitmq_data:
+    keycloak:
+    redis:
+    prometheus_data:
+    grafana_data:
+
 
         # Microservices
         #configuration-service:
@@ -250,19 +194,3 @@ services:
     # interval: 10s
     # timeout: 5s
     # retries: 5
-
-networks:
-    personal-finance-microservice:
-        driver: bridge
-
-volumes:
-    timescaledb:
-    pgadmin:
-    mongo:
-    zipkin:
-    rabbitmq_data:
-    keycloak:
-    redis:
-    prometheus_data:
-    grafana_data:
-    elasticsearch_data:
