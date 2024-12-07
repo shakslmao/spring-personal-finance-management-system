@@ -1,4 +1,4 @@
-package com.devshaks.personal_finance.user_service.user.users;
+package com.devshaks.personal_finance.users;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

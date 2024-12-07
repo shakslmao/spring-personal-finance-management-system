@@ -1,4 +1,4 @@
-package com.devshaks.personal_finance.user_service.user.kafka;
+package com.devshaks.personal_finance.kafka;
 
 public enum EventType {
 

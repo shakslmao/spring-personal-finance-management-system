@@ -1,4 +1,4 @@
-package com.devshaks.personal_finance.user_service.user.handlers;
+package com.devshaks.personal_finance.handlers;
 
 import java.util.Map;
 

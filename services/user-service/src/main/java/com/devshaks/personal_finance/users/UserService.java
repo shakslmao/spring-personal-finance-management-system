@@ -1,11 +1,11 @@
-package com.devshaks.personal_finance.user_service.user.users;
+package com.devshaks.personal_finance.users;
 
-import com.devshaks.personal_finance.user_service.user.exceptions.UserRegistrationException;
-import com.devshaks.personal_finance.user_service.user.handlers.UnauthorizedException;
-import com.devshaks.personal_finance.user_service.user.kafka.AuditEvent;
-import com.devshaks.personal_finance.user_service.user.kafka.AuditEventProducer;
-import com.devshaks.personal_finance.user_service.user.kafka.EventType;
-import com.devshaks.personal_finance.user_service.user.utility.UsernameGenerator;
+import com.devshaks.personal_finance.exceptions.UserRegistrationException;
+import com.devshaks.personal_finance.handlers.UnauthorizedException;
+import com.devshaks.personal_finance.kafka.AuditEvents;
+import com.devshaks.personal_finance.kafka.AuditEventProducer;
+import com.devshaks.personal_finance.kafka.EventType;
+import com.devshaks.personal_finance.utility.UsernameGenerator;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -74,16 +74,17 @@ public class UserService {
             User savedUser = userRepository.save(user);
 
             try {
-                auditEventProducer.sendAuditEvent(new AuditEvent(
+                auditEventProducer.sendAuditEvent(new AuditEvents(
                         EventType.USER_REGISTERED,
                         "User Service",
                         savedUser.getId(),
                         "User Registered Successfully",
-                        LocalDateTime.now()
+                        LocalDateTime.now().toString()
                 ));
 
             } catch (Exception kafkaError) {
-                throw new UserRegistrationException(kafkaError.getMessage());
+                log.error("Error Sending Event to Audit.", kafkaError);
+                throw new UserRegistrationException("Error Sending Event to Audit Service");
             }
             return userMapper.toUserDTO(savedUser);
         } catch (HttpClientErrorException exception) {

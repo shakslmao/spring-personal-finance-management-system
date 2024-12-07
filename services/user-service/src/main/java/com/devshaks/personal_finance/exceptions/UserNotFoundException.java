@@ -1,4 +1,4 @@
-package com.devshaks.personal_finance.user_service.user.exceptions;
+package com.devshaks.personal_finance.exceptions;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;

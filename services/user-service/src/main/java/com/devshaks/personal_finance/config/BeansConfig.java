@@ -1,4 +1,4 @@
-package com.devshaks.personal_finance.user_service.user.config;
+package com.devshaks.personal_finance.config;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
