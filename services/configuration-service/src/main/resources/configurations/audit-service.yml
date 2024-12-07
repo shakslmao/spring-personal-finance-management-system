@@ -1,27 +1,31 @@
 spring:
-  data:
-    mongodb:
-      host: localhost
-      username: root
-      password: root
-      port: 27017
-      database: auditdb
+    data:
+        mongodb:
+           # username: root
+            #password: root
+            host: localhost
+            port: 27017
+            database: auditdb
+            #authentication-database: admin
 
-  kafka:
-    consumer:
-      bootstrap-servers: localhost:9092
-      group-id: auditGroup
-      auto-offset-reset: earliest
-      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
-      properties:
-        spring.json.trusted.packages: "*"
-        spring.json.type.mapping: com.devshaks.personal_finance.kafka.AuditEvents:com.devshaks.personal_finance.kafka.AuditEvents
+    kafka:
+        consumer:
+            bootstrap-servers: localhost:9092
+            group-id: auditGroup
+            auto-offset-reset: earliest
+            key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+            value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+            properties:
+                spring.json.trusted.packages: "*"
+                spring.json.type.mapping: com.devshaks.personal_finance.kafka.AuditEvents:com.devshaks.personal_finance.kafka.AuditEvents
 
 logging:
-  level:
-    org.springframework.kafka: DEBUG
+    level:
+        org.springframework.kafka: DEBUG
+        org.springframework.data.mongodb: DEBUG
+
+
 
 
 server:
-  port: 8080
+    port: 8080

@@ -13,11 +13,11 @@
       </jdbc-additional-properties>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
-    <data-source source="LOCAL" name="mongodb@personal-finance" uuid="7dc38072-ce0f-4b9f-8223-8eec1f4e7653">
+    <data-source source="LOCAL" name="mongodb@personal-finance" uuid="2ee9d809-aac2-4029-946a-f9c13d6807c4">
       <driver-ref>mongo</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>com.dbschema.MongoJdbcDriver</jdbc-driver>
-      <jdbc-url>mongodb://localhost:27017/auditdb</jdbc-url>
+      <jdbc-url>mongodb://localhost:27017/</jdbc-url>
       <jdbc-additional-properties>
         <property name="com.intellij.clouds.kubernetes.db.host.port" />
         <property name="com.intellij.clouds.kubernetes.db.enabled" value="false" />
