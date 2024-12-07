@@ -1,4 +1,4 @@
-package com.devshaks.personal_finance.user_service;
+package com.devshaks.personal_finance;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
