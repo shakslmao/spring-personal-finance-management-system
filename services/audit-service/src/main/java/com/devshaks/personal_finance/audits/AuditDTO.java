@@ -1,10 +1,10 @@
 package com.devshaks.personal_finance.audits;
 
-import java.time.LocalDateTime;
+import com.devshaks.personal_finance.kafka.ServiceNames;
 
 public record AuditDTO (
         EventType eventType,
-        String serviceName,
+        ServiceNames serviceName,
         Long userId,
         String description,
         String timestamp
