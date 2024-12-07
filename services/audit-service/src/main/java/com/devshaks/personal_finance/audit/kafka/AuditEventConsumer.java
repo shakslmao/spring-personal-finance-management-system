@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
 import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -18,18 +19,22 @@ public class AuditEventConsumer {
     @KafkaListener(topics = "user-topic", groupId = "audit-service-group")
     public void consumeAuditEvent(AuditDTO auditDTO) {
         log.info("Received Audit Event: {}", auditDTO);
-        try {
-            if (auditDTO == null || auditDTO.eventType() == null || auditDTO.serviceName() == null || auditDTO.timestamp() == null) {
-                log.warn("Invalid Audit Event received: {}", auditDTO);
-                return;
-            }
+        if (auditDTO == null || auditDTO.eventType() == null || auditDTO.serviceName() == null || auditDTO.timestamp() == null) {
+            log.warn("Invalid Audit Event received: {}", auditDTO);
+            return;
+        }
+        processAuditEvent(auditDTO);
+    }
 
+    @Async("customTaskExecutor")
+    public void processAuditEvent(AuditDTO auditDTO) {
+        try {
             Audit audit = mapToAudit(auditDTO);
             auditRepository.save(audit);
-        } catch (DataAccessException dae) {
-            log.error("Error while saving Audit Event: {}", auditDTO, dae);
+            log.info("Successfully Processed Audit Event: {}", audit);
         } catch (Exception e) {
-            log.error("Unexpected error while processing Audit Event: {}", auditDTO, e);
+            log.error("Error processing Audit Event: {}", auditDTO, e);
+            throw new RuntimeException(e);
         }
     }
 
