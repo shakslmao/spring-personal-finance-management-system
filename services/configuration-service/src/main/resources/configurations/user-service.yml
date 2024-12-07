@@ -11,6 +11,17 @@ spring:
         database-platform: org.hibernate.dialect.PostgreSQLDialect
         show-sql: true
 
+    kafka:
+        producer:
+            bootstrap-servers: localhost:9092
+            key-serializer: org.apache.kafka.common.serialization.StringSerializer
+            value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+            properties:
+                spring.json.type.mapping: auditEvent:com.devshaks.personal_finance.user_service.user.kafka.AuditEvent
+
+
+
+
 server:
     port: 8090
 #eureka:
