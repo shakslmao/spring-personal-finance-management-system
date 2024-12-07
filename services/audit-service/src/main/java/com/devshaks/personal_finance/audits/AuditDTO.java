@@ -1,4 +1,4 @@
-package com.devshaks.personal_finance.audit.audits;
+package com.devshaks.personal_finance.audits;
 
 import java.time.LocalDateTime;
 
@@ -7,6 +7,6 @@ public record AuditDTO (
         String serviceName,
         Long userId,
         String description,
-        LocalDateTime timestamp
+        String timestamp
 ){
 }
