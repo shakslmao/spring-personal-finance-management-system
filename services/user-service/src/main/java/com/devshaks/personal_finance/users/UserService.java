@@ -5,6 +5,7 @@ import com.devshaks.personal_finance.handlers.UnauthorizedException;
 import com.devshaks.personal_finance.kafka.AuditEvents;
 import com.devshaks.personal_finance.kafka.AuditEventProducer;
 import com.devshaks.personal_finance.kafka.EventType;
+import com.devshaks.personal_finance.kafka.ServiceNames;
 import com.devshaks.personal_finance.utility.UsernameGenerator;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -76,7 +77,7 @@ public class UserService {
             try {
                 auditEventProducer.sendAuditEvent(new AuditEvents(
                         EventType.USER_REGISTERED,
-                        "User Service",
+                        ServiceNames.USER_SERVICE,
                         savedUser.getId(),
                         "User Registered Successfully",
                         LocalDateTime.now().toString()
