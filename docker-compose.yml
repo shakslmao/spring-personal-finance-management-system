@@ -20,27 +20,28 @@ services:
             retries: 3
 
     mongodb:
-        container_name: mongodb-ms
-        image: mongo
+        container_name: mongodb
+        image: mongo:latest
         ports:
             - 27017:27017
         volumes:
-            - mongo:/data/db
-        environment:
-            MONGO_INITDB_ROOT_USERNAME: root
-            MONGO_INITDB_ROOT_PASSWORD: root
+            - mongo_data_container:/data/db
+        #environment:
+            #MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+            #MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
         networks:
             - personal-finance-microservice
 
+
     mongo-express:
-        container_name: mongoexpress-ms
+        container_name: mongoexpress
         image: mongo-express
         restart: always
         ports:
             - 8081:8081
         environment:
-            ME_CONFIG_MONGODB_ADMINUSERNAME: root
-            ME_CONFIG_MONGODB_ADMINPASSWORD: root
+            ME_CONFIG_MONGODB_ADMINUSERNAME: ${ME_CONFIG_MONGODB_ADMINUSERNAME}
+            ME_CONFIG_MONGODB_ADMINPASSWORD: ${ME_CONFIG_MONGODB_ADMINPASSWORD}
             ME_CONFIG_MONGODB_SERVER: mongodb
         networks:
             - personal-finance-microservice
@@ -95,7 +96,7 @@ networks:
 volumes:
     timescaledb:
     pgadmin:
-    mongo:
+    mongo_data_container:
     zipkin:
     rabbitmq_data:
     keycloak:
