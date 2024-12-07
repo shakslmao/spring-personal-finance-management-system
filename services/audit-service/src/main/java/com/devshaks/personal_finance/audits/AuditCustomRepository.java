@@ -1,4 +1,4 @@
-package com.devshaks.personal_finance.audit.audits;
+package com.devshaks.personal_finance.audits;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;

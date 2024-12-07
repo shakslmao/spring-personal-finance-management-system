@@ -1,4 +1,4 @@
-package com.devshaks.personal_finance.audit.audits;
+package com.devshaks.personal_finance.audits;
 
 import lombok.*;
 import org.springframework.data.annotation.Id;
@@ -19,6 +19,6 @@ public class Audit {
     private String serviceName; // The name of the service that generated the Event
     private Long userId; // Associated User ID.
     private String description; // Details about the Event.
-    private LocalDateTime timestamp; // Timestamp of when the event occurred.
+    private String timestamp; // Timestamp of when the event occurred.
     private String ipAddress; // IP address associated with the event.
 }

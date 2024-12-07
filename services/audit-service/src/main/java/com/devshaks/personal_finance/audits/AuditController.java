@@ -1,4 +1,4 @@
-package com.devshaks.personal_finance.audit.audits;
+package com.devshaks.personal_finance.audits;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
