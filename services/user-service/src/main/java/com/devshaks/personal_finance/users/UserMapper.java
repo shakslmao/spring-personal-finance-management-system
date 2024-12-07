@@ -1,4 +1,4 @@
-package com.devshaks.personal_finance.user_service.user.users;
+package com.devshaks.personal_finance.users;
 
 import org.springframework.stereotype.Service;
 

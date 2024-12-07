@@ -1,4 +1,4 @@
-package com.devshaks.personal_finance.user_service;
+package com.devshaks.personal_finance;
 
 import io.github.cdimascio.dotenv.Dotenv;
 import org.springframework.boot.SpringApplication;

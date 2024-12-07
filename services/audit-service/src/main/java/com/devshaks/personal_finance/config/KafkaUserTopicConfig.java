@@ -1,4 +1,4 @@
-package com.devshaks.personal_finance.audit.config;
+package com.devshaks.personal_finance.config;
 
 import org.apache.kafka.clients.admin.NewTopic;
 import org.springframework.context.annotation.Bean;

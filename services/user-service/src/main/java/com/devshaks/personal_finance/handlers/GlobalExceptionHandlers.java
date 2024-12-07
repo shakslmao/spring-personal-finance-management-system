@@ -1,6 +1,6 @@
-package com.devshaks.personal_finance.user_service.user.handlers;
+package com.devshaks.personal_finance.handlers;
 
-import com.devshaks.personal_finance.user_service.user.exceptions.UserNotFoundException;
+import com.devshaks.personal_finance.exceptions.UserNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;

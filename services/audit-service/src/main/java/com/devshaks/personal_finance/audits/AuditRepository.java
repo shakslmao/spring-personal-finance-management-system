@@ -1,4 +1,4 @@
-package com.devshaks.personal_finance.audit.audits;
+package com.devshaks.personal_finance.audits;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
