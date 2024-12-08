@@ -32,20 +32,9 @@ public class UserService {
     private final AuditEventProducer auditEventProducer;
 
     private void validateUserRegistrationRequest(@Valid UserRegistrationRequest registrationRequest) {
-        if (registrationRequest == null) {
-            log.error("User registration request is null");
-            throw new UserRegistrationException("User registration request cannot be null");
-        }
-
-        if (userRepository.existsByEmail(registrationRequest.email())) {
-            log.error("Email already exists: {}", registrationRequest.email());
-            throw new UserRegistrationException("Email already exists");
-        }
-
-        if (registrationRequest.dateOfBirth() == null) {
-            log.error("Date of Birth is Null for User: {}", registrationRequest.email());
-            throw new UserRegistrationException("Date of Birth is required");
-        }
+        if (registrationRequest == null) { throw new UserRegistrationException("User registration request cannot be null"); }
+        if (userRepository.existsByEmail(registrationRequest.email())) { throw new UserRegistrationException("Email already exists"); }
+        if (registrationRequest.dateOfBirth() == null) { throw new UserRegistrationException("Date of Birth is required"); }
     }
 
     /**
@@ -60,17 +49,12 @@ public class UserService {
     public UserDTO registerUser(@Valid UserRegistrationRequest userRegistrationRequest) {
         try {
             validateUserRegistrationRequest(userRegistrationRequest);
-
             LocalDate dateOfBirth = userRegistrationRequest.dateOfBirth();
-            if (!isUserAdult(dateOfBirth)) {
-                throw new UserRegistrationException("User must be 18 years or older");
-            }
+            if (!isUserAdult(dateOfBirth)) { throw new UserRegistrationException("User must be 18 years or older"); }
             User user = userMapper.toUserRegistration(userRegistrationRequest);
             String generatedUsername = usernameGenerator.generateUsername(user.getDateOfBirth().getYear());
-
             user.setUsername(generatedUsername);
             String encodedPassword = passwordEncoder.encode(user.getPassword());
-
             user.setPassword(encodedPassword);
             User savedUser = userRepository.save(user);
 
@@ -101,7 +85,6 @@ public class UserService {
     /**
      * Check if the user is 18 years or older.
      * 
-     * @param dateOfBirth
      * @return True if the user is 18 or Older, False otherwise.
      */
     private boolean isUserAdult(LocalDate dateOfBirth) {
