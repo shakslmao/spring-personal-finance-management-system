@@ -17,6 +17,7 @@ public class SecurityConfiguration {
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .authorizeExchange(exchange -> exchange
                         .pathMatchers("(/eureka/**)").permitAll()
+                        .pathMatchers("/api/v1/admins/register").permitAll() //hasAuthority("ROLE_SUPER_ADMIN")
                         .anyExchange()
                         .authenticated())
                 .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()));
