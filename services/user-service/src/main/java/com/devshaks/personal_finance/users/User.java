@@ -2,6 +2,7 @@ package com.devshaks.personal_finance.users;
 
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -13,11 +14,11 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Getter
 @Setter
-@Builder
+@SuperBuilder
 @Entity
-@Inheritance(strategy = InheritanceType.JOINED)
-@EntityListeners(AuditingEntityListener.class)
 @Table(name = "users")
+@EntityListeners(AuditingEntityListener.class)
+@Inheritance(strategy = InheritanceType.JOINED)
 public class User {
 
     @Id
@@ -26,7 +27,7 @@ public class User {
 
     private String firstname;
 
-    @Column(nullable = false, unique = true, length = 6) // Pin Format Username
+    @Column(nullable = false, unique = true) // Pin Format Username
     private String username;
 
     @Column(nullable = false, unique = true, length = 100)
