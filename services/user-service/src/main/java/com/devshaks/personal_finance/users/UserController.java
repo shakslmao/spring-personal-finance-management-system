@@ -1,5 +1,6 @@
 package com.devshaks.personal_finance.users;
 
+import com.devshaks.personal_finance.admins.AdminRegistrationRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -31,6 +32,5 @@ public class UserController {
                 .toUri();
         return ResponseEntity.created(location).body(user);
     }
-
 }
 

@@ -1,16 +1,13 @@
 package com.devshaks.personal_finance.users;
 
+import com.devshaks.personal_finance.admins.AdminRegistrationRequest;
 import org.springframework.stereotype.Service;
 
 @Service
 public class UserMapper {
     public User toUserRegistration(UserRegistrationRequest userRegistrationRequest) {
-        if (userRegistrationRequest == null) {
-            throw new IllegalArgumentException("User Registration Request is Required");
-        }
-        if (userRegistrationRequest.dateOfBirth() == null) {
-            throw new IllegalArgumentException("Date of Birth is Required");
-        }
+        if (userRegistrationRequest == null) { throw new IllegalArgumentException("User Registration Request is Required"); }
+        if (userRegistrationRequest.dateOfBirth() == null) { throw new IllegalArgumentException("Date of Birth is Required"); }
         return User.builder()
                 .firstname(userRegistrationRequest.firstname())
                 .email(userRegistrationRequest.email())
@@ -33,4 +30,5 @@ public class UserMapper {
                 user.getRoles()
         );
     }
+
 }
