@@ -5,8 +5,8 @@ import java.util.Set;
 public record AdminDTO(
         Long id,
         String firstname,
+        String username,
         String email,
-        String adminCode,
         Set<AdminPermissions> permissions,
         AdminStatus status
 ) {
