@@ -13,6 +13,7 @@ public class UserServiceApplication {
         Dotenv dotenv = Dotenv.load();
         System.setProperty("POSTGRES_USER", dotenv.get("POSTGRES_USER"));
         System.setProperty("POSTGRES_PASSWORD", dotenv.get("POSTGRES_PASSWORD"));
+        System.setProperty("SUPER_ADMIN_CODE", dotenv.get("SUPER_ADMIN_CODE"));
         SpringApplication.run(UserServiceApplication.class, args);
     }
 }
