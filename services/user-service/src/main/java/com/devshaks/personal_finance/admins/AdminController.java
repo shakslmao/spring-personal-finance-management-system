@@ -22,8 +22,9 @@ import java.net.URI;
 public class AdminController {
     private final AdminService adminService;
 
-    @Operation(summary = "Register a new Admin")
     @PostMapping("/register")
+    //@PreAuthorize("hasRole('SUPER_ADMIN')")
+    @Operation(summary = "Register a new Admin")
     public ResponseEntity<AdminDTO> registerAdmin(@RequestBody @Valid AdminRegistrationRequest adminRegistrationRequest) {
         AdminDTO admin = adminService.registerAdmin(adminRegistrationRequest);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
