@@ -21,6 +21,9 @@ public record AdminRegistrationRequest(
 
         @NotNull(message = "Date of Birth is Required")
         @Past(message = "Date of Birth must be in the past")
-        LocalDate dateOfBirth
+        LocalDate dateOfBirth,
+
+        @NotNull(message = "Super Admin Code is Required")
+        String adminCode
 ) {
 }
