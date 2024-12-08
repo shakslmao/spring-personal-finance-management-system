@@ -15,6 +15,7 @@ import java.time.LocalDateTime;
 @Setter
 @Builder
 @Entity
+@Inheritance(strategy = InheritanceType.JOINED)
 @EntityListeners(AuditingEntityListener.class)
 @Table(name = "users")
 public class User {
@@ -59,5 +60,5 @@ public class User {
     protected void onUpdate() {
         this.updatedAt = LocalDateTime.now();
     }
-
 }
+
