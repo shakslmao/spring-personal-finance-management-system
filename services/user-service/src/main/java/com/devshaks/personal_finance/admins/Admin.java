@@ -2,6 +2,7 @@ package com.devshaks.personal_finance.admins;
 
 import com.devshaks.personal_finance.users.User;
 import jakarta.persistence.*;
+import lombok.*;
 import org.springframework.data.annotation.LastModifiedDate;
 
 import java.time.LocalDateTime;
@@ -9,7 +10,11 @@ import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Set;
 
+@Getter
+@Setter
 @Entity
+@AllArgsConstructor
+@NoArgsConstructor
 public class Admin extends User {
     @Column(nullable = false, unique = true)
     private String adminCode;

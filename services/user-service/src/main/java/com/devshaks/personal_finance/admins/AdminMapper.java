@@ -17,4 +17,15 @@ public class AdminMapper {
                 .roles(UserRoles.ADMIN)
                 .build();
     }
+
+    public AdminDTO toAdminDTO(Admin admin) {
+        return new AdminDTO(
+                admin.getId(),
+                admin.getFirstname(),
+                admin.getEmail(),
+                admin.getAdminCode(),
+                admin.getPermissions(),
+                admin.getStatus()
+        );
+    }
 }
