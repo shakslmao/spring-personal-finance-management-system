@@ -1,5 +1,6 @@
 package com.devshaks.personal_finance.users;
 
+import com.devshaks.personal_finance.exceptions.UserNotFoundException;
 import com.devshaks.personal_finance.exceptions.UserRegistrationException;
 import com.devshaks.personal_finance.handlers.UnauthorizedException;
 import com.devshaks.personal_finance.kafka.AuditEvents;
@@ -83,8 +84,22 @@ public class UserService {
     }
 
     /**
+     *
+     * @param userId
+     * @return
+     */
+    public UserResponse getUserProfileDetails(Long userId) {
+        return userRepository.findById(userId)
+                .map(userMapper::mapUserToResponse)
+                .orElseThrow(() -> new UserNotFoundException("Cannot Find User"));
+    }
+
+
+    // Users can Deactivate Account if they have No Funds/Transactions/Etc.
+
+    /**
      * Check if the user is 18 years or older.
-     * 
+     *
      * @return True if the user is 18 or Older, False otherwise.
      */
     private boolean isUserAdult(LocalDate dateOfBirth) {
@@ -92,5 +107,6 @@ public class UserService {
         Period age = Period.between(dateOfBirth, today);
         return age.getYears() >= 18;
     }
+
 
 }
