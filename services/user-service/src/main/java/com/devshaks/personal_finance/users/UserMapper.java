@@ -1,6 +1,5 @@
 package com.devshaks.personal_finance.users;
 
-import com.devshaks.personal_finance.admins.AdminRegistrationRequest;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -31,9 +30,9 @@ public class UserMapper {
         );
     }
 
-    public UserResponse mapUserToResponse(User user) {
+    public UserDetailsResponse mapUserToResponse(User user) {
         if (user == null) { throw new IllegalArgumentException("User is Required"); }
-        return new UserResponse(
+        return new UserDetailsResponse(
                 user.getId(),
                 user.getFirstname(),
                 user.getUsername(),
