@@ -31,4 +31,14 @@ public class UserMapper {
         );
     }
 
+    public UserResponse mapUserToResponse(User user) {
+        if (user == null) { throw new IllegalArgumentException("User is Required"); }
+        return new UserResponse(
+                user.getId(),
+                user.getFirstname(),
+                user.getUsername(),
+                user.getEmail(),
+                user.getRoles()
+        );
+    }
 }
