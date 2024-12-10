@@ -10,7 +10,6 @@ import com.devshaks.personal_finance.utility.UsernameGenerator;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.apache.kafka.common.KafkaException;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -41,7 +40,7 @@ public class AdminService {
     public AdminDTO registerAdmin(@Valid AdminRegistrationRequest adminRegistrationRequest) {
         try {
             validateAdminRegistrationRequest(adminRegistrationRequest, predefinedSuperAdminCode);
-            //adminRepository.findByEmail(adminRegistrationRequest.email()).orElseThrow(() -> new AdminRegistrationException("Email Already Exists"));
+            adminRepository.findByEmail(adminRegistrationRequest.email()).orElseThrow(() -> new AdminRegistrationException("Email Already Exists"));
             LocalDate dateOfBirth = adminRegistrationRequest.dateOfBirth();
             if (!isUserAdult(dateOfBirth)) { throw new AdminRegistrationException("Admin Must be Over 18"); }
             Admin admin = adminMapper.toAdminRegistration(adminRegistrationRequest);
