@@ -6,10 +6,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.net.URI;
 
@@ -21,8 +19,8 @@ import java.net.URI;
 public class UserController {
     private final UserService userService;
 
-    @Operation(summary = "Register a new User")
     @PostMapping("/register")
+    @Operation(summary = "Register a new User")
     public ResponseEntity<UserDTO> registerUser(@RequestBody @Valid UserRegistrationRequest userRegistrationRequest) {
         UserDTO user = userService.registerUser(userRegistrationRequest);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
@@ -31,5 +29,28 @@ public class UserController {
                 .toUri();
         return ResponseEntity.created(location).body(user);
     }
+
+    @GetMapping("/{userId}")
+    @Operation(summary = "Response with User Profile Details")
+    public ResponseEntity<UserResponse> getUserProfileDetails(@PathVariable("userId") Long userId) {
+        UserResponse response = userService.getUserProfileDetails(userId);
+        return ResponseEntity.ok(response);
+    }
+
+    // [PUT] Update User Profile
+
+    // [PUT] Change Password
+
+    // [GET] View Activity Logs
+
+    // [GET] Get Notifications Preferences
+
+    // [PUT] Update Notification Preferences
+
+    // [POST] Add Favourite/Most Used Service
+
+    // [GET] Get Favourites
+
+    // [GET] Get Audit Records
 }
 
