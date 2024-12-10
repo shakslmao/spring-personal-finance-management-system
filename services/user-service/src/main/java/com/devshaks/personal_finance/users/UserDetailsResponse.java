@@ -1,6 +1,6 @@
 package com.devshaks.personal_finance.users;
 
-public record UserResponse(
+public record UserDetailsResponse(
         Long userId,
         String firstname,
         String username,
