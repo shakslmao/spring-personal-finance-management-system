@@ -6,7 +6,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.net.URI;
@@ -32,14 +31,19 @@ public class UserController {
 
     @GetMapping("/{userId}")
     @Operation(summary = "Response with User Profile Details")
-    public ResponseEntity<UserResponse> getUserProfileDetails(@PathVariable("userId") Long userId) {
-        UserResponse response = userService.getUserProfileDetails(userId);
+    public ResponseEntity<UserDetailsResponse> getUserProfileDetails(@PathVariable("userId") Long userId) {
+        UserDetailsResponse response = userService.getUserProfileDetails(userId);
         return ResponseEntity.ok(response);
     }
 
-    // [PUT] Update User Profile
+    @PutMapping("/{userId}/change-password")
+    @Operation(summary = "Update a users Password")
+    public ResponseEntity<Void> changeUserPassword(@PathVariable("userId") Long userId, @RequestBody @Valid ChangePasswordRequest passwordRequest) {
+        userService.changeUserPassword(userId, passwordRequest);
+        return ResponseEntity.noContent().build();
+    }
 
-    // [PUT] Change Password
+
 
     // [GET] View Activity Logs
 

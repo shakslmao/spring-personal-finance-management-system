@@ -3,10 +3,8 @@ package com.devshaks.personal_finance.users;
 import com.devshaks.personal_finance.exceptions.UserNotFoundException;
 import com.devshaks.personal_finance.exceptions.UserRegistrationException;
 import com.devshaks.personal_finance.handlers.UnauthorizedException;
-import com.devshaks.personal_finance.kafka.AuditEvents;
-import com.devshaks.personal_finance.kafka.AuditEventProducer;
-import com.devshaks.personal_finance.kafka.EventType;
-import com.devshaks.personal_finance.kafka.ServiceNames;
+import com.devshaks.personal_finance.kafka.*;
+import com.devshaks.personal_finance.utility.AgeVerification;
 import com.devshaks.personal_finance.utility.UsernameGenerator;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -17,10 +15,14 @@ import java.time.LocalDateTime;
 import java.time.Period;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.HttpClientErrorException;
+
+import static com.devshaks.personal_finance.kafka.EventType.USER_PASSWORD_RESET_SUCCESS;
+import static com.devshaks.personal_finance.kafka.EventType.USER_REGISTERED;
 
 @Slf4j
 @Service
@@ -30,7 +32,8 @@ public class UserService {
     private final UserMapper userMapper;
     private final UsernameGenerator usernameGenerator;
     private final PasswordEncoder passwordEncoder;
-    private final AuditEventProducer auditEventProducer;
+    private final AgeVerification ageVerification;
+    private final CreateAuditEvent createAuditEvent;
 
     private void validateUserRegistrationRequest(@Valid UserRegistrationRequest registrationRequest) {
         if (registrationRequest == null) { throw new UserRegistrationException("User registration request cannot be null"); }
@@ -38,40 +41,19 @@ public class UserService {
         if (registrationRequest.dateOfBirth() == null) { throw new UserRegistrationException("Date of Birth is required"); }
     }
 
-    /**
-     * Register a new User with provided details.
-     * 
-     * @param userRegistrationRequest The details for the new user registration.
-     * @return The registered user details.
-     * @throws UnauthorizedException If the request is unauthorized.
-     * @throws RuntimeException      If an error occurs while registering the user.
-     */
     @Transactional
     public UserDTO registerUser(@Valid UserRegistrationRequest userRegistrationRequest) {
         try {
             validateUserRegistrationRequest(userRegistrationRequest);
             LocalDate dateOfBirth = userRegistrationRequest.dateOfBirth();
-            if (!isUserAdult(dateOfBirth)) { throw new UserRegistrationException("User must be 18 years or older"); }
+            if (!ageVerification.isUserAdult(dateOfBirth)) { throw new UserRegistrationException("User must be 18 years or older"); }
             User user = userMapper.toUserRegistration(userRegistrationRequest);
             String generatedUsername = usernameGenerator.generateUsername(user.getDateOfBirth().getYear());
             user.setUsername(generatedUsername);
             String encodedPassword = passwordEncoder.encode(user.getPassword());
             user.setPassword(encodedPassword);
             User savedUser = userRepository.save(user);
-
-            try {
-                auditEventProducer.sendAuditEvent(new AuditEvents(
-                        EventType.USER_REGISTERED,
-                        ServiceNames.USER_SERVICE,
-                        savedUser.getId(),
-                        "User Registered Successfully",
-                        LocalDateTime.now().toString()
-                ));
-
-            } catch (Exception kafkaError) {
-                log.error("Error Sending Event to Audit.", kafkaError);
-                throw new UserRegistrationException("Error Sending Event to Audit Service");
-            }
+            createAuditEvent.sendAuditEvent(USER_REGISTERED, user.getId(), "User Registered Successfully");
             return userMapper.toUserDTO(savedUser);
         } catch (HttpClientErrorException exception) {
             if (exception.getStatusCode() == HttpStatus.UNAUTHORIZED) {
@@ -83,30 +65,26 @@ public class UserService {
         }
     }
 
-    /**
-     *
-     * @param userId
-     * @return
-     */
-    public UserResponse getUserProfileDetails(Long userId) {
+    public UserDetailsResponse getUserProfileDetails(Long userId) {
         return userRepository.findById(userId)
                 .map(userMapper::mapUserToResponse)
                 .orElseThrow(() -> new UserNotFoundException("Cannot Find User"));
     }
 
-
-    // Users can Deactivate Account if they have No Funds/Transactions/Etc.
-
-    /**
-     * Check if the user is 18 years or older.
-     *
-     * @return True if the user is 18 or Older, False otherwise.
-     */
-    private boolean isUserAdult(LocalDate dateOfBirth) {
-        LocalDate today = LocalDate.now();
-        Period age = Period.between(dateOfBirth, today);
-        return age.getYears() >= 18;
+    @Transactional
+    public void changeUserPassword(Long userId, @Valid ChangePasswordRequest passwordRequest) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new UsernameNotFoundException("Cannot find user with ID: " + userId));
+        if (!passwordEncoder.matches(passwordRequest.currentPassword(), user.getPassword())) {
+            createAuditEvent.sendAuditEvent(EventType.USER_PASSWORD_RESET_FAILED, user.getId(), "User Password Reset Failed");
+            throw new IllegalArgumentException("Current password does not match");
+        }
+        user.setPassword(passwordEncoder.encode(passwordRequest.newPassword()));
+        userRepository.save(user);
+        createAuditEvent.sendAuditEvent(USER_PASSWORD_RESET_SUCCESS, user.getId(), "User Password Changed Successfully");
     }
 
+
+
+    // Users can Deactivate Account if they have No Funds/Transactions/Etc.
 
 }
