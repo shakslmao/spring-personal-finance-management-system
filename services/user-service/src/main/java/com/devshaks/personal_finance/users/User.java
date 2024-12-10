@@ -40,6 +40,10 @@ public class User {
     @Enumerated(EnumType.STRING)
     private UserRoles roles;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private AccountStatus status = AccountStatus.ACTIVE;
+
     @Column(name = "date_of_birth", nullable = false)
     private LocalDate dateOfBirth;
 
@@ -50,6 +54,7 @@ public class User {
     @Column(nullable = false)
     @LastModifiedDate
     private LocalDateTime updatedAt;
+
 
     @PrePersist
     protected void onCreate() {

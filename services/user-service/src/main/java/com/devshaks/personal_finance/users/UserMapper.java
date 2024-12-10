@@ -13,6 +13,7 @@ public class UserMapper {
                 .password(userRegistrationRequest.password())
                 .dateOfBirth(userRegistrationRequest.dateOfBirth())
                 .roles(UserRoles.USER)
+                .status(AccountStatus.ACTIVE)
                 .build();
         }
 
@@ -26,7 +27,8 @@ public class UserMapper {
                 user.getUsername(),
                 user.getEmail(),
                 user.getDateOfBirth(),
-                user.getRoles()
+                user.getRoles(),
+                user.getStatus()
         );
     }
 

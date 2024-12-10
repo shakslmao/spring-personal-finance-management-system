@@ -1,5 +1,6 @@
 package com.devshaks.personal_finance.admins;
 
+import com.devshaks.personal_finance.users.AccountStatus;
 import com.devshaks.personal_finance.users.UserRoles;
 import org.springframework.stereotype.Service;
 
@@ -16,7 +17,7 @@ public class AdminMapper {
                 .password(adminRegistrationRequest.password())
                 .adminCode(adminRegistrationRequest.adminCode())
                 .dateOfBirth(adminRegistrationRequest.dateOfBirth())
-                .status(AdminStatus.ACTIVE)
+                .status(AccountStatus.ACTIVE)
                 .roles(UserRoles.ADMIN)
                 .build();
     }
