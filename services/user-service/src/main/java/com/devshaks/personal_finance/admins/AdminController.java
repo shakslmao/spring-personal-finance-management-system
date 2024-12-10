@@ -1,18 +1,18 @@
 package com.devshaks.personal_finance.admins;
 
+import com.devshaks.personal_finance.users.UserDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -23,7 +23,7 @@ public class AdminController {
     private final AdminService adminService;
 
     @PostMapping("/register")
-    //@PreAuthorize("hasRole('SUPER_ADMIN')") or 'USER'
+    //@PreAuthorize("hasRole('')")
     @Operation(summary = "Register a new Admin")
     public ResponseEntity<AdminDTO> registerAdmin(@RequestBody @Valid AdminRegistrationRequest adminRegistrationRequest) {
         AdminDTO admin = adminService.registerAdmin(adminRegistrationRequest);
@@ -34,9 +34,21 @@ public class AdminController {
         return ResponseEntity.created(location).body(admin);
     }
 
-    // [GET] Get All Users
+    @GetMapping("/users")
+    //@PreAuthorize("hasRole('')")
+    @Operation(summary = "Get a List of All Users")
+    public ResponseEntity<List<UserDTO>> getAllUsers() {
+        return ResponseEntity.ok(adminService.getAllUsers());
+    }
 
-    // [GET] Retrieve Details For a Specific User
+    @GetMapping("/users/{userId}")
+    //@PreAuthorize("hasRole('')")
+    @Operation(summary = "Get Details of One Specific User")
+    public ResponseEntity<UserDTO> getUserDetails(@PathVariable("userId") Long userId) {
+        UserDTO response = adminService.getUserDetails(userId);
+        return ResponseEntity.ok(response);
+    }
+
 
     // [PATCH] Deactivate a User
 
