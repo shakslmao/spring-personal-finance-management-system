@@ -8,6 +8,7 @@ public record UserDTO(
         String username,
         String email,
         LocalDate dateOfBirth,
-        UserRoles roles
+        UserRoles roles,
+        AccountStatus status
 ) {
 }

@@ -1,5 +1,7 @@
 package com.devshaks.personal_finance.admins;
 
+import com.devshaks.personal_finance.users.AccountStatus;
+
 import java.util.Set;
 
 public record AdminDTO(
@@ -8,6 +10,6 @@ public record AdminDTO(
         String username,
         String email,
         Set<AdminPermissions> permissions,
-        AdminStatus status
+        AccountStatus status
 ) {
 }
