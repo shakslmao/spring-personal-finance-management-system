@@ -11,6 +11,7 @@
         <option value="$PROJECT_DIR$/services/apigateway-service/pom.xml" />
         <option value="$PROJECT_DIR$/services/user-service/pom.xml" />
         <option value="$PROJECT_DIR$/services/audit-service/pom.xml" />
+        <option value="$PROJECT_DIR$/services/transaction-service/pom.xml" />
       </list>
     </option>
   </component>

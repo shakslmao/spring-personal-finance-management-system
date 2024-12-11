@@ -13,6 +13,15 @@
         <module name="audit-service" />
         <module name="discovery-service" />
       </profile>
+      <profile name="Annotation profile for transaction-service" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="false">
+          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/unknown/lombok-unknown.jar" />
+        </processorPath>
+        <module name="transaction-service" />
+      </profile>
     </annotationProcessing>
   </component>
   <component name="JavacSettings">
@@ -21,6 +30,7 @@
       <module name="audit-service" options="-parameters" />
       <module name="configuration-service" options="-parameters" />
       <module name="discovery-service" options="-parameters" />
+      <module name="transaction-service" options="-parameters" />
       <module name="user-service" options="-parameters" />
     </option>
   </component>
