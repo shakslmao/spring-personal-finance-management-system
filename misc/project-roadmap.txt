@@ -42,6 +42,16 @@ Phase 3: Transaction Service
        - Concurrent Collections
        - Parallel Processing Strategies
        - Thread Safety Implementations
+    5. Predictive analytics using AI/ML to forecast spending patterns.
+        - Time-based: Day of the week, month, seasonality.
+        - Behavioral: Spending frequency, average spending per category.
+        - Extract transaction data, transform it for ML, and load it into the ML pipeline.
+        - Use tools like Apache Kafka or RabbitMQ for streaming new transaction data to the pipeline.
+        - Implement a feature store (e.g., Feast) to manage reusable features for ML models
+        - Store historical data in PostgreSQL or TimescaleDB for trend analysis.
+        - Archive data in a data lake (e.g., S3, HDFS) for large-scale processing.
+
+
 
 Phase 4: Budget & Savings Services
     1. Budget Service

@@ -27,7 +27,7 @@ Service Coordination:
 
 Asynchronous Communication:
     - RabbitMQ: Message Broker
-    - Kafka: Distributed Streaming Platform
+    - Kafka: Message Broker
 
 OpenAPI Specification:
     - Swagger: For API Documentation and Testing
