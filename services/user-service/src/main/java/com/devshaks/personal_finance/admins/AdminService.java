@@ -45,7 +45,6 @@ public class AdminService {
     public AdminDTO registerAdmin(@Valid AdminRegistrationRequest adminRegistrationRequest) {
         try {
             validateAdminRegistrationRequest(adminRegistrationRequest, predefinedSuperAdminCode);
-            adminRepository.findByEmail(adminRegistrationRequest.email()).orElseThrow(() -> new AdminRegistrationException("Email Already Exists"));
             LocalDate dateOfBirth = adminRegistrationRequest.dateOfBirth();
             if (!ageVerification.isUserAdult(dateOfBirth)) { throw new AdminRegistrationException("Admin Must be Over 18"); }
             Admin admin = adminMapper.toAdminRegistration(adminRegistrationRequest);
