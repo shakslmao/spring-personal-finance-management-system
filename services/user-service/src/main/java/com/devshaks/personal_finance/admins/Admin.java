@@ -25,9 +25,6 @@ public class Admin extends User {
     @ElementCollection(fetch = FetchType.EAGER)
     private Set<AdminPermissions> permissions = EnumSet.noneOf(AdminPermissions.class);
 
-    @CreationTimestamp
-    private LocalDateTime createdAt;
-
     @LastModifiedDate
     private LocalDateTime lastAccessedAt;
 
