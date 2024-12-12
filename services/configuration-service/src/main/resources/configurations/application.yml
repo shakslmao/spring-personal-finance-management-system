@@ -9,3 +9,13 @@ spring:
     cloud:
         config:
             override-system-properties: false
+
+management:
+    endpoints:
+        web:
+            exposure:
+                include: health, prometheus, info
+    metrics:
+        export:
+            prometheus:
+                enabled: true
