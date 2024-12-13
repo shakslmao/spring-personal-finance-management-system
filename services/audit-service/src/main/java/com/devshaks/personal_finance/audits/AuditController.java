@@ -12,7 +12,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/audit")
+@RequestMapping("/api/v1/audits")
 @Tag(name = "Audit Controller", description = "")
 public class AuditController {
     private final AuditService auditService;
