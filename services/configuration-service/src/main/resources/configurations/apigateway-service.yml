@@ -11,10 +11,32 @@ spring:
                     enabled: true
             routes:
                 - id: user-service
-                  uri: lb:http://USER-SERVICE
+                  uri: lb://USER-SERVICE
                   predicates:
                       - Path=/api/v1/users/**
+                  filters:
+                      - RemoveRequestHeader=Cookie
+                      - AddRequestHeader=Authorization, "${request.headers['Authorization']:default-token}"
 
+                - id: transaction-service
+                  uri: lb://TRANSACTION-SERVICE
+                  predicates:
+                      - Path=/api/v1/transactions/**
+                  filters:
+                      - RemoveRequestHeader=Cookie
+                      - AddRequestHeader=Authorization, "${request.headers['Authorization']:default-token}"
+
+                - id: audit-service
+                  uri: lb://AUDIT-SERVICE
+                  predicates:
+                      - Path=/api/v1/audits/**
+                  filters:
+                      - RemoveRequestHeader=Cookie
+                      - AddRequestHeader=Authorization, "${request.headers['Authorization']:default-token}"
+
+logging:
+    level:
+        org.springframework.security.oauth2.server.resource: DEBUG
 
 #eureka:
 #   client:
