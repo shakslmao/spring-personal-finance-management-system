@@ -42,6 +42,7 @@ public class User {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
+    @Builder.Default
     private AccountStatus status = AccountStatus.ACTIVE;
 
     @Column(name = "date_of_birth", nullable = false)
@@ -55,7 +56,6 @@ public class User {
     @LastModifiedDate
     private LocalDateTime updatedAt;
 
-
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
@@ -67,4 +67,3 @@ public class User {
         this.updatedAt = LocalDateTime.now();
     }
 }
-
