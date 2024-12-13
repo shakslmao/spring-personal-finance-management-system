@@ -9,7 +9,6 @@ public class TransactionsMapper {
     public Transactions toNewTransaction(TransactionsRequest transactionRequest) {
 
         return Transactions.builder()
-                .userId(transactionRequest.userId())
                 .category(transactionRequest.category())
                 .amount(transactionRequest.amount())
                 .description(transactionRequest.description())
