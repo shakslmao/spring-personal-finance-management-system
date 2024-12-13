@@ -22,6 +22,7 @@ public class Admin extends User {
 
     @Enumerated(EnumType.STRING)
     @ElementCollection(fetch = FetchType.EAGER)
+    @Builder.Default
     private Set<AdminPermissions> permissions = EnumSet.noneOf(AdminPermissions.class);
 
     @LastModifiedDate
