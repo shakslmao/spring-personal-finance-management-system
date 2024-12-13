@@ -35,24 +35,35 @@ public class AdminService {
     private final UserMapper userMapper;
     private final AgeVerification ageVerification;
 
-
-    private void validateAdminRegistrationRequest(@Valid AdminRegistrationRequest registrationRequest, String adminCode) {
-        if (registrationRequest == null) { throw new AdminRegistrationException("Admin Registration Cannot be Null"); }
-        if (registrationRequest.dateOfBirth() == null) { throw new AdminRegistrationException("Date of Birth is required"); }
-        if (!predefinedSuperAdminCode.equals(adminCode)) { throw new AdminRegistrationException("Super Admin Code Not Matched"); }
+    private void validateAdminRegistrationRequest(@Valid AdminRegistrationRequest registrationRequest,
+            String adminCode) {
+        if (registrationRequest == null) {
+            throw new AdminRegistrationException("Admin Registration Cannot be Null");
+        }
+        if (registrationRequest.dateOfBirth() == null) {
+            throw new AdminRegistrationException("Date of Birth is required");
+        }
+        if (!predefinedSuperAdminCode.equals(adminCode)) {
+            throw new AdminRegistrationException("Super Admin Code Not Matched");
+        }
     }
 
     public AdminDTO registerAdmin(@Valid AdminRegistrationRequest adminRegistrationRequest) {
         try {
             validateAdminRegistrationRequest(adminRegistrationRequest, predefinedSuperAdminCode);
             LocalDate dateOfBirth = adminRegistrationRequest.dateOfBirth();
-            if (!ageVerification.isUserAdult(dateOfBirth)) { throw new AdminRegistrationException("Admin Must be Over 18"); }
+            if (!ageVerification.isUserAdult(dateOfBirth)) {
+                throw new AdminRegistrationException("Admin Must be Over 18");
+            }
             Admin admin = adminMapper.toAdminRegistration(adminRegistrationRequest);
             String generatedUsername = usernameGenerator.generateAdminUsername(admin.getDateOfBirth().getYear());
             admin.setUsername(generatedUsername);
             String encodedPassword = passwordEncoder.encode(admin.getPassword());
             admin.setPassword(encodedPassword);
-            if (admin.getPermissions() == null) { admin.setPermissions(EnumSet.noneOf(AdminPermissions.class)); }
+
+            if (admin.getPermissions() == null) {
+                admin.setPermissions(EnumSet.noneOf(AdminPermissions.class));
+            }
             Admin savedAdmin = adminRepository.save(admin);
             createKafkaAuditEvent.sendAuditEvent(ADMIN_REGISTERED, admin.getId(), "Admin Registered Successfully");
             return adminMapper.toAdminDTO(savedAdmin);

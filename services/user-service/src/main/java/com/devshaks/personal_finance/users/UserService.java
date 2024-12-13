@@ -34,9 +34,15 @@ public class UserService {
     private final CreateAuditEvent createKafkaAuditEvent;
 
     private void validateUserRegistrationRequest(@Valid UserRegistrationRequest registrationRequest) {
-        if (registrationRequest == null) { throw new UserRegistrationException("User registration request cannot be null"); }
-        if (userRepository.existsByEmail(registrationRequest.email())) { throw new UserRegistrationException("Email already exists"); }
-        if (registrationRequest.dateOfBirth() == null) { throw new UserRegistrationException("Date of Birth is required"); }
+        if (registrationRequest == null) {
+            throw new UserRegistrationException("User registration request cannot be null");
+        }
+        if (userRepository.existsByEmail(registrationRequest.email())) {
+            throw new UserRegistrationException("Email already exists");
+        }
+        if (registrationRequest.dateOfBirth() == null) {
+            throw new UserRegistrationException("Date of Birth is required");
+        }
     }
 
     @Transactional
@@ -44,7 +50,9 @@ public class UserService {
         try {
             validateUserRegistrationRequest(userRegistrationRequest);
             LocalDate dateOfBirth = userRegistrationRequest.dateOfBirth();
-            if (!ageVerification.isUserAdult(dateOfBirth)) { throw new UserRegistrationException("User must be 18 years or older"); }
+            if (!ageVerification.isUserAdult(dateOfBirth)) {
+                throw new UserRegistrationException("User must be 18 years or older");
+            }
             User user = userMapper.toUserRegistration(userRegistrationRequest);
             String generatedUsername = usernameGenerator.generateUsername(user.getDateOfBirth().getYear());
             user.setUsername(generatedUsername);
@@ -71,17 +79,18 @@ public class UserService {
 
     @Transactional
     public void changeUserPassword(Long userId, @Valid ChangePasswordRequest passwordRequest) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new UsernameNotFoundException("Cannot find user with ID: " + userId));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UsernameNotFoundException("Cannot find user with ID: " + userId));
         if (!passwordEncoder.matches(passwordRequest.currentPassword(), user.getPassword())) {
-            createKafkaAuditEvent.sendAuditEvent(EventType.USER_PASSWORD_RESET_FAILED, user.getId(), "User Password Reset Failed");
+            createKafkaAuditEvent.sendAuditEvent(EventType.USER_PASSWORD_RESET_FAILED, user.getId(),
+                    "User Password Reset Failed");
             throw new IllegalArgumentException("Current password does not match");
         }
         user.setPassword(passwordEncoder.encode(passwordRequest.newPassword()));
         userRepository.save(user);
-        createKafkaAuditEvent.sendAuditEvent(USER_PASSWORD_RESET_SUCCESS, user.getId(), "User Password Changed Successfully");
+        createKafkaAuditEvent.sendAuditEvent(USER_PASSWORD_RESET_SUCCESS, user.getId(),
+                "User Password Changed Successfully");
     }
-
-
 
     // Users can Deactivate Account if they have No Funds/Transactions/Etc.
 

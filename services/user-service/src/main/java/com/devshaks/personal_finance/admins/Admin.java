@@ -4,7 +4,6 @@ import com.devshaks.personal_finance.users.User;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
-import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.data.annotation.LastModifiedDate;
 
 import java.time.LocalDateTime;
@@ -36,7 +35,8 @@ public class Admin extends User {
         if (this.permissions == null) {
             this.permissions = EnumSet.noneOf(AdminPermissions.class);
         }
-        this.permissions.add(permissions); }
+        this.permissions.add(permissions);
+    }
 
     public void removePermission(AdminPermissions permissions) {
         if (this.permissions != null) {

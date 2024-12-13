@@ -74,10 +74,10 @@ public class AuditService {
      * @return
      */
     public List<AuditDTO> searchAuditLogs(Long userId, EventType eventType, String serviceName, Pageable pageable) {
-      return auditCustomRepository.findAll(serviceName, userId, eventType, pageable)
-              .getContent()
-              .stream()
-              .map(auditMapper::toAuditDTO)
-              .collect(Collectors.toList());
+        return auditCustomRepository.findAll(serviceName, userId, eventType, pageable)
+                .getContent()
+                .stream()
+                .map(auditMapper::toAuditDTO)
+                .collect(Collectors.toList());
     }
 }
