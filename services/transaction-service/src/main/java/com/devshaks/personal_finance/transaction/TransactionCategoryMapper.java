@@ -1,8 +1,8 @@
-package com.devshaks.personal_finance.transactions;
-
-import java.util.*;
+package com.devshaks.personal_finance.transaction;
 
 import org.springframework.stereotype.Service;
+
+import java.util.*;
 
 @Service
 public class TransactionCategoryMapper {

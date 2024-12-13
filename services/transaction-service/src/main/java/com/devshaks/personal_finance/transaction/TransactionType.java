@@ -1,4 +1,4 @@
-package com.devshaks.personal_finance.transactions;
+package com.devshaks.personal_finance.transaction;
 
 public enum TransactionType {
     INCOME,
