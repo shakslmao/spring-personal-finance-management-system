@@ -1,4 +1,4 @@
-package com.devshaks.personal_finance.transaction;
+package com.devshaks.personal_finance.transactions;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -16,12 +16,13 @@ import java.net.URI;
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/transactions")
 @Tag(name = "Transaction Controller", description = "Handles Transaction Related Operations")
-public class TransactionController {
-    private final TransactionService transactionService;
+public class TransactionsController {
+
+    private final TransactionsService transactionService;
 
     @PostMapping("/new")
-    public ResponseEntity<TransactionDTO> newTransaction(@RequestBody @Valid TransactionRequest transactionRequest) {
-        TransactionDTO transaction = transactionService.newTransaction(transactionRequest);
+    public ResponseEntity<TransactionsDTO> newTransaction(@RequestBody @Valid TransactionsRequest transactionRequest) {
+        TransactionsDTO transaction = transactionService.newTransaction(transactionRequest);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}")
                 .buildAndExpand(transaction.id())

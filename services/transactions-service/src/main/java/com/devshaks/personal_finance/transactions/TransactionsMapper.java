@@ -1,29 +1,31 @@
-package com.devshaks.personal_finance.transaction;
+package com.devshaks.personal_finance.transactions;
 
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 
 @Service
-public class TransactionMapper {
-    public Transaction toNewTransaction(TransactionRequest transactionRequest) {
-        return Transaction.builder()
+public class TransactionsMapper {
+    public Transactions toNewTransaction(TransactionsRequest transactionRequest) {
+
+        return Transactions.builder()
                 .userId(transactionRequest.userId())
                 .category(transactionRequest.category())
                 .amount(transactionRequest.amount())
                 .description(transactionRequest.description())
-                .tags(TransactionCategoryMapper.getTagsForCategory(transactionRequest.category()))
+                .tags(TransactionsCategoryMapper.getTagsForCategory(transactionRequest.category()))
                 .transactionDate(LocalDateTime.now())
-                .transactionType(TransactionType.EXPENSE)
-                .transactionStatus(TransactionStatus.PENDING)
+                .transactionType(TransactionsType.EXPENSE)
+                .transactionStatus(TransactionsStatus.PENDING)
                 .build();
     }
 
-    public TransactionDTO toTransactionDTO(Transaction transaction) {
+
+    public TransactionsDTO toTransactionDTO(Transactions transaction) {
         if (transaction == null) {
             throw new IllegalArgumentException("transaction cannot be null");
         }
-        return new TransactionDTO(
+        return new TransactionsDTO(
                 transaction.getId(),
                 transaction.getUserId(),
                 transaction.getCategory(),
@@ -34,4 +36,5 @@ public class TransactionMapper {
                 transaction.getDescription(),
                 transaction.getTags());
     }
+
 }

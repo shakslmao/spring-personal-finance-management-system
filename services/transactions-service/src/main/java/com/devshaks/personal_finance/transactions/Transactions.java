@@ -1,4 +1,4 @@
-package com.devshaks.personal_finance.transaction;
+package com.devshaks.personal_finance.transactions;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -12,11 +12,11 @@ import java.util.List;
 @Getter
 @Setter
 @Builder
+@Entity
 @AllArgsConstructor
 @NoArgsConstructor
-@Entity
 @EntityListeners(AuditingEntityListener.class)
-public class Transaction {
+public class Transactions {
     @Id
     @GeneratedValue
     private Long id;
@@ -36,11 +36,11 @@ public class Transaction {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private TransactionType transactionType;
+    private TransactionsType transactionType;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private TransactionStatus transactionStatus;
+    private TransactionsStatus transactionStatus;
 
     @Column(nullable = false)
     private String description;
@@ -49,5 +49,4 @@ public class Transaction {
     @CollectionTable(name = "transaction_tags", joinColumns = @JoinColumn(name = "transaction_id"))
     @Column(name = "tag")
     private List<String> tags;
-
 }

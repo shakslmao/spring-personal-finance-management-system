@@ -1,11 +1,8 @@
-package com.devshaks.personal_finance.transaction;
-
-import org.springframework.stereotype.Service;
+package com.devshaks.personal_finance.transactions;
 
 import java.util.*;
 
-@Service
-public class TransactionCategoryMapper {
+public class TransactionsCategoryMapper {
     private static final Map<String, List<String>> CATEGORY_TAGS = new HashMap<>();
 
     static {
