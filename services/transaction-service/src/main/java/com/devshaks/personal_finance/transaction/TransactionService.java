@@ -1,4 +1,4 @@
-package com.devshaks.personal_finance.transactions;
+package com.devshaks.personal_finance.transaction;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

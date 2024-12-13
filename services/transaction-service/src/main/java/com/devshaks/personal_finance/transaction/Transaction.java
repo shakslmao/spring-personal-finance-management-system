@@ -1,4 +1,4 @@
-package com.devshaks.personal_finance.transactions;
+package com.devshaks.personal_finance.transaction;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -12,11 +12,11 @@ import java.util.List;
 @Getter
 @Setter
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 @Entity
 @EntityListeners(AuditingEntityListener.class)
-public class Transactions {
+public class Transaction {
     @Id
     @GeneratedValue
     private Long id;

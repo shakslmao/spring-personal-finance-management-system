@@ -1,4 +1,4 @@
-package com.devshaks.personal_finance.transactions;
+package com.devshaks.personal_finance.transaction;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
