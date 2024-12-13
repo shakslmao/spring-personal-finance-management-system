@@ -8,9 +8,6 @@ import jakarta.validation.constraints.Size;
 import java.math.BigDecimal;
 
 public record TransactionsRequest(
-        @NotNull(message = "User ID is Required")
-        Long userId,
-
         @NotBlank(message = "Category is Required")
         String category,
 
