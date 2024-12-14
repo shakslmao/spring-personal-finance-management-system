@@ -17,7 +17,7 @@ spring:
 
 application:
     config:
-        user-service-url: http://localhost:8090/api/v1/users
+        user-service-url: http://localhost:8222/api/v1/users
 
 resilience4j:
     circuitbreaker:
