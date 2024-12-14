@@ -20,7 +20,7 @@ import java.time.LocalDate;
 import java.util.EnumSet;
 import java.util.List;
 
-import static com.devshaks.personal_finance.kafka.EventType.ADMIN_REGISTERED;
+import static com.devshaks.personal_finance.kafka.UserEvents.ADMIN_REGISTERED;
 
 @Service
 @RequiredArgsConstructor
