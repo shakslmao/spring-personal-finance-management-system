@@ -11,7 +11,7 @@ Microservices to Create
 08. Currency Exchange Service: Fetches and applies real-time currency conversion rates for international transactions.
 09. Loan Service: Provides loan options, EMI calculators, and repayment schedules for users.
 10. Audit Service: Logs and monitors critical actions for compliance and debugging purposes.
-11. hehehehe
+
 Enterprise-Grade Technologies to Implement
 Backend Libraries:
     - Spring Boot: Core Backend Framework
