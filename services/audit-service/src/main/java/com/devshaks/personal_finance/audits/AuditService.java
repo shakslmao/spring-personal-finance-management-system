@@ -1,5 +1,8 @@
 package com.devshaks.personal_finance.audits;
 
+import com.devshaks.personal_finance.events.EventType;
+import com.devshaks.personal_finance.events.UserEvents;
+import com.devshaks.personal_finance.kafka.ServiceNames;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -14,10 +17,6 @@ public class AuditService {
     private final AuditCustomRepository auditCustomRepository;
     private final AuditMapper auditMapper;
 
-    /**
-     *
-     * @return
-     */
     public List<AuditDTO> getAllAuditLogs() {
         return auditRepository.findAll()
                 .stream()
@@ -25,12 +24,6 @@ public class AuditService {
                 .collect(Collectors.toList());
     }
 
-    /**
-     *
-     * @param userId
-     * @param pageable
-     * @return
-     */
     public List<AuditDTO> getUserAuditLogs(Long userId, Pageable pageable) {
         return auditRepository.findByUserId(userId, pageable)
                 .getContent()
@@ -39,13 +32,7 @@ public class AuditService {
                 .collect(Collectors.toList());
     }
 
-    /**
-     *
-     * @param eventType
-     * @param pageable
-     * @return
-     */
-    public List<AuditDTO> getEventAuditLogs(EventType eventType, Pageable pageable) {
+    public List<AuditDTO> getEventAuditLogs(Enum<?> eventType, Pageable pageable) {
         return auditRepository.findByEventType(eventType, pageable)
                 .getContent()
                 .stream()
@@ -53,12 +40,7 @@ public class AuditService {
                 .collect(Collectors.toList());
     }
 
-    /**
-     *
-     * @param serviceName
-     * @return
-     */
-    public List<AuditDTO> getServiceAuditLogs(String serviceName, Pageable pageable) {
+    public List<AuditDTO> getServiceAuditLogs(ServiceNames serviceName, Pageable pageable) {
         return auditRepository.findByServiceName(serviceName, pageable)
                 .getContent()
                 .stream()
@@ -66,14 +48,7 @@ public class AuditService {
                 .collect(Collectors.toList());
     }
 
-    /**
-     *
-     * @param userId
-     * @param eventType
-     * @param serviceName
-     * @return
-     */
-    public List<AuditDTO> searchAuditLogs(Long userId, EventType eventType, String serviceName, Pageable pageable) {
+    public List<AuditDTO> searchAuditLogs(Long userId, Enum<?> eventType, String serviceName, Pageable pageable) {
         return auditCustomRepository.findAll(serviceName, userId, eventType, pageable)
                 .getContent()
                 .stream()
