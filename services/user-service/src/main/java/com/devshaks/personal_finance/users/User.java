@@ -21,6 +21,8 @@ import java.time.LocalDateTime;
 @Inheritance(strategy = InheritanceType.JOINED)
 public class User {
 
+    // add new field for transactions.
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
