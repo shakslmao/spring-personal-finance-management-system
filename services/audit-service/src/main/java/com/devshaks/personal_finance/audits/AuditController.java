@@ -1,5 +1,7 @@
 package com.devshaks.personal_finance.audits;
 
+import com.devshaks.personal_finance.events.EventType;
+import com.devshaks.personal_finance.kafka.ServiceNames;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -25,25 +27,19 @@ public class AuditController {
 
     @GetMapping("/user/{userId}")
     @Operation(summary = "Retrieves All Audit Logs for User")
-    public ResponseEntity<List<AuditDTO>> getUserAuditLogs(
-            @PathVariable("userId") Long userId,
-            @PageableDefault(size = 10) Pageable pageable) {
+    public ResponseEntity<List<AuditDTO>> getUserAuditLogs(@PathVariable("userId") Long userId, @PageableDefault(size = 10) Pageable pageable) {
         return ResponseEntity.ok(auditService.getUserAuditLogs(userId, pageable));
     }
 
     @GetMapping("/event/{eventType}")
     @Operation(summary = "Retrieves All Event Audit Logs")
-    public ResponseEntity<List<AuditDTO>> getEventAuditLogs(
-            @PathVariable("eventType") EventType eventType,
-            @PageableDefault(size = 10) Pageable pageable) {
+    public ResponseEntity<List<AuditDTO>> getEventAuditLogs(@PathVariable("eventType") Enum<?> eventType, @PageableDefault(size = 10) Pageable pageable) {
         return ResponseEntity.ok(auditService.getEventAuditLogs(eventType, pageable));
     }
 
     @GetMapping("/event/{serviceName}")
     @Operation(summary = "Retrieves All Logs for the Service")
-    public ResponseEntity<List<AuditDTO>> getServiceAuditLogs(
-            @PathVariable("serviceName") String serviceName,
-            @PageableDefault(size = 10) Pageable pageable) {
+    public ResponseEntity<List<AuditDTO>> getServiceAuditLogs(@PathVariable("serviceName") ServiceNames serviceName, @PageableDefault(size = 10) Pageable pageable) {
         return ResponseEntity.ok(auditService.getServiceAuditLogs(serviceName, pageable));
     }
 

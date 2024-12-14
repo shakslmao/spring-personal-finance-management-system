@@ -1,5 +1,7 @@
 package com.devshaks.personal_finance.audits;
 
+import com.devshaks.personal_finance.events.EventType;
+import com.devshaks.personal_finance.events.UserEvents;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -16,7 +18,7 @@ import java.util.List;
 public class AuditCustomRepository {
     private final MongoTemplate mongoTemplate;
 
-    public Page<Audit> findAll(String serviceName, Long userId, EventType eventType, Pageable pageable) {
+    public Page<Audit> findAll(String serviceName, Long userId, Enum<?> eventType, Pageable pageable) {
         Criteria criteria = new Criteria();
 
         if (serviceName != null) {
