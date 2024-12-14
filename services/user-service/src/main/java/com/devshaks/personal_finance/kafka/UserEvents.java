@@ -1,6 +1,6 @@
-package com.devshaks.personal_finance.audits;
+package com.devshaks.personal_finance.kafka;
 
-public enum EventType {
+public enum UserEvents {
     ADMIN_REGISTERED,
     ADMIN_DELETED,
     ADMIN_ROLE_CHANGED,
@@ -18,8 +18,4 @@ public enum EventType {
     USER_PASSWORD_RESET_FAILED,
     USER_ACCOUNT_LOCKED,
     USER_ACCOUNT_UNLOCKED,
-
-    // Transaction Events
-
-    // Budget Events
 }
