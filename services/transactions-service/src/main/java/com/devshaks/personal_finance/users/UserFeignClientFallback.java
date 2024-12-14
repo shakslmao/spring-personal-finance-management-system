@@ -6,11 +6,13 @@ import org.springframework.stereotype.Component;
 public class UserFeignClientFallback implements UserFeignClient {
 
     @Override
-    public UserClientDTO getUserById(Long id) {
-        UserClientDTO fallbackResponse = new UserClientDTO();
-        fallbackResponse.setId(id);
-        fallbackResponse.setFirstname("Unknown");
-        fallbackResponse.setEmail("unknown@example.com");
-        return fallbackResponse;
+    public UserDetailsResponse getUserProfileDetails(Long id) {
+        return new UserDetailsResponse(
+                id,
+                "Unknown",
+                "unknown",
+                "unknown@example.com",
+                UserRoles.NOT_ASSIGNED
+        );
     }
 }
