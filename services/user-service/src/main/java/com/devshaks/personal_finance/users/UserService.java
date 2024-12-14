@@ -19,8 +19,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.HttpClientErrorException;
 
-import static com.devshaks.personal_finance.kafka.EventType.USER_PASSWORD_RESET_SUCCESS;
-import static com.devshaks.personal_finance.kafka.EventType.USER_REGISTERED;
+import static com.devshaks.personal_finance.kafka.UserEvents.USER_PASSWORD_RESET_SUCCESS;
+import static com.devshaks.personal_finance.kafka.UserEvents.USER_REGISTERED;
 
 @Slf4j
 @Service
@@ -82,7 +82,7 @@ public class UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UsernameNotFoundException("Cannot find user with ID: " + userId));
         if (!passwordEncoder.matches(passwordRequest.currentPassword(), user.getPassword())) {
-            createKafkaAuditEvent.sendAuditEvent(EventType.USER_PASSWORD_RESET_FAILED, user.getId(),
+            createKafkaAuditEvent.sendAuditEvent(UserEvents.USER_PASSWORD_RESET_FAILED, user.getId(),
                     "User Password Reset Failed");
             throw new IllegalArgumentException("Current password does not match");
         }
