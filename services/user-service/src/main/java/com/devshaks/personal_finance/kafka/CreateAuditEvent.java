@@ -11,10 +11,10 @@ import java.time.LocalDateTime;
 public class CreateAuditEvent {
     private final AuditEventProducer auditEventProducer;
 
-    public void sendAuditEvent(EventType eventType, Long userId, String description) {
+    public void sendAuditEvent(UserEvents userEvent, Long userId, String description) {
         try {
-            auditEventProducer.sendAuditEvent(new AuditEvents(
-                    eventType,
+            auditEventProducer.sendAuditEvent(new UserEventDTO(
+                    userEvent,
                     ServiceNames.USER_SERVICE,
                     userId,
                     description,
