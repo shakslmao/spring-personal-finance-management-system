@@ -1,5 +1,7 @@
 package com.devshaks.personal_finance.audits;
 
+import com.devshaks.personal_finance.events.EventType;
+import com.devshaks.personal_finance.events.UserEvents;
 import com.devshaks.personal_finance.kafka.ServiceNames;
 import lombok.*;
 import org.springframework.data.annotation.Id;
@@ -15,7 +17,7 @@ public class Audit {
 
     @Id
     private String id;
-    private EventType eventType; // The type of Event
+    private Enum<?> eventType; // The type of Event
     private ServiceNames serviceName; // The name of the service that generated the Event
     private Long userId; // Associated User ID.
     private String description; // Details about the Event.
