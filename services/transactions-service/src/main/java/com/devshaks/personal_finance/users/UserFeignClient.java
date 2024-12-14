@@ -11,5 +11,5 @@ import org.springframework.web.bind.annotation.PathVariable;
 @FeignClient(name = "user-service", url = "${application.config.user-service-url}", fallback = UserFeignClientFallback.class, qualifiers = "userFeignClient", configuration = FeignConfig.class)
 public interface UserFeignClient {
     @GetMapping("/{userId}")
-    UserClientDTO getUserById(@PathVariable("userId") Long id);
+    UserDetailsResponse getUserProfileDetails(@PathVariable("userId") Long id);
 }
