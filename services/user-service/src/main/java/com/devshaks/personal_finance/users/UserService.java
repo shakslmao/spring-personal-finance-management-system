@@ -3,7 +3,8 @@ package com.devshaks.personal_finance.users;
 import com.devshaks.personal_finance.exceptions.UserNotFoundException;
 import com.devshaks.personal_finance.exceptions.UserRegistrationException;
 import com.devshaks.personal_finance.handlers.UnauthorizedException;
-import com.devshaks.personal_finance.kafka.*;
+import com.devshaks.personal_finance.kafka.audit.AuditEventSender;
+import com.devshaks.personal_finance.kafka.events.UserEvents;
 import com.devshaks.personal_finance.utility.AgeVerification;
 import com.devshaks.personal_finance.utility.UsernameGenerator;
 import jakarta.validation.Valid;
@@ -19,8 +20,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.HttpClientErrorException;
 
-import static com.devshaks.personal_finance.kafka.UserEvents.USER_PASSWORD_RESET_SUCCESS;
-import static com.devshaks.personal_finance.kafka.UserEvents.USER_REGISTERED;
+import static com.devshaks.personal_finance.kafka.events.UserEvents.USER_PASSWORD_RESET_SUCCESS;
+import static com.devshaks.personal_finance.kafka.events.UserEvents.USER_REGISTERED;
 
 @Slf4j
 @Service
@@ -31,7 +32,7 @@ public class UserService {
     private final UsernameGenerator usernameGenerator;
     private final PasswordEncoder passwordEncoder;
     private final AgeVerification ageVerification;
-    private final CreateAuditEvent createKafkaAuditEvent;
+    private final AuditEventSender createKafkaAuditEvent;
 
     private void validateUserRegistrationRequest(@Valid UserRegistrationRequest registrationRequest) {
         if (registrationRequest == null) {
