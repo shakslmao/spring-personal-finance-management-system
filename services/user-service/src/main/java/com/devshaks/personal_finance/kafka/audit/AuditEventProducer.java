@@ -1,5 +1,6 @@
-package com.devshaks.personal_finance.kafka;
+package com.devshaks.personal_finance.kafka.audit;
 
+import com.devshaks.personal_finance.kafka.data.AuditUserEventDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -12,13 +13,13 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class AuditEventProducer {
-    private final KafkaTemplate<String, UserEventDTO> kafkaTemplate;
-    public void sendAuditEvent(UserEventDTO auditEvents) {
+    private final KafkaTemplate<String, AuditUserEventDTO> kafkaTemplate;
+    public void sendAuditEvent(AuditUserEventDTO auditEvents) {
         log.info("Sending User Event to Audit Service: {}", auditEvents);
-        Message<UserEventDTO> message = MessageBuilder
+        Message<AuditUserEventDTO> message = MessageBuilder
                 .withPayload(auditEvents)
                 .setHeader(KafkaHeaders.TOPIC, "user-topic")
-                .setHeader("__TypeId__", UserEventDTO.class.getName())
+                .setHeader("__TypeId__", AuditUserEventDTO.class.getName())
                 .build();
         kafkaTemplate.send(message);
     }

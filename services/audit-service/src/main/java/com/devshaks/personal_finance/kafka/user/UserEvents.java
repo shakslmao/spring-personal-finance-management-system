@@ -1,4 +1,4 @@
-package com.devshaks.personal_finance.kafka;
+package com.devshaks.personal_finance.kafka.user;
 
 public enum UserEvents {
     ADMIN_REGISTERED,
