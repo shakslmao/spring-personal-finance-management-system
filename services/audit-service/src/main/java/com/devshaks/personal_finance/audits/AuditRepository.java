@@ -1,8 +1,6 @@
 package com.devshaks.personal_finance.audits;
 
-import com.devshaks.personal_finance.events.EventType;
-import com.devshaks.personal_finance.events.UserEvents;
-import com.devshaks.personal_finance.kafka.ServiceNames;
+import com.devshaks.personal_finance.kafka.services.ServiceNames;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;

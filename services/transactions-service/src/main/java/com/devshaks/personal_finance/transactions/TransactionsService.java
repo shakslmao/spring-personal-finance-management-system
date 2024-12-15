@@ -1,6 +1,6 @@
 package com.devshaks.personal_finance.transactions;
 
-import com.devshaks.personal_finance.kafka.AuditEventSender;
+import com.devshaks.personal_finance.kafka.audit.AuditEventSender;
 import com.devshaks.personal_finance.users.UserDetailsResponse;
 import com.devshaks.personal_finance.users.UserFeignClient;
 import jakarta.validation.Valid;
@@ -9,7 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.stereotype.Service;
 
-import static com.devshaks.personal_finance.kafka.TransactionEvents.TRANSACTION_CREATED;
+import static com.devshaks.personal_finance.kafka.events.TransactionEvents.TRANSACTION_CREATED;
 
 @Slf4j
 @Service

@@ -1,7 +1,5 @@
 package com.devshaks.personal_finance.audits;
 
-import com.devshaks.personal_finance.events.EventType;
-import com.devshaks.personal_finance.events.UserEvents;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;

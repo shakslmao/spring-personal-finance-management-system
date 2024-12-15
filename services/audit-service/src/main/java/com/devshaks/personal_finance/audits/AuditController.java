@@ -1,7 +1,7 @@
 package com.devshaks.personal_finance.audits;
 
-import com.devshaks.personal_finance.events.EventType;
-import com.devshaks.personal_finance.kafka.ServiceNames;
+import com.devshaks.personal_finance.kafka.events.EventType;
+import com.devshaks.personal_finance.kafka.services.ServiceNames;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
