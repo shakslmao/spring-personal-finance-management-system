@@ -3,7 +3,7 @@ package com.devshaks.personal_finance.admins;
 import com.devshaks.personal_finance.exceptions.AdminRegistrationException;
 import com.devshaks.personal_finance.exceptions.UserNotFoundException;
 import com.devshaks.personal_finance.handlers.UnauthorizedException;
-import com.devshaks.personal_finance.kafka.*;
+import com.devshaks.personal_finance.kafka.audit.AuditEventSender;
 import com.devshaks.personal_finance.users.UserDTO;
 import com.devshaks.personal_finance.users.UserMapper;
 import com.devshaks.personal_finance.users.UserRepository;
@@ -20,7 +20,7 @@ import java.time.LocalDate;
 import java.util.EnumSet;
 import java.util.List;
 
-import static com.devshaks.personal_finance.kafka.UserEvents.ADMIN_REGISTERED;
+import static com.devshaks.personal_finance.kafka.events.UserEvents.ADMIN_REGISTERED;
 
 @Service
 @RequiredArgsConstructor
@@ -30,7 +30,7 @@ public class AdminService {
     private final AdminMapper adminMapper;
     private final UsernameGenerator usernameGenerator;
     private final PasswordEncoder passwordEncoder;
-    private final CreateAuditEvent createKafkaAuditEvent;
+    private final AuditEventSender createKafkaAuditEvent;
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final AgeVerification ageVerification;

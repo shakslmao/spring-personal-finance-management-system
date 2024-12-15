@@ -1,8 +1,6 @@
 package com.devshaks.personal_finance.audits;
 
-import com.devshaks.personal_finance.events.EventType;
-import com.devshaks.personal_finance.events.UserEvents;
-import com.devshaks.personal_finance.kafka.ServiceNames;
+import com.devshaks.personal_finance.kafka.services.ServiceNames;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
