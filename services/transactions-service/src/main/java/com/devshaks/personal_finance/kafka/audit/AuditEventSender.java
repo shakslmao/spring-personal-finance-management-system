@@ -12,9 +12,9 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class AuditEventSender {
     private final AuditEventProducer auditEventProducer;
-    public void sendAuditEvent(TransactionEvents transactionEvents, Long userId, Long transactionId, String description) {
+    public void sendEventToAudit(TransactionEvents transactionEvents, Long userId, Long transactionId, String description) {
         try {
-            auditEventProducer.sendAuditEventFromTransaction(new AuditTransactionEventDTO(
+            auditEventProducer.sendAuditProducerEventFromTransaction(new AuditTransactionEventDTO(
                     transactionEvents,
                     ServiceNames.TRANSACTION_SERVICE,
                     userId,
