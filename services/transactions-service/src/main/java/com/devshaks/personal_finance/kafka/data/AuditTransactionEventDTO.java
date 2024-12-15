@@ -1,9 +1,10 @@
-package com.devshaks.personal_finance.kafka;
+package com.devshaks.personal_finance.kafka.data;
 
-import com.devshaks.personal_finance.events.TransactionEvents;
+import com.devshaks.personal_finance.kafka.services.ServiceNames;
+import com.devshaks.personal_finance.kafka.events.TransactionEvents;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public record TransactionEventDTO(
+public record AuditTransactionEventDTO(
         @JsonProperty("eventType") TransactionEvents eventType,
         @JsonProperty("serviceName") ServiceNames serviceName,
         @JsonProperty("userId") Long userId,

@@ -1,8 +1,11 @@
-package com.devshaks.personal_finance.kafka;
+package com.devshaks.personal_finance.kafka.consumers;
 
 import com.devshaks.personal_finance.audits.Audit;
 import com.devshaks.personal_finance.audits.AuditRepository;
-import com.devshaks.personal_finance.events.EventMapper;
+import com.devshaks.personal_finance.kafka.data.AuditBudgetEventDTO;
+import com.devshaks.personal_finance.kafka.data.AuditTransactionEventDTO;
+import com.devshaks.personal_finance.kafka.data.AuditUserEventDTO;
+import com.devshaks.personal_finance.kafka.events.EventMapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
@@ -29,6 +32,7 @@ public class KafkaAuditConsumer {
     @KafkaListener(topics = {"user-topic", "transaction-topic", "budget-topic"}, groupId = "auditGroup", containerFactory = "kafkaListenerContainerFactory")
     public void consumeAuditEvent(@Payload String payload, @Header("kafka_receivedTopic") String topic) {
         try {
+            log.info("Receiving Event From : {}, {}", payload, topic);
             // Parse the incoming payload based on the topic to identify its event type.
             Object event = parseEventByTopic(payload, topic);
 
@@ -52,9 +56,9 @@ public class KafkaAuditConsumer {
      */
     private Object parseEventByTopic(String payload, String topic) throws JsonProcessingException {
         return switch (topic) {
-            case "user-topic" -> objectMapper.readValue(payload, UserEventDTO.class);
-            case "transaction-topic" -> objectMapper.readValue(payload, TransactionEventDTO.class);
-            case "budget-topic" -> objectMapper.readValue(payload, BudgetEventDTO.class);
+            case "user-topic" -> objectMapper.readValue(payload, AuditUserEventDTO.class);
+            case "transaction-topic" -> objectMapper.readValue(payload, AuditTransactionEventDTO.class);
+            case "budget-topic" -> objectMapper.readValue(payload, AuditBudgetEventDTO.class);
             default -> throw new IllegalArgumentException("Unsupported Topic: " + topic);
         };
     }
@@ -67,8 +71,8 @@ public class KafkaAuditConsumer {
     public void initMapperRegistry() {
         eventMapperRegistry = Map.of(
                 // Mapping for User events.
-                UserEventDTO.class, event -> {
-                    UserEventDTO userEvent = (UserEventDTO) event;
+                AuditUserEventDTO.class, event -> {
+                    AuditUserEventDTO userEvent = (AuditUserEventDTO) event;
                     return Audit.builder()
                             .eventType(eventMapper.mapEventToSpecificType(userEvent.eventType())) // Map event type to a standardized value.
                             .serviceName(userEvent.serviceName()) // Set the service that generated the event.
@@ -78,8 +82,8 @@ public class KafkaAuditConsumer {
                             .build();
                 },
                 // Mapping for Transaction events.
-                TransactionEventDTO.class, event -> {
-                    TransactionEventDTO transactionEvent = (TransactionEventDTO) event;
+                AuditTransactionEventDTO.class, event -> {
+                    AuditTransactionEventDTO transactionEvent = (AuditTransactionEventDTO) event;
                     return Audit.builder()
                             .eventType(eventMapper.mapEventToSpecificType(transactionEvent.eventType()))
                             .serviceName(transactionEvent.serviceName())
@@ -89,8 +93,8 @@ public class KafkaAuditConsumer {
                             .build();
                 },
                 // Mapping for Budget events.
-                BudgetEventDTO.class, event -> {
-                    BudgetEventDTO budgetEvent = (BudgetEventDTO) event;
+                AuditBudgetEventDTO.class, event -> {
+                    AuditBudgetEventDTO budgetEvent = (AuditBudgetEventDTO) event;
                     return Audit.builder()
                             .eventType(eventMapper.mapEventToSpecificType(budgetEvent.eventType()))
                             .serviceName(budgetEvent.serviceName())
