@@ -25,6 +25,5 @@ public class AuditEventSender {
         } catch (Exception kafkaError) {
             throw new RuntimeException("Error Sending the Event to the Audit Service");
         }
-
     }
 }
