@@ -11,7 +11,8 @@ public class TransactionsMapper {
                 transactions.getCategory(),
                 transactions.getAmount(),
                 transactions.getTransactionDate(),
-                transactions.getDescription()
+                transactions.getTransactionDescription(),
+                transactions.getEventDescription()
         );
     }
 }
