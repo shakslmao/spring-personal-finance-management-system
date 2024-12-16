@@ -10,6 +10,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.exception.ConstraintViolationException;
@@ -19,6 +20,7 @@ import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -40,30 +42,8 @@ public class KafkaUserConsumer {
             log.info("Received Event From: {}: {}", topic, payload);
             Object event = parseEventByTopic(payload, topic);
             processEvent(topic, event);
-        } catch (JsonProcessingException e) {
-            // Thrown by Jackson if JSON parsing fails
-            log.error("Error parsing JSON for topic {}: {}", topic, e.getMessage(), e);
-            // Optionally: send to a "dead-letter queue," or skip processing
-        } catch (EntityNotFoundException | UsernameNotFoundException e) {
-            // Common when a user doesn't exist in the DB
-            log.error("User not found while processing topic {}: {}", topic, e.getMessage(), e);
-            // Optionally handle the missing user scenario
-        } catch (ConstraintViolationException e) {
-            // Thrown by Hibernate if a DB constraint (unique, not-null, etc.) is violated
-            log.error("Constraint violation for topic {}: {}", topic, e.getMessage(), e);
-            // Optionally handle or skip
-        } catch (DataIntegrityViolationException e) {
-            // Often thrown by Spring Data/Hibernate on unique or foreign key violations
-            log.error("Data integrity violation for topic {}: {}", topic, e.getMessage(), e);
-            // Optionally handle or skip
-        } catch (IllegalArgumentException e) {
-            // Thrown by parseEventByTopic(...) if the topic is unsupported
-            log.error("Invalid topic {} or payload format: {}", topic, e.getMessage(), e);
-            // Optionally handle the unknown topic
         } catch (Exception e) {
-            // Final catch-all for anything unexpected
             log.error("General error while consuming message from topic {}: {}", topic, e.getMessage(), e);
-            // Optionally rethrow or handle in a custom way
         }
     }
 
@@ -76,9 +56,13 @@ public class KafkaUserConsumer {
     }
 
     private void processEvent(String topic, Object event) {
-        Consumer<Object> handler = topicHandlerRegistry.get(topic);
+        Consumer<Object> handler = topicHandlerRegistry.getOrDefault(topic, e -> log.warn("No Handler Was Found For Topic: {}, event: {}", topic, e));
         if (handler == null) { throw new IllegalArgumentException("Unknown topic: " + topic); }
-        handler.accept(event);
+        try {
+            handler.accept(event);
+        } catch (Exception e) {
+            log.error("Error processing event for topic {}: {}", topic, e.getMessage(), e);
+        }
     }
 
     @PostConstruct
@@ -87,12 +71,13 @@ public class KafkaUserConsumer {
                 "transaction-topic", event -> {
                     UserTransactionEventDTO transactionEvent = (UserTransactionEventDTO) event;
                     handleTransactionEvent(transactionEvent);
-                }
+                },
+                "unknown", event -> log.warn("Fallback Handler Invoked for Unsupported Event: {}", event)
                 // todo: budget, notification
         );
     }
 
-    public void handleTransactionEvent(UserTransactionEventDTO event) {
+    public void handleTransactionEvent(@Valid UserTransactionEventDTO event) {
         User user = userRepository.findById(event.userId()).orElseThrow(() -> new UsernameNotFoundException("User not found"));
         Transactions transactions = Transactions.builder()
                 .user(user)
@@ -100,10 +85,11 @@ public class KafkaUserConsumer {
                 .category(event.category())
                 .amount(event.amount())
                 .serviceName(event.serviceNames())
-                .transactionDate(LocalDateTime.parse(event.transactionDate(), DateTimeFormatter.ISO_DATE_TIME))
+                .transactionDate(event.transactionDate())
                 .transactionType(event.transactionsType())
                 .transactionStatus(event.transactionsStatus())
-                .description(event.description())
+                .transactionDescription(event.transactionDescription())
+                .eventDescription(event.eventDescription())
                 .build();
 
         transactionsRepository.save(transactions);
