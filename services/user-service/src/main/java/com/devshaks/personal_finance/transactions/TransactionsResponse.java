@@ -11,6 +11,7 @@ public record TransactionsResponse(
         String category,
         BigDecimal amount,
         LocalDateTime transactionDate,
-        String description
+        String eventDescription,
+        String transactionDescription
 ) {
 }
