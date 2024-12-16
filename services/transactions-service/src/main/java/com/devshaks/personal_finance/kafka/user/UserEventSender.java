@@ -6,6 +6,7 @@ import com.devshaks.personal_finance.kafka.services.ServiceNames;
 import com.devshaks.personal_finance.transactions.TransactionsStatus;
 import com.devshaks.personal_finance.transactions.TransactionsType;
 import lombok.RequiredArgsConstructor;
+import org.springframework.kafka.KafkaException;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -29,8 +30,12 @@ public class UserEventSender {
                     ServiceNames.TRANSACTION_SERVICE,
                     transactionEvents
             ));
-        } catch (Exception kafkaError) {
-            throw new RuntimeException("Error Sending to User Service");
+        } catch (KafkaException e) {
+            // Catch Kafka-specific exceptions
+            throw new RuntimeException("Kafka error sending event: " + e.getMessage(), e);
+        } catch (Exception e) {
+            // Final catch-all
+            throw new RuntimeException("General error sending event to user service: " + e.getMessage(), e);
         }
     }
 
