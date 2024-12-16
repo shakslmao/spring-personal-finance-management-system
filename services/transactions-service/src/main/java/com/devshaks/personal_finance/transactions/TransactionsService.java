@@ -11,7 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import static com.devshaks.personal_finance.kafka.events.TransactionEvents.TRANSACTION_CREATED;
-// umm.
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
