@@ -8,7 +8,6 @@ public record AuditTransactionEventDTO(
         @JsonProperty("eventType") TransactionEvents eventType,
         @JsonProperty("serviceName") ServiceNames serviceName,
         @JsonProperty("userId") Long userId,
-        @JsonProperty("transactionId") Long transactionId,
         @JsonProperty("description") String description,
         @JsonProperty("timestamp") String timestamp
 ) {
