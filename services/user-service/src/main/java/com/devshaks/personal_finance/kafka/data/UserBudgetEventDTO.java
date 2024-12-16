@@ -1,6 +1,6 @@
 package com.devshaks.personal_finance.kafka.data;
 
-import com.devshaks.personal_finance.kafka.budget.BudgetEvents;
+import com.devshaks.personal_finance.kafka.events.BudgetEvents;
 import com.devshaks.personal_finance.kafka.services.ServiceNames;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
