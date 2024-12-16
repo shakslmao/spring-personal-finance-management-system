@@ -5,7 +5,7 @@ import com.devshaks.personal_finance.exceptions.UserNotFoundException;
 import com.devshaks.personal_finance.exceptions.UserRegistrationException;
 import com.devshaks.personal_finance.handlers.UnauthorizedException;
 import com.devshaks.personal_finance.kafka.audit.AuditEventSender;
-import com.devshaks.personal_finance.kafka.users.UserEvents;
+import com.devshaks.personal_finance.kafka.events.UserEvents;
 import com.devshaks.personal_finance.transactions.Transactions;
 import com.devshaks.personal_finance.transactions.TransactionsMapper;
 import com.devshaks.personal_finance.transactions.TransactionsRepository;
@@ -25,10 +25,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.HttpClientErrorException;
-import org.w3c.dom.stylesheets.LinkStyle;
 
-import static com.devshaks.personal_finance.kafka.users.UserEvents.USER_PASSWORD_RESET_SUCCESS;
-import static com.devshaks.personal_finance.kafka.users.UserEvents.USER_REGISTERED;
+import static com.devshaks.personal_finance.kafka.events.UserEvents.USER_PASSWORD_RESET_SUCCESS;
+import static com.devshaks.personal_finance.kafka.events.UserEvents.USER_REGISTERED;
 
 @Slf4j
 @Service
@@ -69,7 +68,7 @@ public class UserService {
             String encodedPassword = passwordEncoder.encode(user.getPassword());
             user.setPassword(encodedPassword);
             User savedUser = userRepository.save(user);
-            createKafkaAuditEvent.sendAuditEvent(USER_REGISTERED, user.getId(), "User Registered Successfully");
+            createKafkaAuditEvent.sendAuditEventFromUser(USER_REGISTERED, user.getId(), "User Registered Successfully");
             return userMapper.toUserDTO(savedUser);
         } catch (HttpClientErrorException exception) {
             if (exception.getStatusCode() == HttpStatus.UNAUTHORIZED) {
@@ -91,14 +90,12 @@ public class UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UsernameNotFoundException("Cannot find user with ID: " + userId));
         if (!passwordEncoder.matches(passwordRequest.currentPassword(), user.getPassword())) {
-            createKafkaAuditEvent.sendAuditEvent(UserEvents.USER_PASSWORD_RESET_FAILED, user.getId(),
-                    "User Password Reset Failed");
+            createKafkaAuditEvent.sendAuditEventFromUser(UserEvents.USER_PASSWORD_RESET_FAILED, user.getId(), "User Password Reset Failed");
             throw new IllegalArgumentException("Current password does not match");
         }
         user.setPassword(passwordEncoder.encode(passwordRequest.newPassword()));
         userRepository.save(user);
-        createKafkaAuditEvent.sendAuditEvent(USER_PASSWORD_RESET_SUCCESS, user.getId(),
-                "User Password Changed Successfully");
+        createKafkaAuditEvent.sendAuditEventFromUser(USER_PASSWORD_RESET_SUCCESS, user.getId(), "User Password Changed Successfully");
     }
 
     public List<TransactionsResponse> getUsersTransactions(Long userId) {
