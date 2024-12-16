@@ -1,8 +1,5 @@
 package com.devshaks.personal_finance.kafka.events;
 
-import com.devshaks.personal_finance.kafka.budget.BudgetEvents;
-import com.devshaks.personal_finance.kafka.notifications.NotificationEvents;
-import com.devshaks.personal_finance.kafka.transactions.TransactionEvents;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
