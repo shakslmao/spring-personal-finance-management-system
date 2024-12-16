@@ -21,7 +21,7 @@ import java.time.LocalDate;
 import java.util.EnumSet;
 import java.util.List;
 
-import static com.devshaks.personal_finance.kafka.users.UserEvents.ADMIN_REGISTERED;
+import static com.devshaks.personal_finance.kafka.events.UserEvents.ADMIN_REGISTERED;
 
 @Service
 @RequiredArgsConstructor
@@ -67,7 +67,7 @@ public class AdminService {
                 admin.setPermissions(EnumSet.noneOf(AdminPermissions.class));
             }
             Admin savedAdmin = adminRepository.save(admin);
-            createKafkaAuditEvent.sendAuditEvent(ADMIN_REGISTERED, admin.getId(), "Admin Registered Successfully");
+            createKafkaAuditEvent.sendAuditEventFromUser(ADMIN_REGISTERED, admin.getId(), "Admin Registered Successfully");
             return adminMapper.toAdminDTO(savedAdmin);
         } catch (HttpClientErrorException exception) {
             if (exception.getStatusCode() == HttpStatus.UNAUTHORIZED) {
