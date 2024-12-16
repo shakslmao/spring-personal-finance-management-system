@@ -14,13 +14,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.HttpClientErrorException;
 
 import java.time.LocalDate;
 import java.util.EnumSet;
 import java.util.List;
 
-import static com.devshaks.personal_finance.kafka.events.UserEvents.ADMIN_REGISTERED;
+import static com.devshaks.personal_finance.kafka.users.UserEvents.ADMIN_REGISTERED;
 
 @Service
 @RequiredArgsConstructor
@@ -48,6 +49,7 @@ public class AdminService {
         }
     }
 
+    @Transactional
     public AdminDTO registerAdmin(@Valid AdminRegistrationRequest adminRegistrationRequest) {
         try {
             validateAdminRegistrationRequest(adminRegistrationRequest, predefinedSuperAdminCode);
@@ -77,12 +79,14 @@ public class AdminService {
         }
     }
 
+    @Transactional
     public List<UserDTO> getAllUsers() {
         return userRepository.findAll().stream()
                 .map(userMapper::toUserDTO)
                 .toList();
     }
 
+    @Transactional
     public UserDTO getUserDetails(Long userId) {
         return userRepository.findById(userId)
                 .map(userMapper::toUserDTO)
