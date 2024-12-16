@@ -3,7 +3,7 @@ package com.devshaks.personal_finance.kafka.audit;
 import com.devshaks.personal_finance.exceptions.AuditEventException;
 import com.devshaks.personal_finance.kafka.services.ServiceNames;
 import com.devshaks.personal_finance.kafka.data.AuditUserEventDTO;
-import com.devshaks.personal_finance.kafka.events.UserEvents;
+import com.devshaks.personal_finance.kafka.users.UserEvents;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
