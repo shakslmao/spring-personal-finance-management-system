@@ -8,7 +8,7 @@ import org.springframework.kafka.config.TopicBuilder;
 @Configuration
 public class KafkaTransactionTopicConfig {
     @Bean
-    public NewTopic transactionTopic() { return TopicBuilder.name("transaction-topic").build(); }
+    public NewTopic transactionTopic() { return TopicBuilder.name("audit-transaction-topic").build(); }
 
 
 }
