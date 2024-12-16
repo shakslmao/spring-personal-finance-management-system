@@ -1,7 +1,7 @@
 package com.devshaks.personal_finance.kafka.data;
 
 import com.devshaks.personal_finance.kafka.services.ServiceNames;
-import com.devshaks.personal_finance.kafka.users.UserEvents;
+import com.devshaks.personal_finance.kafka.events.UserEvents;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public record AuditUserEventDTO(
