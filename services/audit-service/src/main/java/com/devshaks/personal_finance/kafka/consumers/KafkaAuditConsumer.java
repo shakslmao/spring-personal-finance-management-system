@@ -29,7 +29,7 @@ public class KafkaAuditConsumer {
     private Map<Class<?>, Function<Object, Audit>> eventMapperRegistry;
 
     // Listens to multiple Kafka topics and processes events.
-    @KafkaListener(topics = {"user-topic", "audit-transaction-topic", "budget-topic"}, groupId = "auditGroup", containerFactory = "kafkaListenerContainerFactory")
+    @KafkaListener(topics = {"user-topic", "transaction-topic", "budget-topic"}, groupId = "auditGroup", containerFactory = "kafkaListenerContainerFactory")
     public void consumeAuditEvent(@Payload String payload, @Header("kafka_receivedTopic") String topic) {
         try {
             log.info("Receiving Event From : {}, {}", payload, topic);
@@ -59,7 +59,7 @@ public class KafkaAuditConsumer {
     private Object parseEventByTopic(String payload, String topic) throws JsonProcessingException {
         return switch (topic) {
             case "user-topic" -> objectMapper.readValue(payload, AuditUserEventDTO.class);
-            case "audit-transaction-topic" -> objectMapper.readValue(payload, AuditTransactionEventDTO.class);
+            case "transaction-topic" -> objectMapper.readValue(payload, AuditTransactionEventDTO.class);
             case "budget-topic" -> objectMapper.readValue(payload, AuditBudgetEventDTO.class);
             default -> throw new IllegalArgumentException("Unsupported Topic: " + topic);
         };
