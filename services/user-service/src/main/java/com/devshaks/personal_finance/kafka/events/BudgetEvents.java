@@ -1,4 +1,4 @@
-package com.devshaks.personal_finance.kafka.budget;
+package com.devshaks.personal_finance.kafka.events;
 
 public enum BudgetEvents {
     BUDGET_CREATED,
