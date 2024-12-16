@@ -1,10 +1,15 @@
 package com.devshaks.personal_finance.users;
 
+import com.devshaks.personal_finance.exceptions.TransactionNotFoundException;
 import com.devshaks.personal_finance.exceptions.UserNotFoundException;
 import com.devshaks.personal_finance.exceptions.UserRegistrationException;
 import com.devshaks.personal_finance.handlers.UnauthorizedException;
 import com.devshaks.personal_finance.kafka.audit.AuditEventSender;
 import com.devshaks.personal_finance.kafka.users.UserEvents;
+import com.devshaks.personal_finance.transactions.Transactions;
+import com.devshaks.personal_finance.transactions.TransactionsMapper;
+import com.devshaks.personal_finance.transactions.TransactionsRepository;
+import com.devshaks.personal_finance.transactions.TransactionsResponse;
 import com.devshaks.personal_finance.utility.AgeVerification;
 import com.devshaks.personal_finance.utility.UsernameGenerator;
 import jakarta.validation.Valid;
@@ -12,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -19,6 +25,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.HttpClientErrorException;
+import org.w3c.dom.stylesheets.LinkStyle;
 
 import static com.devshaks.personal_finance.kafka.users.UserEvents.USER_PASSWORD_RESET_SUCCESS;
 import static com.devshaks.personal_finance.kafka.users.UserEvents.USER_REGISTERED;
@@ -33,6 +40,8 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final AgeVerification ageVerification;
     private final AuditEventSender createKafkaAuditEvent;
+    private final TransactionsMapper transactionsMapper;
+    private final TransactionsRepository transactionsRepository;
 
     private void validateUserRegistrationRequest(@Valid UserRegistrationRequest registrationRequest) {
         if (registrationRequest == null) {
@@ -72,14 +81,12 @@ public class UserService {
         }
     }
 
-    @Transactional
     public UserDetailsResponse getUserProfileDetails(Long userId) {
         return userRepository.findById(userId)
                 .map(userMapper::mapUserToResponse)
                 .orElseThrow(() -> new UserNotFoundException("Cannot Find User"));
     }
 
-    @Transactional
     public void changeUserPassword(Long userId, @Valid ChangePasswordRequest passwordRequest) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UsernameNotFoundException("Cannot find user with ID: " + userId));
@@ -93,6 +100,13 @@ public class UserService {
         createKafkaAuditEvent.sendAuditEvent(USER_PASSWORD_RESET_SUCCESS, user.getId(),
                 "User Password Changed Successfully");
     }
+
+    public List<TransactionsResponse> getUsersTransactions(Long userId) {
+        List<Transactions> transactions = transactionsRepository.findByUserId(userId);
+        if (transactions.isEmpty()) { throw new TransactionNotFoundException("Cannot Find Transaction For this User"); }
+        return transactions.stream().map(transactionsMapper::mapUserToTransactionResponse).toList();
+    }
+
 
     // Users can Deactivate Account if they have No Funds/Transactions/Etc.
 
