@@ -1,4 +1,4 @@
-package com.devshaks.personal_finance.kafka.notifications;
+package com.devshaks.personal_finance.kafka.events;
 
 public enum NotificationEvents {
     TRANSACTION_SUCCESS,
