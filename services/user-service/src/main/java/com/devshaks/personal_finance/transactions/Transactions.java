@@ -32,7 +32,6 @@ public class Transactions {
     @Column(nullable = false)
     private String category;
 
-    @Column(nullable = false)
     private BigDecimal amount;
 
     @Enumerated(EnumType.STRING)
@@ -51,5 +50,7 @@ public class Transactions {
     private TransactionsStatus transactionStatus;
 
     @Column(nullable = false)
-    private String description;
+    private String eventDescription;
+
+    private String transactionDescription;
 }
