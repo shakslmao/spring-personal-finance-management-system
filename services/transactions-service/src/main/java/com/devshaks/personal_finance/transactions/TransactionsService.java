@@ -28,8 +28,19 @@ public class TransactionsService {
         Transactions transactions = transactionsMapper.toNewTransaction(transactionRequest);
         transactions.setUserId(userId);
         Transactions savedTransaction = transactionsRepository.save(transactions);
-        auditEventSender.sendEventToAudit(TRANSACTION_CREATED, userId, transactions.getId(), "New Transaction Created");
-        userEventSender.sendEventToUser(TRANSACTION_CREATED, userId, transactions.getId(), "New Transaction Recorded", transactions.getCategory(), transactions.getAmount());
+        auditEventSender.sendEventToAudit(
+                TRANSACTION_CREATED,
+                userId,
+                "New Transaction Created");
+
+        userEventSender.sendEventToUser(
+                TRANSACTION_CREATED,
+                userId,
+                transactions.getId(),
+                "New Transaction Recorded",
+                transactions.getDescription(),
+                transactions.getCategory(),
+                transactions.getAmount());
         return transactionsMapper.toTransactionDTO(savedTransaction);
     }
 }
