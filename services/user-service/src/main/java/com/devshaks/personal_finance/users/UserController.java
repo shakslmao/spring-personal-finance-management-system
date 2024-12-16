@@ -1,5 +1,6 @@
 package com.devshaks.personal_finance.users;
 
+import com.devshaks.personal_finance.transactions.TransactionsResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -9,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.net.URI;
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -45,6 +47,14 @@ public class UserController {
             @RequestBody @Valid ChangePasswordRequest passwordRequest) {
         userService.changeUserPassword(userId, passwordRequest);
         return ResponseEntity.noContent().build();
+    }
+
+    // GET Transactions.
+    @GetMapping("/transactions/{userId}")
+    @Operation(summary = "Get Users Recent Transactions")
+    public ResponseEntity<List<TransactionsResponse>> getUsersTransactions(@PathVariable("userId") Long userId) {
+        List<TransactionsResponse> transactionResponse = userService.getUsersTransactions(userId);
+        return ResponseEntity.ok(transactionResponse);
     }
 
     // [GET] Get Audit Records
