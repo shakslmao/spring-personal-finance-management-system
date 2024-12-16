@@ -22,7 +22,7 @@ public class Transactions {
     @GeneratedValue
     private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private Long transactionId;
 
     @ManyToOne(fetch = FetchType.LAZY)
