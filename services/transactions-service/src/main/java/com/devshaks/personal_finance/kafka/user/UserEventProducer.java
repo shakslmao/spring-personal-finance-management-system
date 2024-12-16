@@ -1,6 +1,7 @@
 package com.devshaks.personal_finance.kafka.user;
 
 import com.devshaks.personal_finance.kafka.data.UserTransactionEventDTO;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -14,7 +15,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class UserEventProducer {
     private final KafkaTemplate<String, UserTransactionEventDTO> kafkaTemplate;
-    public void sendAuditProducerEventFromTransaction(UserTransactionEventDTO transactionEvents) {
+    public void sendUserProducerEventFromTransaction(@Valid UserTransactionEventDTO transactionEvents) {
         log.info("Sending Transaction Event to User Service: {}", transactionEvents);
         Message<UserTransactionEventDTO> message = MessageBuilder
                 .withPayload(transactionEvents)
