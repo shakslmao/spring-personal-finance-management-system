@@ -20,10 +20,7 @@ import java.util.List;
 @Entity
 @Table(name = "users")
 @EntityListeners(AuditingEntityListener.class)
-@Inheritance(strategy = InheritanceType.JOINED)
 public class User {
-
-    // add new field for transactions.
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
