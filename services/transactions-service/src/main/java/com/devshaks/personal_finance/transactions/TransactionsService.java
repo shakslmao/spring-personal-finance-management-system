@@ -11,7 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import static com.devshaks.personal_finance.kafka.events.TransactionEvents.TRANSACTION_CREATED;
-
+// umm.
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -29,7 +29,7 @@ public class TransactionsService {
         transactions.setUserId(userId);
         Transactions savedTransaction = transactionsRepository.save(transactions);
         auditEventSender.sendEventToAudit(TRANSACTION_CREATED, userId, transactions.getId(), "New Transaction Created");
-        userEventSender.sendEventToUser(TRANSACTION_CREATED, userId, transactions.getId(), "You Have Made a New Transaction", transactions.getCategory(), transactions.getAmount());
+        userEventSender.sendEventToUser(TRANSACTION_CREATED, userId, transactions.getId(), "New Transaction Recorded", transactions.getCategory(), transactions.getAmount());
         return transactionsMapper.toTransactionDTO(savedTransaction);
     }
 }
