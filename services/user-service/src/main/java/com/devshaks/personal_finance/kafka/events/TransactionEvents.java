@@ -1,4 +1,4 @@
-package com.devshaks.personal_finance.kafka.transactions;
+package com.devshaks.personal_finance.kafka.events;
 
 public enum TransactionEvents {
     TRANSACTION_CREATED,
