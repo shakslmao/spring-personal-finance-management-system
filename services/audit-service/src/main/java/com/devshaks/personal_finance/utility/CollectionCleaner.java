@@ -17,5 +17,5 @@ public class CollectionCleaner implements CommandLineRunner {
         System.out.println("\"Database dropped successfully.\"");
     }
 }
+ */
 
-*/
