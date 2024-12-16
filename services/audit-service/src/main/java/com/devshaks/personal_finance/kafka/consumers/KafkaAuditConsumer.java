@@ -40,7 +40,9 @@ public class KafkaAuditConsumer {
             Audit audit = mapToAudit(event);
 
             // Persist the Audit entity to the database.
+            log.info("saving audit event to database");
             auditRepository.save(audit);
+            log.info("saved audit event to database: {}", audit);
         } catch (Exception e) {
             // Logs any exception that occurs during processing for debugging purposes.
             log.error(e.getMessage(), e);
