@@ -26,7 +26,6 @@ import java.util.List;
 @Tag(name = "Transaction Controller", description = "Handles Transaction Related Operations")
 public class TransactionsController {
     private final TransactionsService transactionService;
-    private final TransactionsService transactionsService;
 
     @PostMapping("/new/{userId}")
     @Operation(summary = "Create a New Transaction For a User")
@@ -74,7 +73,7 @@ public class TransactionsController {
             @RequestParam(required = false) TransactionsType transactionsType,
             @RequestParam(required = false) TransactionsStatus transactionsStatus,
             @PageableDefault(size = 20, sort = "transactionDate", direction = Sort.Direction.DESC)Pageable pageable) {
-        Page<TransactionsDTO> transactionsFilter = transactionsService.getTransactionFilter(userId,category, transactionDate, transactionsType, transactionsStatus, pageable);
+        Page<TransactionsDTO> transactionsFilter = transactionService.getTransactionFilter(userId,category, transactionDate, transactionsType, transactionsStatus, pageable);
         return ResponseEntity.ok(transactionsFilter);
     }
 
