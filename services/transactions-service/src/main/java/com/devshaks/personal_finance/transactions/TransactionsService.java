@@ -10,8 +10,11 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static com.devshaks.personal_finance.kafka.events.TransactionEvents.TRANSACTION_CREATED;
@@ -50,4 +53,13 @@ public class TransactionsService {
         if (transactions.isEmpty()) { throw new TransactionNotFoundException("Cannot Find Transaction For this User"); }
         return transactions.stream().map(transactionsMapper::mapUserToTransactionResponse).toList();
     }
+
+    public TransactionsDTO getTransactionById(Long id) {
+        return null;
+    }
+    public List<TransactionsDTO> getUserTransactionByCategory(Long userId, String category) {
+        return null;
+    }
+    public Page<TransactionsDTO> getTransactionFilter(Long userId, String category, LocalDateTime transactionDate, TransactionsType transactionsType, TransactionsStatus transactionsStatus, Pageable pageable) {return null;}
+    public UserTransactionStatisticsDTO getUserTransactionStats(Long userId) { return null; }
 }
