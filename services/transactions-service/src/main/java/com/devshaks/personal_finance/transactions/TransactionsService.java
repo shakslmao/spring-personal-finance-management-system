@@ -17,7 +17,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -48,14 +47,14 @@ public class TransactionsService {
     }
 
 
-    @Cacheable(value = "transactions", key = "#userId")
+    // @Cacheable(value = "transactions", key = "#userId")
     public List<TransactionsResponse> getUsersTransactions(Long userId) {
         List<Transactions> transactions = transactionsRepository.findByUserId(userId);
         if (transactions.isEmpty()) { throw new TransactionNotFoundException("Cannot Find Transaction For this User"); }
         return transactions.stream().map(transactionsMapper::mapUserToTransactionResponse).toList();
     }
 
-    @Cacheable(value = "transactions", key = "#id")
+    // @Cacheable(value = "transactions", key = "#id")
     public TransactionsDTO getTransactionById(Long id) {
         return transactionsRepository.findById(id)
                 .map(transactionsMapper::toTransactionDTO)
@@ -63,14 +62,14 @@ public class TransactionsService {
     }
 
 
-    @Cacheable(value = "transactions", key = "#userId + '-' + #category")
+    // @Cacheable(value = "transactions", key = "T(String).format('%d-%s', #userId, #category)")
     public List<TransactionsDTO> getUserTransactionByCategory(Long userId, String category) {
         List<Transactions> transactions = transactionsRepository.findByUserIdAndCategory(userId, category);
         if (transactions.isEmpty()) { throw new TransactionNotFoundException("Cannot Find Transaction For Category '" + category + "'"); }
         return transactions.stream().map(transactionsMapper::toTransactionDTO).toList();
     }
 
-    @Cacheable(value = "transaction-filters", key = "#userId + '-' + #category + '-' + #pageable.pageNumber")
+    // @Cacheable(value = "transaction-filters", key = "#userId + '-' + #category + '-' + #pageable.pageNumber")
     public Page<TransactionsDTO> getTransactionFilter(Long userId, String category, LocalDateTime transactionDate, TransactionsType transactionsType, TransactionsStatus transactionsStatus, Pageable pageable) {
         Specification<Transactions> specification = Specification.where(null);
         if (userId != null) { specification.and((root, query, cb) -> cb.equal(root.get("userId"), userId)); }
