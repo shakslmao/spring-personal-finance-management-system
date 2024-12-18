@@ -7,7 +7,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -61,8 +60,8 @@ public class TransactionsController {
     // Get Transaction With Filtering and Pagination.
     @GetMapping("/filter")
     @Operation(summary = "Filter Transactions Through Various Parameters")
-    public ResponseEntity<Page<TransactionsDTO>> getTransactionFilter(@RequestParam(required = false) Long userId, @RequestParam(required = false) String category, @RequestParam(required = false) LocalDateTime transactionDate, @RequestParam(required = false) TransactionsType transactionsType, @RequestParam(required = false) TransactionsStatus transactionsStatus, @PageableDefault(size = 20, sort = "transactionDate", direction = Sort.Direction.DESC) Pageable pageable) {
-        Page<TransactionsDTO> transactionsFilter = transactionService.getTransactionFilter(userId, category, transactionDate, transactionsType, transactionsStatus, pageable);
+    public ResponseEntity<PaginatedTransactionDTO> getTransactionFilter(@RequestParam(required = false) Long userId, @RequestParam(required = false) String category, @RequestParam(required = false) LocalDateTime transactionDate, @RequestParam(required = false) TransactionsType transactionsType, @RequestParam(required = false) TransactionsStatus transactionsStatus, @PageableDefault(size = 20, sort = "transactionDate", direction = Sort.Direction.DESC) Pageable pageable) {
+        PaginatedTransactionDTO transactionsFilter = transactionService.getTransactionFilter(userId, category, transactionDate, transactionsType, transactionsStatus, pageable);
         return ResponseEntity.ok(transactionsFilter);
     }
 

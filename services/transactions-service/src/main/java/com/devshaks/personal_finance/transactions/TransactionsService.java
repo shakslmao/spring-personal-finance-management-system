@@ -70,7 +70,7 @@ public class TransactionsService {
     }
 
     // @Cacheable(value = "transaction-filters", key = "#userId + '-' + #category + '-' + #pageable.pageNumber")
-    public Page<TransactionsDTO> getTransactionFilter(Long userId, String category, LocalDateTime transactionDate, TransactionsType transactionsType, TransactionsStatus transactionsStatus, Pageable pageable) {
+    public PaginatedTransactionDTO getTransactionFilter(Long userId, String category, LocalDateTime transactionDate, TransactionsType transactionsType, TransactionsStatus transactionsStatus, Pageable pageable) {
         Specification<Transactions> specification = Specification.where(null);
         if (userId != null) { specification.and((root, query, cb) -> cb.equal(root.get("userId"), userId)); }
         if (category != null) { specification.and((root, query, cb) -> cb.equal(root.get("category"), category)); }
@@ -79,7 +79,8 @@ public class TransactionsService {
         if (transactionsStatus != null) { specification = specification.and((root, query, cb) -> cb.equal(root.get("transactionStatus"), transactionsStatus)); }
 
         Page<Transactions> transactionsPage = transactionsRepository.findAll(specification, pageable);
-        return transactionsPage.map(transactionsMapper::toTransactionDTO);
+        List<TransactionsDTO> content = transactionsPage.getContent().stream().map(transactionsMapper::toTransactionDTO).collect(Collectors.toList());
+        return new PaginatedTransactionDTO(content, transactionsPage.getNumber(), transactionsPage.getSize(), transactionsPage.getTotalElements(), transactionsPage.getTotalPages(), transactionsPage.isLast());
     }
 
     public UserTransactionStatisticsDTO getUserTransactionStats(Long userId) {
