@@ -4,6 +4,7 @@ spring:
     redis:
         host: localhost
         port: 6379
+        key-prefix: transactions
 
     datasource:
         url: jdbc:postgresql://localhost:5432/transactiondb
