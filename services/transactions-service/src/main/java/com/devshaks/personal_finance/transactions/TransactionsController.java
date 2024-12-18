@@ -32,10 +32,7 @@ public class TransactionsController {
     @ApiResponses(value = { @ApiResponse(responseCode = "201", description = "Transaction Created Successfully"), @ApiResponse(responseCode = "400", description = "Invalid input data") })
     public ResponseEntity<TransactionsDTO> newTransaction(@PathVariable("userId") Long userId, @RequestBody @Valid TransactionsRequest transactionRequest) {
         TransactionsDTO transaction = transactionService.newTransaction(transactionRequest, userId);
-        URI location = ServletUriComponentsBuilder.fromCurrentRequest()
-                .path("/{id}")
-                .buildAndExpand(transaction.id())
-                .toUri();
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(transaction.id()).toUri();
         return ResponseEntity.created(location).body(transaction);
     }
 
@@ -64,13 +61,7 @@ public class TransactionsController {
     // Get Transaction With Filtering and Pagination.
     @GetMapping("/filter")
     @Operation(summary = "Filter Transactions Through Various Parameters")
-    public ResponseEntity<Page<TransactionsDTO>> getTransactionFilter(
-            @RequestParam(required = false) Long userId,
-            @RequestParam(required = false) String category,
-            @RequestParam(required = false) LocalDateTime transactionDate,
-            @RequestParam(required = false) TransactionsType transactionsType,
-            @RequestParam(required = false) TransactionsStatus transactionsStatus,
-            @PageableDefault(size = 20, sort = "transactionDate", direction = Sort.Direction.DESC)Pageable pageable) {
+    public ResponseEntity<Page<TransactionsDTO>> getTransactionFilter(@RequestParam(required = false) Long userId, @RequestParam(required = false) String category, @RequestParam(required = false) LocalDateTime transactionDate, @RequestParam(required = false) TransactionsType transactionsType, @RequestParam(required = false) TransactionsStatus transactionsStatus, @PageableDefault(size = 20, sort = "transactionDate", direction = Sort.Direction.DESC) Pageable pageable) {
         Page<TransactionsDTO> transactionsFilter = transactionService.getTransactionFilter(userId, category, transactionDate, transactionsType, transactionsStatus, pageable);
         return ResponseEntity.ok(transactionsFilter);
     }
@@ -89,6 +80,6 @@ public class TransactionsController {
         return ResponseEntity.noContent().build();
     }
 
-     // TODO: Delete Transaction - Only if Status.FAILED.   Update Transaction -> From Pending to Completed.
+    // TODO: Delete Transaction - Only if Status.FAILED.   Update Transaction -> From Pending to Completed.
 
 }
