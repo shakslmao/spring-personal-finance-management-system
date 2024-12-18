@@ -1,4 +1,10 @@
 spring:
+    cache:
+        type: redis
+    redis:
+        host: localhost
+        port: 6379
+
     datasource:
         url: jdbc:postgresql://localhost:5432/transactiondb
         username: ${POSTGRES_USER}
@@ -10,10 +16,6 @@ spring:
         database: postgresql
         database-platform: org.hibernate.dialect.PostgreSQLDialect
         show-sql: true
-
-    redis:
-        host: localhost
-        port: 6379
 
     kafka:
         producer:
