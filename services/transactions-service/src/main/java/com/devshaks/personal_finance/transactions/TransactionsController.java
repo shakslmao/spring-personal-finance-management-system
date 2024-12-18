@@ -55,13 +55,11 @@ public class TransactionsController {
     }
 
     // Get Transactions By User ID & Category.
-    @GetMapping("/users/{userId}/category/{category}")
+    @GetMapping("/user/{userId}/category/{category}")
     @Operation(summary = "Get Users Transactions By Their ID & Categories")
     public ResponseEntity<List<TransactionsDTO>> getUserTransactionByCategory(@PathVariable("userId") Long userId, @PathVariable("category") String category) {
         return ResponseEntity.ok(transactionService.getUserTransactionByCategory(userId, category));
     }
-
-    // check.
 
     // Get Transaction With Filtering and Pagination.
     @GetMapping("/filter")
@@ -73,7 +71,7 @@ public class TransactionsController {
             @RequestParam(required = false) TransactionsType transactionsType,
             @RequestParam(required = false) TransactionsStatus transactionsStatus,
             @PageableDefault(size = 20, sort = "transactionDate", direction = Sort.Direction.DESC)Pageable pageable) {
-        Page<TransactionsDTO> transactionsFilter = transactionService.getTransactionFilter(userId,category, transactionDate, transactionsType, transactionsStatus, pageable);
+        Page<TransactionsDTO> transactionsFilter = transactionService.getTransactionFilter(userId, category, transactionDate, transactionsType, transactionsStatus, pageable);
         return ResponseEntity.ok(transactionsFilter);
     }
 
@@ -85,6 +83,12 @@ public class TransactionsController {
         return ResponseEntity.ok(statisticsDTO);
     }
 
-    // TODO: Delete Transaction - Only if Status.FAILED.   Update Transaction -> From Pending to Completed.
+    @DeleteMapping("{id}")
+    public ResponseEntity<Void> deleteTransaction(@PathVariable("id") Long id) {
+        transactionService.deleteTransaction(id);
+        return ResponseEntity.noContent().build();
+    }
+
+     // TODO: Delete Transaction - Only if Status.FAILED.   Update Transaction -> From Pending to Completed.
 
 }
