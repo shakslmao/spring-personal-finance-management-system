@@ -34,6 +34,14 @@ spring:
                       - RemoveRequestHeader=Cookie
                       - AddRequestHeader=Authorization, "${request.headers['Authorization']:default-token}"
 
+                - id: budget-service
+                  uri: lb://BUDGET-SERVICE
+                  predicates:
+                      - Path=/api/v1/budgets/**
+                  filters:
+                      - RemoveRequestHeader=Cookie
+                      - AddRequestHeader=Authorization, "${request.headers['Authorization']:default-token}"
+
 logging:
     level:
         org.springframework.security.oauth2.server.resource: DEBUG
