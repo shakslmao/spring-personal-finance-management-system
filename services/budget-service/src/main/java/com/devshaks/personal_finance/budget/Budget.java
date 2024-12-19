@@ -1,22 +1,20 @@
 package com.devshaks.personal_finance.budget;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.YearMonth;
 import java.util.List;
 
 @Getter
 @Setter
 @Entity
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "budgets")
@@ -43,7 +41,7 @@ public class Budget {
     private List<BudgetCategory> categories;
 
     @Column(nullable = false)
-    private LocalDate month;
+    private String month;
 
     @CreatedDate
     @Column(nullable = false)
@@ -51,4 +49,12 @@ public class Budget {
 
     @LastModifiedDate
     private LocalDateTime updatedAt;
+
+    public YearMonth getMonthAsYearMonth() {
+        return YearMonth.parse(this.month);
+    }
+
+    public void setMonthFromYearMonth(YearMonth yearMonth) {
+        this.month = yearMonth.toString();
+    }
 }
