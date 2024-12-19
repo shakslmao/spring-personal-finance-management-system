@@ -14,7 +14,8 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class AuditEventProducer {
     private final KafkaTemplate<String, AuditTransactionEventDTO> kafkaTemplate;
-    public void sendAuditProducerEventFromTransaction(AuditTransactionEventDTO transactionEvents) {
+
+    public void sendEventToAuditFromTransaction(AuditTransactionEventDTO transactionEvents) {
         log.info("Sending Transaction Event To Audit Service: {}", transactionEvents);
         Message<AuditTransactionEventDTO> message = MessageBuilder
                 .withPayload(transactionEvents)

@@ -14,7 +14,7 @@ public class AuditEventSender {
     private final AuditEventProducer auditEventProducer;
     public void sendEventToAudit(TransactionEvents transactionEvents, Long userId, String description) {
         try {
-            auditEventProducer.sendAuditProducerEventFromTransaction(new AuditTransactionEventDTO(
+            auditEventProducer.sendEventToAuditFromTransaction(new AuditTransactionEventDTO(
                     transactionEvents,
                     ServiceNames.TRANSACTION_SERVICE,
                     userId,
