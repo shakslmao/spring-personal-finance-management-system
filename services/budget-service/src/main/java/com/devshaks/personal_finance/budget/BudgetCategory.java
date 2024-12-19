@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 
 @Getter
 @Setter
+@Builder
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
@@ -29,7 +30,6 @@ public class BudgetCategory {
     @Column(nullable = false)
     private String categoryName;
 
-    @Column(nullable = false)
     private BigDecimal categoryLimit;
 
     @Column(nullable = false)
