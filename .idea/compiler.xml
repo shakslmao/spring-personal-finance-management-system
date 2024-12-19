@@ -7,10 +7,11 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="user-service" />
         <module name="configuration-service" />
         <module name="apigateway-service" />
         <module name="audit-service" />
+        <module name="user-service" />
+        <module name="budget-service" />
         <module name="discovery-service" />
         <module name="transactions-service" />
       </profile>
@@ -23,6 +24,7 @@
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="apigateway-service" options="-parameters" />
       <module name="audit-service" options="-parameters" />
+      <module name="budget-service" options="-parameters" />
       <module name="configuration-service" options="-parameters" />
       <module name="discovery-service" options="-parameters" />
       <module name="transaction-service" options="-parameters" />
