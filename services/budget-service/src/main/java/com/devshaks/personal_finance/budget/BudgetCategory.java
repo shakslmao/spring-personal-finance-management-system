@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "budgets")
+@Table(name = "budget_categories")
 @EntityListeners(AuditingEntityListener.class)
 public class BudgetCategory {
 
@@ -27,18 +27,19 @@ public class BudgetCategory {
     @JoinColumn(name = "budget_id", nullable = false)
     private Budget budget;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String categoryName;
 
+    @Column(nullable = true)
     private BigDecimal categoryLimit;
 
     @Column(nullable = false)
     private BigDecimal spentAmount;
 
     @CreatedDate
-    @Column(nullable = false)
+    @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
     @LastModifiedDate
-    private LocalDateTime updatedAt;
+    private LocalDateTime updatedAt; // Retain auditing for updatedAt
 }
