@@ -11,12 +11,9 @@ spring:
         database-platform: org.hibernate.dialect.PostgreSQLDialect
         show-sql: true
 
-    kafka:
-        producer:
-            bootstrap-servers: localhost:9092
-            key-serializer: org.apache.kafka.common.serialization.StringSerializer
-            value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
-            properties:
+application:
+    config:
+        user-service-url: http://localhost:8222/api/v1/users
 
 server:
     port: 8060
