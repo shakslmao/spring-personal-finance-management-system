@@ -36,7 +36,7 @@ public class BudgetService {
     public BudgetResponse createUserBudget(Long userId, BudgetRequest budgetRequest) {
         UserDetailsResponse userDetails;
         try {
-            userDetails =  userFeignClient.getUserProfileDetails(userId);
+            userDetails = userFeignClient.getUserProfileDetails(userId);
         } catch (Exception e) {
             throw new RuntimeException("Failed to fetch user details", e);
         }
@@ -69,7 +69,9 @@ public class BudgetService {
 
     public List<BudgetResponse> getUserBudgets(Long userId) {
         List<Budget> budgets = budgetRepository.findByUserId(userId);
-        if (budgets.isEmpty()) { throw new BudgetNotFoundException("Budget Was Not Found"); }
+        if (budgets.isEmpty()) {
+            throw new BudgetNotFoundException("Budget Was Not Found");
+        }
         return budgets.stream()
                 .map(budgetMapper::mapBudgetToResponse)
                 .collect(Collectors.toList());
@@ -104,45 +106,45 @@ public class BudgetService {
                     budget.setMonth(String.valueOf(YearMonth.parse(value.toString())));
                     break;
                 case "categories":
-                List<Map<String, Object>> categoryUpdates = (List<Map<String, Object>>) value;
+                    List<Map<String, Object>> categoryUpdates = (List<Map<String, Object>>) value;
 
-                // Get existing categories
-                List<BudgetCategory> existingCategories = budget.getCategories();
+                    // Get existing categories
+                    List<BudgetCategory> existingCategories = budget.getCategories();
 
-                // map new categories
-                List<BudgetCategory> updatedCategories = categoryUpdates.stream().map(categoryRequest -> {
-                    String name = categoryRequest.get("name") != null
-                            ? categoryRequest.get("name").toString()
-                            : null;
-                    BigDecimal categoryLimit = categoryRequest.get("categoryLimit") != null
-                            ? new BigDecimal(categoryRequest.get("categoryLimit").toString())
-                            : null;
+                    // map new categories
+                    List<BudgetCategory> updatedCategories = categoryUpdates.stream().map(categoryRequest -> {
+                        String name = categoryRequest.get("name") != null
+                                ? categoryRequest.get("name").toString()
+                                : null;
+                        BigDecimal categoryLimit = categoryRequest.get("categoryLimit") != null
+                                ? new BigDecimal(categoryRequest.get("categoryLimit").toString())
+                                : null;
 
-                    if (name == null || categoryLimit == null) {
-                        throw new BudgetUpdateException("Category Name and Category Limit cannot be null");
-                    }
+                        if (name == null || categoryLimit == null) {
+                            throw new BudgetUpdateException("Category Name and Category Limit cannot be null");
+                        }
 
-                    // check if the category exists
-                    return existingCategories.stream()
-                            .filter(c -> c.getCategoryName().equals(name))
-                            .findFirst()
-                            .map(existingCategory -> {
-                                existingCategory.setCategoryLimit(categoryLimit);
-                                return existingCategory;
-                            })
-                            .orElseGet(() -> {
-                                BudgetCategory newCategory = new BudgetCategory();
-                                newCategory.setCategoryLimit(categoryLimit);
-                                newCategory.setBudget(budget);
-                                return newCategory;
-                            });
+                        // check if the category exists
+                        return existingCategories.stream()
+                                .filter(c -> c.getCategoryName().equals(name))
+                                .findFirst()
+                                .map(existingCategory -> {
+                                    existingCategory.setCategoryLimit(categoryLimit);
+                                    return existingCategory;
+                                })
+                                .orElseGet(() -> {
+                                    BudgetCategory newCategory = new BudgetCategory();
+                                    newCategory.setCategoryLimit(categoryLimit);
+                                    newCategory.setBudget(budget);
+                                    return newCategory;
+                                });
 
-                }).collect(Collectors.toList());
+                    }).collect(Collectors.toList());
 
-                // set the updated categories
-                existingCategories.clear();
-                existingCategories.addAll(updatedCategories);
-                break;
+                    // set the updated categories
+                    existingCategories.clear();
+                    existingCategories.addAll(updatedCategories);
+                    break;
                 default:
                     throw new IllegalArgumentException("Unknown field: " + key);
             }
@@ -155,14 +157,17 @@ public class BudgetService {
 
     public BudgetCategoryResponse addCategoryToBudget(Long userId, Long id, @Valid BudgetCategoryRequest request) {
         // find budget by id.
-        Budget budget = budgetRepository.findByIdAndUserId(id, userId).orElseThrow(() -> new BudgetNotFoundException("Budget Was Not Found"));
+        Budget budget = budgetRepository.findByIdAndUserId(id, userId)
+                .orElseThrow(() -> new BudgetNotFoundException("Budget Was Not Found"));
 
         // validate that the category name doest not already exist.
         boolean categoryExists = budget.getCategories()
                 .stream()
                 .anyMatch(category -> category.getCategoryName().equalsIgnoreCase(request.name()));
 
-        if (categoryExists) { throw new BudgetUpdateException("Category Name already exists"); }
+        if (categoryExists) {
+            throw new BudgetUpdateException("Category Name already exists");
+        }
 
         // create the new category
         BudgetCategory category = budgetMapper.toNewCategory(request, budget);
