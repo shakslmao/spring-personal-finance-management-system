@@ -5,7 +5,8 @@
             "name": "DiscoveryServiceApplication",
             "request": "launch",
             "mainClass": "com.devshaks.personal_finance.DiscoveryServiceApplication",
-            "projectName": "discovery-service"
+            "projectName": "discovery-service",
+            "vmArgs": " -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=50988 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dspring.jmx.enabled=true -Djava.rmi.server.hostname=localhost -Dspring.application.admin.enabled=true -Dspring.boot.project.name=discovery-service"
         },
         {
             "type": "java",
@@ -26,7 +27,8 @@
             "mainClass": "com.devshaks.personal_finance.ApigatewayServiceApplication",
             "projectName": "apigateway-service",
             "args": "",
-            "envFile": "${workspaceFolder}/.env"
+            "envFile": "${workspaceFolder}/.env",
+            "vmArgs": " -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=51012 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dspring.jmx.enabled=true -Djava.rmi.server.hostname=localhost -Dspring.application.admin.enabled=true -Dspring.boot.project.name=apigateway-service"
         },
         {
             "type": "java",
@@ -35,6 +37,16 @@
             "cwd": "${workspaceFolder}",
             "mainClass": "com.devshaks.personal_finance.user_service.UserServiceApplication",
             "projectName": "user-service",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot-BudgetServiceApplication<budget-service>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.devshaks.personal_finance.BudgetServiceApplication",
+            "projectName": "budget-service",
             "args": "",
             "envFile": "${workspaceFolder}/.env"
         }
