@@ -1,6 +1,8 @@
 package com.devshaks.personal_finance.budget;
 
 import com.devshaks.personal_finance.budget.category.BudgetCategory;
+import com.devshaks.personal_finance.budget.category.BudgetCategoryRequest;
+import com.devshaks.personal_finance.budget.category.BudgetCategoryResponse;
 import com.devshaks.personal_finance.exceptions.AuditEventException;
 import com.devshaks.personal_finance.exceptions.BudgetNotFoundException;
 import com.devshaks.personal_finance.exceptions.BudgetUpdateException;
@@ -9,6 +11,7 @@ import com.devshaks.personal_finance.kafka.audit.AuditEventSender;
 import com.devshaks.personal_finance.kafka.events.BudgetEvents;
 import com.devshaks.personal_finance.user.UserDetailsResponse;
 import com.devshaks.personal_finance.user.UserFeignClient;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -148,5 +151,24 @@ public class BudgetService {
         Budget updatedBudget = budgetRepository.save(budget);
         auditEventSender.sendEventToAudit(BudgetEvents.BUDGET_UPDATED, userId, "User Updated Their Budget");
         return budgetMapper.mapBudgetToResponse(updatedBudget);
+    }
+
+    public BudgetCategoryResponse addCategoryToBudget(Long userId, Long id, @Valid BudgetCategoryRequest request) {
+        // find budget by id.
+        Budget budget = budgetRepository.findByIdAndUserId(id, userId).orElseThrow(() -> new BudgetNotFoundException("Budget Was Not Found"));
+
+        // validate that the category name doest not already exist.
+        boolean categoryExists = budget.getCategories()
+                .stream()
+                .anyMatch(category -> category.getCategoryName().equalsIgnoreCase(request.name()));
+
+        if (categoryExists) { throw new BudgetUpdateException("Category Name already exists"); }
+
+        // create the new category
+        BudgetCategory category = budgetMapper.toNewCategory(request, budget);
+        budget.getCategories().add(category);
+        budgetRepository.save(budget);
+        auditEventSender.sendEventToAudit(BudgetEvents.BUDGET_CATEGORY_CREATED, userId, "User Added a New Category");
+        return budgetMapper.toNewCategoryResponse(category);
     }
 }

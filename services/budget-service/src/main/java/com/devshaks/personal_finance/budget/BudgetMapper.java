@@ -34,13 +34,21 @@ public class BudgetMapper {
         return budget;
     }
 
-    private BudgetCategory toNewCategory(BudgetCategoryRequest categoryRequest, Budget budget) {
+    public BudgetCategory toNewCategory(BudgetCategoryRequest categoryRequest, Budget budget) {
         return BudgetCategory.builder()
                 .categoryName(categoryRequest.name())
                 .categoryLimit(categoryRequest.categoryLimit() != null ? categoryRequest.categoryLimit() : BigDecimal.ZERO)
                 .spentAmount(BigDecimal.ZERO)
                 .budget(budget)
                 .build();
+    }
+
+    public BudgetCategoryResponse toNewCategoryResponse(BudgetCategory category) {
+        return new BudgetCategoryResponse(
+                category.getId(),
+                category.getCategoryName(),
+                category.getCategoryLimit(),
+                category.getSpentAmount());
     }
 
     public BudgetResponse mapBudgetToResponse(Budget budget) {
