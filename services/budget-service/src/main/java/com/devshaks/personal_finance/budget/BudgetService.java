@@ -16,7 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.YearMonth;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -94,21 +93,52 @@ public class BudgetService {
         updates.forEach((key, value) -> {
             switch (key) {
                 case "monthlyLimit":
-                    budget.setMonthlyLimit(new BigDecimal(value.toString()));
+                    BigDecimal newMonthlyLimit = new BigDecimal(value.toString());
+                    budget.setMonthlyLimit(newMonthlyLimit);
+                    budget.setRemainingAmount(newMonthlyLimit.subtract(budget.getSpentAmount()));
                     break;
                 case "month":
                     budget.setMonth(String.valueOf(YearMonth.parse(value.toString())));
                     break;
                 case "categories":
                 List<Map<String, Object>> categoryUpdates = (List<Map<String, Object>>) value;
-                List<BudgetCategory> updatedCategories = categoryUpdates.stream().map(category -> {
-                    BudgetCategory budgetCategory = new BudgetCategory();
-                    budgetCategory.setCategoryName(category.get("name").toString());
-                    budgetCategory.setCategoryLimit(new BigDecimal(category.get("categoryLimit").toString()));
-                    budgetCategory.setBudget(budget); // Set relationship if applicable
-                    return budgetCategory;
+
+                // Get existing categories
+                List<BudgetCategory> existingCategories = budget.getCategories();
+
+                // map new categories
+                List<BudgetCategory> updatedCategories = categoryUpdates.stream().map(categoryRequest -> {
+                    String name = categoryRequest.get("name") != null
+                            ? categoryRequest.get("name").toString()
+                            : null;
+                    BigDecimal categoryLimit = categoryRequest.get("categoryLimit") != null
+                            ? new BigDecimal(categoryRequest.get("categoryLimit").toString())
+                            : null;
+
+                    if (name == null || categoryLimit == null) {
+                        throw new BudgetUpdateException("Category Name and Category Limit cannot be null");
+                    }
+
+                    // check if the category exists
+                    return existingCategories.stream()
+                            .filter(c -> c.getCategoryName().equals(name))
+                            .findFirst()
+                            .map(existingCategory -> {
+                                existingCategory.setCategoryLimit(categoryLimit);
+                                return existingCategory;
+                            })
+                            .orElseGet(() -> {
+                                BudgetCategory newCategory = new BudgetCategory();
+                                newCategory.setCategoryLimit(categoryLimit);
+                                newCategory.setBudget(budget);
+                                return newCategory;
+                            });
+
                 }).collect(Collectors.toList());
-                budget.setCategories(updatedCategories);
+
+                // set the updated categories
+                existingCategories.clear();
+                existingCategories.addAll(updatedCategories);
                 break;
                 default:
                     throw new IllegalArgumentException("Unknown field: " + key);
