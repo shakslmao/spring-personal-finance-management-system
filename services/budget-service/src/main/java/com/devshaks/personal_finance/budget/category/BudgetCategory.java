@@ -1,5 +1,6 @@
-package com.devshaks.personal_finance.budget;
+package com.devshaks.personal_finance.budget.category;
 
+import com.devshaks.personal_finance.budget.Budget;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
