@@ -1,6 +1,6 @@
 package com.devshaks.personal_finance.kafka.consumer;
 
-import com.devshaks.personal_finance.kafka.audit.AuditEventProducer;
+import com.devshaks.personal_finance.exceptions.TransactionNotFoundException;
 import com.devshaks.personal_finance.kafka.audit.AuditEventSender;
 import com.devshaks.personal_finance.kafka.data.TransactionValidatedEventDTO;
 import com.devshaks.personal_finance.kafka.events.TransactionEvents;
@@ -18,14 +18,13 @@ import org.springframework.stereotype.Service;
 public class KafkaTransactionConsumer {
 
     private final TransactionsRepository transactionsRepository;
-    private final AuditEventProducer auditEventProducer;
     private final AuditEventSender auditEventSender;
 
     @KafkaListener(topics = "transaction-validated", groupId = "transactionGroup", containerFactory = "kafkaListenerContainerFactory")
-    public void consumeTransactionEvents(TransactionValidatedEventDTO transactionValidated) {
-        Transactions transactions = transactionsRepository.findById(transactionValidated.transactionId()).orElse(null);
-        assert transactions != null;
-        if (transactionValidated.isSuccessful()) {
+    public void consumeTransactionEvents(TransactionValidatedEventDTO event) {
+        Transactions transactions = transactionsRepository.findById(event.transactionId()).orElseThrow(() -> new TransactionNotFoundException("Transaction not found"));
+
+        if (event.isSuccessful()) {
             transactions.setTransactionStatus(TransactionsStatus.APPROVED);
             auditEventSender.sendEventToAudit(TransactionEvents.TRANSACTION_BUDGET_RESTRICTION_APPROVED, transactions.getUserId(), "Approved Transaction With Budget Restriction");
         } else {

@@ -1,9 +1,6 @@
 package com.devshaks.personal_finance.handlers;
 
-import com.devshaks.personal_finance.exceptions.AuditEventException;
-import com.devshaks.personal_finance.exceptions.BudgetNotFoundException;
-import com.devshaks.personal_finance.exceptions.TransactionNotFoundException;
-import com.devshaks.personal_finance.exceptions.UserNotFoundException;
+import com.devshaks.personal_finance.exceptions.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -35,7 +32,13 @@ public class GlobalExceptionHandlers {
 
     @ExceptionHandler(AuditEventException.class)
     public ResponseEntity<String> handleException(AuditEventException e) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(e.getMessage());
+    }
+
+    @ExceptionHandler(BudgetValidationException.class)
+    public ResponseEntity<String> handleException(BudgetValidationException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(e.getMessage());
     }
 

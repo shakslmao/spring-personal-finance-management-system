@@ -3,6 +3,7 @@ package com.devshaks.personal_finance.transactions;
 import com.devshaks.personal_finance.exceptions.TransactionNotFoundException;
 import com.devshaks.personal_finance.exceptions.UserNotFoundException;
 import com.devshaks.personal_finance.kafka.audit.AuditEventSender;
+import com.devshaks.personal_finance.kafka.transaction.TransactionEventSender;
 import com.devshaks.personal_finance.kafka.user.UserEventSender;
 import com.devshaks.personal_finance.users.UserDetailsResponse;
 import com.devshaks.personal_finance.users.UserFeignClient;
@@ -10,6 +11,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import org.apache.kafka.common.KafkaException;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
@@ -33,6 +35,7 @@ public class TransactionsService {
     private final UserFeignClient userFeignClient;
     private final AuditEventSender auditEventSender;
     private final UserEventSender userEventSender;
+    private final TransactionEventSender transactionEventSender;
 
 
     public TransactionsDTO newTransaction(@Valid TransactionsRequest transactionRequest, Long userId) {
@@ -41,8 +44,15 @@ public class TransactionsService {
         Transactions transactions = transactionsMapper.toNewTransaction(transactionRequest);
         transactions.setUserId(userId);
         Transactions savedTransaction = transactionsRepository.save(transactions);
-        auditEventSender.sendEventToAudit(TRANSACTION_CREATED, userId, "New Transaction Created");
-        userEventSender.sendEventToUser(userId, transactions.getId(), "New Transaction Recorded", transactions.getAmount());
+
+        try {
+            auditEventSender.sendEventToAudit(TRANSACTION_CREATED, userId, "New Transaction Created");
+            userEventSender.sendEventToUser(userId, transactions.getId(), "New Transaction Recorded", transactions.getAmount());
+            transactionEventSender.sendEventToBudget(transactions.getId(), userId, transactions.getCategory(), transactions.getAmount(), transactions.getDescription());
+        } catch (Exception e) {
+            throw new KafkaException("Failed to save new transaction", e);
+        }
+
         return transactionsMapper.toTransactionDTO(savedTransaction);
     }
 

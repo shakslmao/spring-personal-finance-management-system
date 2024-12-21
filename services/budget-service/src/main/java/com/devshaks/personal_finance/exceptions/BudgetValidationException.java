@@ -1,7 +1,11 @@
 package com.devshaks.personal_finance.exceptions;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
+@Data
+@EqualsAndHashCode(callSuper = true)
 public class BudgetValidationException extends RuntimeException {
-  public BudgetValidationException(String message) {
-    super(message);
-  }
+    private final String exceptionMessage;
+
 }

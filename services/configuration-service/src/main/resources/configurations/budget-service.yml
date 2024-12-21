@@ -18,7 +18,17 @@ spring:
             value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
             properties:
                 spring.json.type.mapping.com.devshaks.personal_finance.kafka.data.AuditBudgetEventDTO: com.devshaks.personal_finance.kafka.data.AuditBudgetEventDTO
+                spring.json.type.mapping.com.devshaks.personal_finance.kafka.data.TransactionValidatedEventDTO: com.devshaks.personal_finance.kafka.data.TransactionValidatedEventDTO
 
+        consumer:
+            bootstrap-servers: localhost:9092
+            group-id: budgetGroup
+            auto-offset-reset: earliest
+            key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+            value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+            properties:
+                spring.json.trusted.packages: "*"
+                spring.json.type.mapping.com.devshaks.personal_finance.kafka.data.TransactionCreatedEventDTO: com.devshaks.personal_finance.kafka.data.TransactionCreatedEventDTO
 
 application:
     config:
