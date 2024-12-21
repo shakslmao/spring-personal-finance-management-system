@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @RestController
@@ -44,20 +45,28 @@ public class BudgetController {
     }
 
     // Delete a Budget
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/user/{userId}/delete/{id}")
     @Operation(summary = "Delete a Budget by Budget ID")
     @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Budget Deleted Successfully"),  @ApiResponse(responseCode = "404", description = "Budget Not Found")})
-    public ResponseEntity<String> deleteBudget(@PathVariable("id") Long id) {
-        budgetService.deleteBudget(id);
-        return ResponseEntity.ok("Budget Deleted Successfully");
+    public ResponseEntity<Void> deleteBudget(@PathVariable("userId") Long userId, @PathVariable("id") Long id) {
+        budgetService.deleteBudget(userId, id);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
-
     // Update an Existing Budget
+    @PutMapping("/update/{userId}/{id}")
+    @Operation(summary = "Update Budget Details By Budget ID")
+    @ApiResponses(value = { @ApiResponse(responseCode = "200", description = ""), @ApiResponse(responseCode = "404", description = "")})
+    public ResponseEntity<BudgetResponse> updateBudget(
+            @PathVariable("userId") Long userId,
+            @PathVariable("id") Long id,
+            @RequestBody Map<String, Object> updates) {
+        BudgetResponse updatedBudget = budgetService.updateBudget(userId, id, updates);
+        return ResponseEntity.status(HttpStatus.OK).body(updatedBudget);
+
+    }
 
     // Add a new Category to an Existing Budget
-
-    // Update a Category from a Budget
 
     // Delete a Category from a Budget
 
