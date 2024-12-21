@@ -1,7 +1,9 @@
 package com.devshaks.personal_finance.budget;
 
+import com.devshaks.personal_finance.budget.category.BudgetCategory;
 import com.devshaks.personal_finance.exceptions.AuditEventException;
 import com.devshaks.personal_finance.exceptions.BudgetNotFoundException;
+import com.devshaks.personal_finance.exceptions.BudgetUpdateException;
 import com.devshaks.personal_finance.exceptions.UserNotFoundException;
 import com.devshaks.personal_finance.kafka.audit.AuditEventSender;
 import com.devshaks.personal_finance.kafka.events.BudgetEvents;
@@ -12,7 +14,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+import java.time.YearMonth;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -67,7 +73,50 @@ public class BudgetService {
                 .collect(Collectors.toList());
     }
 
-    public void deleteBudget(Long id) {
-        budgetRepository.deleteById(id);
+    public void deleteBudget(Long id, Long userId) {
+        if (!budgetRepository.existsByIdAndUserId(id, userId)) {
+            throw new BudgetNotFoundException("Budget Was Not Found");
+        }
+        try {
+            budgetRepository.deleteByIdAndUserId(id, userId);
+            auditEventSender.sendEventToAudit(BudgetEvents.BUDGET_DELETED, userId, "User Deleted Budget");
+
+        } catch (Exception e) {
+            log.error("Failed to delete budget with ID: {} for user ID: {}. Error: {}", id, userId, e.getMessage());
+            throw new AuditEventException("Failed to delete budget");
+        }
+    }
+
+    public BudgetResponse updateBudget(Long userId, Long id, Map<String, Object> updates) {
+        Budget budget = budgetRepository.findByIdAndUserId(id, userId)
+                .orElseThrow(() -> new BudgetNotFoundException("Budget Was Not Found"));
+
+        updates.forEach((key, value) -> {
+            switch (key) {
+                case "monthlyLimit":
+                    budget.setMonthlyLimit(new BigDecimal(value.toString()));
+                    break;
+                case "month":
+                    budget.setMonth(String.valueOf(YearMonth.parse(value.toString())));
+                    break;
+                case "categories":
+                List<Map<String, Object>> categoryUpdates = (List<Map<String, Object>>) value;
+                List<BudgetCategory> updatedCategories = categoryUpdates.stream().map(category -> {
+                    BudgetCategory budgetCategory = new BudgetCategory();
+                    budgetCategory.setCategoryName(category.get("name").toString());
+                    budgetCategory.setCategoryLimit(new BigDecimal(category.get("categoryLimit").toString()));
+                    budgetCategory.setBudget(budget); // Set relationship if applicable
+                    return budgetCategory;
+                }).collect(Collectors.toList());
+                budget.setCategories(updatedCategories);
+                break;
+                default:
+                    throw new IllegalArgumentException("Unknown field: " + key);
+            }
+        });
+
+        Budget updatedBudget = budgetRepository.save(budget);
+        auditEventSender.sendEventToAudit(BudgetEvents.BUDGET_UPDATED, userId, "User Updated Their Budget");
+        return budgetMapper.mapBudgetToResponse(updatedBudget);
     }
 }
