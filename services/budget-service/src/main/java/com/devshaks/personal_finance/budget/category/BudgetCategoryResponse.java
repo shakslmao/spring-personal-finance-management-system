@@ -1,4 +1,4 @@
-package com.devshaks.personal_finance.budget;
+package com.devshaks.personal_finance.budget.category;
 
 import java.math.BigDecimal;
 
