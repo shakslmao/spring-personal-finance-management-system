@@ -1,9 +1,12 @@
 package com.devshaks.personal_finance.budget;
 
+import com.devshaks.personal_finance.budget.category.BudgetCategoryRequest;
+import com.devshaks.personal_finance.budget.category.BudgetCategoryResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -21,6 +24,7 @@ import java.util.Map;
 public class BudgetController {
     private final BudgetService budgetService;
 
+    // Create Budget
     @PostMapping("/create/{userId}")
     @Operation(summary = "Set a new Budget Limit for a User")
     @ApiResponses(value = { @ApiResponse(responseCode = "201"), @ApiResponse(responseCode = "400" )})
@@ -29,6 +33,7 @@ public class BudgetController {
         return ResponseEntity.status(HttpStatus.CREATED).body(budgetResponse);
     }
 
+    // Get Budget By ID.
     @GetMapping("/{id}")
     @Operation(summary = "Get Budget Details by Budget ID")
     @ApiResponses(value = { @ApiResponse(responseCode = "200"),  @ApiResponse(responseCode = "404" )})
@@ -36,6 +41,7 @@ public class BudgetController {
         return ResponseEntity.ok(budgetService.getBudgetById(id));
     }
 
+    // Get user Budgets
     @GetMapping("/user/{userId}")
     @Operation(summary = "Get a Budget Response From a User ID.")
     @ApiResponses(value = {@ApiResponse(responseCode = "200"), @ApiResponse(responseCode = "404" )})
@@ -67,6 +73,11 @@ public class BudgetController {
     }
 
     // Add a new Category to an Existing Budget
+    @PostMapping("/categories/{userId}/{id}")
+    public ResponseEntity<BudgetCategoryResponse> addCategoryToBudget(@PathVariable("userId") Long userId, @PathVariable("id") Long id, @Valid @RequestBody BudgetCategoryRequest request) {
+        BudgetCategoryResponse categoryResponse = budgetService.addCategoryToBudget(userId, id, request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(categoryResponse);
+    }
 
     // Delete a Category from a Budget
 
