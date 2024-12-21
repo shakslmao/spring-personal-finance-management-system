@@ -4,6 +4,7 @@ import com.devshaks.personal_finance.budget.Budget;
 import com.devshaks.personal_finance.budget.BudgetRepository;
 import com.devshaks.personal_finance.budget.category.BudgetCategory;
 import com.devshaks.personal_finance.budget.category.BudgetCategoryRepository;
+import com.devshaks.personal_finance.exceptions.BudgetValidationException;
 import com.devshaks.personal_finance.kafka.data.TransactionCreatedEventDTO;
 import com.devshaks.personal_finance.kafka.transactions.TransactionEventSender;
 import lombok.RequiredArgsConstructor;
@@ -23,12 +24,19 @@ public class KafkaBudgetConsumer {
 
     @KafkaListener(topics = "transaction-created", groupId = "budgetGroup", containerFactory = "kafkaListenerContainerFactory")
     public void consumeBudgetEvents(TransactionCreatedEventDTO transactionEvent) {
-        boolean isSuccessful = validateAndUpdateBudget(transactionEvent);
-        transactionEventSender.sendEventToTransaction(
-                transactionEvent.transactionId(),
-                transactionEvent.userId(),
-                isSuccessful,
-                isSuccessful ? "Transaction Approved" : "Exceeds Budget or Category Limit");
+        try {
+            boolean isSuccessful = validateAndUpdateBudget(transactionEvent);
+            transactionEventSender.sendEventToTransaction(
+                    transactionEvent.transactionId(),
+                    transactionEvent.userId(),
+                    isSuccessful,
+                    "Transaction Approved");
+        } catch (BudgetValidationException ex) {
+            transactionEventSender.sendEventToTransaction(
+                    transactionEvent.transactionId(),
+                    transactionEvent.userId(),
+                    false,
+                    ex.getExceptionMessage());}
     }
 
     private boolean validateAndUpdateBudget(TransactionCreatedEventDTO transactionEvent) {
@@ -37,7 +45,7 @@ public class KafkaBudgetConsumer {
 
         // Check if transaction exceeds monthly limit.
         if (budget.getRemainingAmount().compareTo(transactionEvent.amount()) < 0) {
-            return false;
+            throw new BudgetValidationException("Transaction Exceeds Monthly Budget Limit");
         }
 
         // check category limit if category exists
@@ -47,7 +55,7 @@ public class KafkaBudgetConsumer {
 
             if (category.getCategoryLimit() != null &&
                     category.getCategoryLimit().subtract(category.getSpentAmount()).compareTo(transactionEvent.amount()) < 0) {
-                return false;
+                throw new BudgetValidationException("Transaction Exceeds Monthly Budget Limit");
             }
 
             category.setSpentAmount(category.getSpentAmount().add(transactionEvent.amount()));
