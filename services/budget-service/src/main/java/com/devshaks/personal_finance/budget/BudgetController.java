@@ -78,11 +78,4 @@ public class BudgetController {
         BudgetCategoryResponse categoryResponse = budgetService.addCategoryToBudget(userId, id, request);
         return ResponseEntity.status(HttpStatus.CREATED).body(categoryResponse);
     }
-
-    // Delete a Category from a Budget
-
-    // Check if a Transaction Exceeds a Budget
-
-    // Generate Budget Report.
-
-  }
+}
