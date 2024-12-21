@@ -1,5 +1,8 @@
 package com.devshaks.personal_finance.budget;
 
+import com.devshaks.personal_finance.budget.category.BudgetCategory;
+import com.devshaks.personal_finance.budget.category.BudgetCategoryRequest;
+import com.devshaks.personal_finance.budget.category.BudgetCategoryResponse;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;

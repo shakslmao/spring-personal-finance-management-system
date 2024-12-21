@@ -1,5 +1,7 @@
 package com.devshaks.personal_finance.budget;
 
+import com.devshaks.personal_finance.budget.category.BudgetCategoryResponse;
+
 import java.math.BigDecimal;
 import java.time.YearMonth;
 import java.util.List;

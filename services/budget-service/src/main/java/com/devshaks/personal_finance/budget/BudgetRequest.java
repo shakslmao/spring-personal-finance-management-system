@@ -1,5 +1,6 @@
 package com.devshaks.personal_finance.budget;
 
+import com.devshaks.personal_finance.budget.category.BudgetCategoryRequest;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 
