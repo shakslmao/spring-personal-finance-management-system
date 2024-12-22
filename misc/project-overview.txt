@@ -15,18 +15,15 @@ Microservices to Create
 Enterprise-Grade Technologies to Implement
 Backend Libraries:
     - Spring Boot: Core Backend Framework
-    - Spring Batch: For processing large datasets like financial transactions.
     - Spring Security: For user authentication and authorisation.
 
 Service Coordination:
     - Eureka: Service Discovery and Registration
-    - Ribbon: Load Balancer
     - Feign: REST Client
     - Resilience4j: Circuit Breaker
     - API Gateway - Spring Cloud Gateway
 
 Asynchronous Communication:
-    - RabbitMQ: Message Broker
     - Kafka: Message Broker
 
 OpenAPI Specification:
@@ -46,7 +43,6 @@ Data Visualisation:
 
 Authentication:
     - OAuth2: For secure user authentication and authorisation
-    - JWT: For stateless authentication
     - Keycloak
 
 Payment API:
@@ -57,7 +53,6 @@ DevOps:
     - Kubernetes: Container Orchestration
     - GitHub Actions or Jenkins: CI/CD Pipeline
     - Prometheus: Monitoring and Alerting
-    - ELK Stack: Log Management
 
 Security:
     - Vault by HashiCorp: For secure management of sensitive data (e.g., API keys, passwords)

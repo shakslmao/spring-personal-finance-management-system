@@ -12,7 +12,6 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 @EnableFeignClients
 @EnableCaching
 public class TransactionsServiceApplication {
-
     public static void main(String[] args) {
         Dotenv dotenv = Dotenv.load();
         System.setProperty("POSTGRES_USER", dotenv.get("POSTGRES_USER"));
