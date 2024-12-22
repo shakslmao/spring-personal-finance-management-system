@@ -16,13 +16,13 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class KafkaTransactionConsumer {
-
     private final TransactionsRepository transactionsRepository;
     private final AuditEventSender auditEventSender;
 
     @KafkaListener(topics = "transaction-validated", groupId = "transactionGroup", containerFactory = "kafkaListenerContainerFactory")
     public void consumeTransactionEvents(TransactionValidatedEventDTO event) {
-        Transactions transactions = transactionsRepository.findById(event.transactionId()).orElseThrow(() -> new TransactionNotFoundException("Transaction not found"));
+        Transactions transactions = transactionsRepository.findById(event.transactionId())
+                .orElseThrow(() -> new TransactionNotFoundException("Transaction not found"));
 
         if (event.isSuccessful()) {
             transactions.setTransactionStatus(TransactionsStatus.APPROVED);

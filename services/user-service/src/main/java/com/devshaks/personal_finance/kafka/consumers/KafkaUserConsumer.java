@@ -9,21 +9,15 @@ import com.devshaks.personal_finance.users.UserRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.exception.ConstraintViolationException;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Map;
 import java.util.function.Consumer;
 
@@ -36,7 +30,8 @@ public class KafkaUserConsumer {
     private final ObjectMapper objectMapper;
     private Map<String, Consumer<Object>> topicHandlerRegistry;
 
-    @KafkaListener(topics = {"transaction-topic", "budget-topic", "notification-topic"}, groupId = "userGroup", containerFactory = "kafkaListenerContainerFactory")
+    @KafkaListener(topics = { "transaction-topic", "budget-topic",
+            "notification-topic" }, groupId = "userGroup", containerFactory = "kafkaListenerContainerFactory")
     public void consumeUserEvent(@Payload String payload, @Header("kafka_receivedTopic") String topic) {
         try {
             log.info("Received Event From: {}: {}", topic, payload);
@@ -58,8 +53,11 @@ public class KafkaUserConsumer {
     }
 
     private void processEvent(String topic, Object event) {
-        Consumer<Object> handler = topicHandlerRegistry.getOrDefault(topic, e -> log.warn("No Handler Was Found For Topic: {}, event: {}", topic, e));
-        if (handler == null) { throw new IllegalArgumentException("Unknown topic: " + topic); }
+        Consumer<Object> handler = topicHandlerRegistry.getOrDefault(topic,
+                e -> log.warn("No Handler Was Found For Topic: {}, event: {}", topic, e));
+        if (handler == null) {
+            throw new IllegalArgumentException("Unknown topic: " + topic);
+        }
         try {
             handler.accept(event);
         } catch (Exception e) {
@@ -75,12 +73,13 @@ public class KafkaUserConsumer {
                     handleTransactionEvent(transactionEvent);
                 },
                 "unknown", event -> log.warn("Fallback Handler Invoked for Unsupported Event: {}", event)
-                // todo: budget, notification
+        // todo: budget, notification
         );
     }
 
     public void handleTransactionEvent(@Valid UserTransactionEventDTO event) {
-        User user = userRepository.findById(event.userId()).orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        User user = userRepository.findById(event.userId())
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
         Transactions transactions = Transactions.builder()
                 .user(user)
                 .transactionId(event.transactionId())
