@@ -1,5 +1,7 @@
 package com.devshaks.personal_finance.handlers;
 
+import com.devshaks.personal_finance.exceptions.BudgetExceededException;
+import com.devshaks.personal_finance.exceptions.BudgetNotFoundException;
 import com.devshaks.personal_finance.exceptions.TransactionNotFoundException;
 import com.devshaks.personal_finance.exceptions.UserNotFoundException;
 import org.springframework.http.HttpStatus;
@@ -22,6 +24,18 @@ public class GlobalExceptionHandlers {
     @ExceptionHandler(TransactionNotFoundException.class)
     public ResponseEntity<String> handleException(TransactionNotFoundException e) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(e.getMessage());
+    }
+
+    @ExceptionHandler(BudgetExceededException.class)
+    public ResponseEntity<String> handleException(BudgetExceededException e) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(e.getMessage());
+    }
+
+    @ExceptionHandler(BudgetNotFoundException.class)
+    public ResponseEntity<String> handleException(BudgetNotFoundException e) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
                 .body(e.getMessage());
     }
 
