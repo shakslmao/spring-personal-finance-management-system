@@ -1,5 +1,7 @@
 package com.devshaks.personal_finance.transactions;
 
+import com.devshaks.personal_finance.exceptions.BudgetExceededException;
+import com.devshaks.personal_finance.exceptions.BudgetNotFoundException;
 import com.devshaks.personal_finance.exceptions.TransactionNotFoundException;
 import com.devshaks.personal_finance.exceptions.UserNotFoundException;
 import com.devshaks.personal_finance.kafka.audit.AuditEventSender;
@@ -16,7 +18,9 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -43,18 +47,28 @@ public class TransactionsService {
         }
         Transactions transactions = transactionsMapper.toNewTransaction(transactionRequest);
         transactions.setUserId(userId);
+        transactions.setTransactionStatus(TransactionsStatus.PENDING);
         Transactions savedTransaction = transactionsRepository.save(transactions);
 
         try {
-            auditEventSender.sendEventToAudit(TRANSACTION_CREATED, userId, "New Transaction Created");
-            userEventSender.sendEventToUser(userId, transactions.getId(), "New Transaction Recorded",
-                    transactions.getAmount());
-            transactionEventSender.sendEventToBudget(transactions.getId(), userId, transactions.getCategory(),
-                    transactions.getAmount(), transactions.getDescription());
-        } catch (Exception e) {
-            throw new KafkaException("Failed to save new transaction", e);
+            transactionEventSender.sendEventToBudget(
+                    transactions.getId(),
+                    transactions.getUserId(),
+                    transactions.getCategory(),
+                    transactions.getAmount(),
+                    transactions.getDescription());
+        } catch (BudgetExceededException | BudgetNotFoundException ex) {
+            savedTransaction.setTransactionStatus(TransactionsStatus.REJECTED);
+            transactionsRepository.save(savedTransaction);
+            throw new ResponseStatusException(HttpStatus.CONFLICT, ex.getMessage());
+        } catch (Exception ex) {
+            savedTransaction.setTransactionStatus(TransactionsStatus.REJECTED);
+            transactionsRepository.save(savedTransaction);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to validate transaction");
         }
 
+        auditEventSender.sendEventToAudit(TRANSACTION_CREATED, userId, "New Transaction Created");
+        // userEventSender.sendEventToUser(userId, transactions.getId(), "New Transaction Recorded", transactions.getAmount());
         return transactionsMapper.toTransactionDTO(savedTransaction);
     }
 
