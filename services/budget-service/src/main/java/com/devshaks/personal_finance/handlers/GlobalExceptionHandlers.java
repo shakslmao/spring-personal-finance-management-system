@@ -30,6 +30,19 @@ public class GlobalExceptionHandlers {
                 .body(e.getMessage());
     }
 
+    @ExceptionHandler(BudgetCategoryNotFoundException.class)
+    public ResponseEntity<String> handleException(BudgetCategoryNotFoundException e) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(e.getMessage());
+    }
+
+    @ExceptionHandler(BudgetExceededException.class)
+    public ResponseEntity<String> handleException(BudgetExceededException e) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(e.getMessage());
+    }
+
+
     @ExceptionHandler(AuditEventException.class)
     public ResponseEntity<String> handleException(AuditEventException e) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
