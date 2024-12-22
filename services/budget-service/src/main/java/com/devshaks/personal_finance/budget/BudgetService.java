@@ -106,6 +106,7 @@ public class BudgetService {
                     budget.setMonth(String.valueOf(YearMonth.parse(value.toString())));
                     break;
                 case "categories":
+                    @SuppressWarnings("unchecked")
                     List<Map<String, Object>> categoryUpdates = (List<Map<String, Object>>) value;
 
                     // Get existing categories
