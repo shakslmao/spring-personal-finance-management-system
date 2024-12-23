@@ -89,7 +89,6 @@ public class KafkaBudgetConsumer {
         budget.setSpentAmount(budget.getSpentAmount().add(transactionEvent.amount()));
         budget.setRemainingAmount(budget.getMonthlyLimit().subtract(budget.getSpentAmount()));
         budgetRepository.save(budget);
-
         return true;
     }
 }
