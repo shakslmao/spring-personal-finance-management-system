@@ -42,6 +42,7 @@ Phase 3: Transaction Service
        - Concurrent Collections
        - Parallel Processing Strategies
        - Thread Safety Implementations
+
     5. Predictive analytics using AI/ML to forecast spending patterns.
         - Time-based: Day of the week, month, seasonality.
         - Behavioral: Spending frequency, average spending per category.
