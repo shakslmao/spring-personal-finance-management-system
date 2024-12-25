@@ -140,7 +140,7 @@ public class BudgetService {
                                     return newCategory;
                                 });
 
-                    }).collect(Collectors.toList());
+                    }).toList();
 
                     // set the updated categories
                     existingCategories.clear();
