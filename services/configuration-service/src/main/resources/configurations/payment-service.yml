@@ -1,6 +1,6 @@
 spring:
     datasource:
-        url: jdbc:postgresql://localhost:5432/transactiondb
+        url: jdbc:postgresql://localhost:5432/paymentdb
         username: ${POSTGRES_USER}
         password: ${POSTGRES_PASSWORD}
         driver-class-name: org.postgresql.Driver
@@ -10,6 +10,11 @@ spring:
         database: postgresql
         database-platform: org.hibernate.dialect.PostgreSQLDialect
         show-sql: true
+
+application:
+    config:
+        STRIPE_API_SECRET_KEY: ${STRIPE_API_SECRET_KEY}
+        STRIPE_API_PUBLISHABLE_KEY: ${STRIPE_API_PUBLISHABLE_KEY}
 
 server:
     port: 8070
