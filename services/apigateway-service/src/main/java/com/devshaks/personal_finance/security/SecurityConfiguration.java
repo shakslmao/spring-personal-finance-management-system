@@ -18,9 +18,6 @@ public class SecurityConfiguration {
                 .authorizeExchange(exchange -> exchange
                         .pathMatchers("(/eureka/**)").permitAll()
                         .pathMatchers("/api/v1/users/register").permitAll()
-                        .pathMatchers("/api/v1/users/**").authenticated()
-                        .pathMatchers("/api/v1/transactions/**").authenticated()
-                        .pathMatchers("/api/v1/audits/**").authenticated()
                         .anyExchange()
                         .authenticated())
                 .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()));
