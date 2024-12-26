@@ -15,6 +15,8 @@ public class PaymentServiceApplication {
 		Dotenv dotenv = Dotenv.load();
 		System.setProperty("POSTGRES_USER", dotenv.get("POSTGRES_USER"));
 		System.setProperty("POSTGRES_PASSWORD", dotenv.get("POSTGRES_PASSWORD"));
+		System.setProperty("STRIPE_API_SECRET_KEY", dotenv.get("STRIPE_API_SECRET_KEY"));
+		System.setProperty("STRIPE_API_PUBLISHABLE_KEY", dotenv.get("STRIPE_API_PUBLISHABLE_KEY"));
 		SpringApplication.run(PaymentServiceApplication.class, args);
 	}
 }
