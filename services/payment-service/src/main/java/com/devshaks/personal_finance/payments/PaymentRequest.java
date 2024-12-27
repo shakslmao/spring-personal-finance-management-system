@@ -1,4 +1,11 @@
 package com.devshaks.personal_finance.payments;
 
-public record PaymentRequest() {
+import java.math.BigDecimal;
+
+public record PaymentRequest(
+        Long transactionId,
+        Long userId,
+        BigDecimal amount,
+        String currency
+) {
 }
