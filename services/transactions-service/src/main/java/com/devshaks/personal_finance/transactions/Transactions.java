@@ -42,6 +42,10 @@ public class Transactions {
     @Column(nullable = false)
     private TransactionsStatus transactionStatus;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = true)
+    private PaymentStatus paymentStatus;
+
     @Column(nullable = false)
     private String description;
 
