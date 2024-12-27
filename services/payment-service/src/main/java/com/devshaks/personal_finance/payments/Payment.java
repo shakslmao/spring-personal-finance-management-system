@@ -41,7 +41,7 @@ public class Payment {
     @Enumerated(EnumType.STRING)
     private PaymentStatus status;
 
-    @Column
+    @Column(columnDefinition = "TEXT")
     private String gatewayResponse;
 
     @CreatedDate
