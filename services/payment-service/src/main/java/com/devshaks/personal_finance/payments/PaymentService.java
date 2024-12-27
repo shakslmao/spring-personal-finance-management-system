@@ -25,6 +25,8 @@ public class PaymentService {
                     .putMetadata("transactionId",String.valueOf(paymentRequest.transactionId()))
                     .build();
             PaymentIntent paymentIntent = PaymentIntent.create(params);
+            String gatewayResponse = paymentIntent.toJson();
+
             Payment payment = Payment.builder()
                     .paymentStripeId(paymentIntent.getId())
                     .userId(paymentRequest.userId())
@@ -32,10 +34,11 @@ public class PaymentService {
                     .amount(paymentRequest.amount())
                     .currency(paymentRequest.currency())
                     .status(PaymentStatus.PAYMENT_PENDING)
+                    .gatewayResponse(gatewayResponse)
                     .build();
             paymentRepository.save(payment);
-            return new PaymentResponse(paymentIntent.getId(), PaymentStatus.PAYMENT_PENDING);
 
+            return new PaymentResponse(paymentIntent.getId(), PaymentStatus.PAYMENT_PENDING, gatewayResponse);
         } catch (Exception e) {
             throw new PaymentValidationException(e.getMessage());
         }
