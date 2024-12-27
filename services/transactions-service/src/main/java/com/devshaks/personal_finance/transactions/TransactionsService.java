@@ -3,11 +3,9 @@ package com.devshaks.personal_finance.transactions;
 import com.devshaks.personal_finance.budget.BudgetCategoryResponse;
 import com.devshaks.personal_finance.budget.BudgetFeignClient;
 import com.devshaks.personal_finance.budget.BudgetResponse;
-import com.devshaks.personal_finance.exceptions.BudgetExceededException;
-import com.devshaks.personal_finance.exceptions.BudgetNotFoundException;
-import com.devshaks.personal_finance.exceptions.TransactionNotFoundException;
-import com.devshaks.personal_finance.exceptions.UserNotFoundException;
+import com.devshaks.personal_finance.exceptions.*;
 import com.devshaks.personal_finance.kafka.audit.AuditEventSender;
+import com.devshaks.personal_finance.kafka.payment.PaymentEventSender;
 import com.devshaks.personal_finance.kafka.transaction.TransactionEventSender;
 import com.devshaks.personal_finance.kafka.user.UserEventSender;
 import com.devshaks.personal_finance.users.UserDetailsResponse;
@@ -45,6 +43,7 @@ public class TransactionsService {
     private final AuditEventSender auditEventSender;
     private final UserEventSender userEventSender;
     private final TransactionEventSender transactionEventSender;
+    private final PaymentEventSender paymentEventSender;
 
     public TransactionsDTO newTransaction(@Valid TransactionsRequest transactionRequest, Long userId) {
         // Confirm user exists
@@ -93,6 +92,7 @@ public class TransactionsService {
 
         Transactions transactions = transactionsMapper.toNewTransaction(transactionRequest);
         transactions.setUserId(userId);
+        transactions.setPaymentStatus(PaymentStatus.PAYMENT_PENDING);
         transactions.setTransactionStatus(TransactionsStatus.PENDING);
         Transactions savedTransaction = transactionsRepository.save(transactions);
 
@@ -111,6 +111,19 @@ public class TransactionsService {
             savedTransaction.setTransactionStatus(TransactionsStatus.REJECTED);
             transactionsRepository.save(savedTransaction);
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to validate transaction");
+        }
+
+        try {
+            paymentEventSender.sendEventToPayment(
+                    transactions.getUserId(),
+                    transactions.getId(),
+                    transactions.getAmount()
+            );
+
+        } catch (PaymentValidationException ex) {
+            savedTransaction.setPaymentStatus(PaymentStatus.PAYMENT_REJECTED);
+            transactionsRepository.save(savedTransaction);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to send payment validation event");
         }
 
         auditEventSender.sendEventToAudit(TRANSACTION_CREATED, userId, "New Transaction Created");
