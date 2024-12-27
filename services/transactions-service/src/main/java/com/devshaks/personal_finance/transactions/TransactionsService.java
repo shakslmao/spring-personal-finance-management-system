@@ -121,7 +121,7 @@ public class TransactionsService {
             );
 
         } catch (PaymentValidationException ex) {
-            savedTransaction.setPaymentStatus(PaymentStatus.PAYMENT_REJECTED);
+            savedTransaction.setPaymentStatus(PaymentStatus.PAYMENT_FAILED);
             transactionsRepository.save(savedTransaction);
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to send payment validation event");
         }
