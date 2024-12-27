@@ -1,6 +1,7 @@
 package com.devshaks.personal_finance.kafka.data;
 
-import com.devshaks.personal_finance.kafka.transactions.PaymentStatus;
+
+import com.devshaks.personal_finance.payments.PaymentStatus;
 
 import java.math.BigDecimal;
 
