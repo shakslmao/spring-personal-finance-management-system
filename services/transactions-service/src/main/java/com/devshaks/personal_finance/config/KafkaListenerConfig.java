@@ -22,24 +22,21 @@ import java.util.Map;
 public class KafkaListenerConfig {
 
     @Bean
-    public ConcurrentKafkaListenerContainerFactory<String, TransactionValidatedEventDTO> kafkaListenerContainerFactory(
-            ConsumerFactory<String, TransactionValidatedEventDTO> consumerFactory) {
-        ConcurrentKafkaListenerContainerFactory<String, TransactionValidatedEventDTO> factory =
+    public ConcurrentKafkaListenerContainerFactory<String, String> kafkaListenerContainerFactory(
+            ConsumerFactory<String, String> consumerFactory) {
+        ConcurrentKafkaListenerContainerFactory<String, String> factory =
                 new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerFactory);
         return factory;
     }
 
     @Bean
-    public ConsumerFactory<String, TransactionValidatedEventDTO> consumerFactory() {
-        JsonDeserializer<TransactionValidatedEventDTO> deserializer = new JsonDeserializer<>(TransactionValidatedEventDTO.class);
-        deserializer.setRemoveTypeHeaders(false);
-        deserializer.addTrustedPackages("*");
-        deserializer.setUseTypeMapperForKey(true);
-
+    public ConsumerFactory<String, String> consumerFactory() {
         Map<String, Object> config = new HashMap<>();
         config.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
         config.put(ConsumerConfig.GROUP_ID_CONFIG, "transactionGroup");
-        return new DefaultKafkaConsumerFactory<>(config, new StringDeserializer(), deserializer);
+        config.put(JsonDeserializer.TRUSTED_PACKAGES, "*");
+        return new DefaultKafkaConsumerFactory<>(config, new StringDeserializer(), new StringDeserializer());
+
     }
 }
