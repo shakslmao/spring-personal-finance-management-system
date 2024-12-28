@@ -6,6 +6,8 @@ public record PaymentRequest(
         Long transactionId,
         Long userId,
         BigDecimal amount,
-        String currency
+        String currency,
+        String paymentStripeId
+
 ) {
 }

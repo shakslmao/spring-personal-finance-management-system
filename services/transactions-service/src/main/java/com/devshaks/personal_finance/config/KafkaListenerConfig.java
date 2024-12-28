@@ -1,7 +1,5 @@
 package com.devshaks.personal_finance.config;
 
-import com.devshaks.personal_finance.kafka.data.TransactionCreatedEventDTO;
-import com.devshaks.personal_finance.kafka.data.TransactionValidatedEventDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;

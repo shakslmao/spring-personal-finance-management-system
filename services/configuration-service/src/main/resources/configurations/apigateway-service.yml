@@ -42,6 +42,15 @@ spring:
                       - RemoveRequestHeader=Cookie
                       - AddRequestHeader=Authorization, "${request.headers['Authorization']:default-token}"
 
+                - id: payment-service
+                  uri: lb://PAYMENT-SERVICE
+                  predicates:
+                      - Path=/api/v1/payments/**
+                  filters:
+                      - RemoveRequestHeader=Cookie
+                      - AddRequestHeader=Authorization, "${request.headers['Authorization']:default-token}"
+
+
 logging:
     level:
         org.springframework.security.oauth2.server.resource: DEBUG
