@@ -40,43 +40,42 @@ spring:
                 spring.json.type.mapping.com.devshaks.personal_finance.kafka.data.TransactionValidatedEventDTO: com.devshaks.personal_finance.kafka.data.TransactionValidatedEventDTO
                 spring.json.type.mapping.com.devshaks.personal_finance.kafka.data.PaymentTransactionEventDTO: com.devshaks.personal_finance.kafka.data.PaymentTransactionEventDTO
 
-
 application:
     config:
         user-service-url: http://localhost:8222/api/v1/users
         budget-service-url: http://localhost:8222/api/v1/budgets
+        payment-service-url: http://localhost:8222/api/v1/payments
 
 resilience4j:
     circuitbreaker:
         instances:
             userService:
-                register-health-indicator: true         # Enables health check endpoint for the circuit breaker
-                sliding-window-size: 10                # Number of calls to record in the sliding window
-                minimum-number-of-calls: 5             # Minimum calls before evaluating failure rate
-                failure-rate-threshold: 50             # Percentage of failed calls to open the circuit
-                wait-duration-in-open-state: 10s       # Time before the circuit transitions from open to half-open
+                register-health-indicator: true # Enables health check endpoint for the circuit breaker
+                sliding-window-size: 10 # Number of calls to record in the sliding window
+                minimum-number-of-calls: 5 # Minimum calls before evaluating failure rate
+                failure-rate-threshold: 50 # Percentage of failed calls to open the circuit
+                wait-duration-in-open-state: 10s # Time before the circuit transitions from open to half-open
                 permitted-number-of-calls-in-half-open-state: 3 # Number of calls allowed in half-open state
                 automatic-transition-from-open-to-half-open-enabled: true # Auto transition enabled
 
     retry:
         instances:
             userService:
-                max-attempts: 3                        # Maximum number of retry attempts
-                wait-duration: 2s                      # Delay between retry attempts
-                enable-exponential-backoff: true       # Option to use exponential backoff for retries
-                exponential-backoff-multiplier: 1.5    # Backoff multiplier (only if exponential backoff is enabled)
+                max-attempts: 3 # Maximum number of retry attempts
+                wait-duration: 2s # Delay between retry attempts
+                enable-exponential-backoff: true # Option to use exponential backoff for retries
+                exponential-backoff-multiplier: 1.5 # Backoff multiplier (only if exponential backoff is enabled)
 
     bulkhead:
         instances:
             userService:
-                max-concurrent-calls: 10               # Maximum concurrent calls allowed
-                max-wait-duration: 0ms                 # Wait time for additional calls (0 = no waiting)
+                max-concurrent-calls: 10 # Maximum concurrent calls allowed
+                max-wait-duration: 0ms # Wait time for additional calls (0 = no waiting)
 
     timeLimiter:
         instances:
             userService:
-                timeout-duration: 2s                   # Maximum allowed time for the method execution
-
+                timeout-duration: 2s # Maximum allowed time for the method execution
 
 server:
     port: 8050

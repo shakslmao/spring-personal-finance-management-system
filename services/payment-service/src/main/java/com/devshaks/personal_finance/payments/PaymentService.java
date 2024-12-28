@@ -1,14 +1,19 @@
 package com.devshaks.personal_finance.payments;
 
 import com.devshaks.personal_finance.exceptions.PaymentValidationException;
+import com.stripe.exception.StripeException;
 import com.stripe.model.PaymentIntent;
 import com.stripe.param.PaymentIntentCreateParams;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.Optional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class PaymentService {
@@ -16,14 +21,25 @@ public class PaymentService {
 
     public PaymentResponse validatePayment(@Valid PaymentRequest paymentRequest) {
         try {
+            Optional<Payment> existingPayment = paymentRepository
+                    .findByPaymentStripeId(paymentRequest.paymentStripeId());
+            if (existingPayment.isPresent()) {
+                log.info("Payment with stripePaymentId {} already exists", paymentRequest.paymentStripeId());
+                Payment payment = existingPayment.get();
+                return new PaymentResponse(payment.getPaymentStripeId(), payment.getStatus(),
+                        payment.getGatewayResponse());
+
+            }
+
             // create payment intent.
             PaymentIntentCreateParams params = PaymentIntentCreateParams.builder()
                     .setAmount(paymentRequest.amount().multiply(BigDecimal.valueOf(100)).longValue())
                     .setCurrency(paymentRequest.currency())
                     .setDescription("Transaction for User " + paymentRequest.userId())
-                    .putMetadata("userId",String.valueOf(paymentRequest.userId()))
-                    .putMetadata("transactionId",String.valueOf(paymentRequest.transactionId()))
+                    .putMetadata("userId", String.valueOf(paymentRequest.userId()))
+                    .putMetadata("transactionId", String.valueOf(paymentRequest.transactionId()))
                     .build();
+
             PaymentIntent paymentIntent = PaymentIntent.create(params);
             String gatewayResponse = paymentIntent.toJson();
 
@@ -39,8 +55,12 @@ public class PaymentService {
             paymentRepository.save(payment);
 
             return new PaymentResponse(paymentIntent.getId(), PaymentStatus.PAYMENT_PENDING, gatewayResponse);
+        } catch (StripeException se) {
+            log.error("Stripe API error while validating payment: {}", se.getMessage(), se);
+            throw new PaymentValidationException("Payment validation failed due to Stripe error: " + se.getMessage());
         } catch (Exception e) {
-            throw new PaymentValidationException(e.getMessage());
+            log.error("Unexpected error while validating payment: {}", e.getMessage(), e);
+            throw new PaymentValidationException("Unexpected error during payment validation");
         }
     }
 

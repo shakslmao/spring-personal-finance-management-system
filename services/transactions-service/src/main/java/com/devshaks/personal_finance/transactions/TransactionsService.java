@@ -7,7 +7,6 @@ import com.devshaks.personal_finance.exceptions.*;
 import com.devshaks.personal_finance.kafka.audit.AuditEventSender;
 import com.devshaks.personal_finance.kafka.payment.PaymentEventSender;
 import com.devshaks.personal_finance.kafka.transaction.TransactionEventSender;
-import com.devshaks.personal_finance.kafka.user.UserEventSender;
 import com.devshaks.personal_finance.users.UserDetailsResponse;
 import com.devshaks.personal_finance.users.UserFeignClient;
 import jakarta.validation.Valid;
@@ -41,7 +40,6 @@ public class TransactionsService {
     private final UserFeignClient userFeignClient;
     private final BudgetFeignClient budgetFeignClient;
     private final AuditEventSender auditEventSender;
-    private final UserEventSender userEventSender;
     private final TransactionEventSender transactionEventSender;
     private final PaymentEventSender paymentEventSender;
 
@@ -69,13 +67,13 @@ public class TransactionsService {
         // check if the transaction amount exceeds remaining budget
         BigDecimal transactionAmount = transactionRequest.amount();
         if (currentMonthBudget != null && currentMonthBudget.remainingAmount().compareTo(transactionAmount) < 0) {
-            auditEventSender.sendEventToAudit(TRANSACTION_FAILED_BUDGET_EXCEEDED, userId, "Failed Transaction, User Attempted to Breach Budget");
+            auditEventSender.sendEventToAudit(TRANSACTION_FAILED_BUDGET_EXCEEDED, userId,
+                    "Failed Transaction, User Attempted to Breach Budget");
             throw new BudgetExceededException("Monthly Budget exceeded");
         }
 
         String transactionCategory = transactionRequest.category();
         if (transactionCategory != null) {
-            assert currentMonthBudget != null;
             BudgetCategoryResponse category = currentMonthBudget.categories().stream()
                     .filter(cat -> cat.name().equalsIgnoreCase(transactionCategory))
                     .findFirst()
@@ -84,7 +82,8 @@ public class TransactionsService {
             if (category != null && category.categoryLimit() != null) {
                 BigDecimal categoryRemaining = category.categoryLimit().subtract(category.spentAmount());
                 if (categoryRemaining.compareTo(transactionAmount) < 0) {
-                    auditEventSender.sendEventToAudit(TRANSACTION_FAILED_BUDGET_EXCEEDED, userId, "Failed Transaction, User Attempted to Breach Budget");
+                    auditEventSender.sendEventToAudit(TRANSACTION_FAILED_BUDGET_EXCEEDED, userId,
+                            "Failed Transaction, User Attempted to Breach Budget");
                     throw new BudgetExceededException("Budget Limit Exceeded For Category");
                 }
             }
@@ -117,17 +116,16 @@ public class TransactionsService {
             paymentEventSender.sendEventToPayment(
                     transactions.getUserId(),
                     transactions.getId(),
-                    transactions.getAmount()
-            );
+                    transactions.getAmount());
 
         } catch (PaymentValidationException ex) {
             savedTransaction.setPaymentStatus(PaymentStatus.PAYMENT_FAILED);
             transactionsRepository.save(savedTransaction);
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to send payment validation event");
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
+                    "Failed to send payment validation event");
         }
 
         auditEventSender.sendEventToAudit(TRANSACTION_CREATED, userId, "New Transaction Created");
-        // userEventSender.sendEventToUser(userId, transactions.getId(), "New Transaction Recorded", transactions.getAmount());
         return transactionsMapper.toTransactionDTO(savedTransaction);
     }
 
@@ -147,7 +145,8 @@ public class TransactionsService {
                 .orElseThrow(() -> new TransactionNotFoundException("Cannot Find Transaction With ID"));
     }
 
-    // @Cacheable(value = "transactions", key = "T(String).format('%d-%s', #userId, #category)")
+    // @Cacheable(value = "transactions", key = "T(String).format('%d-%s', #userId,
+    // #category)")
     public List<TransactionsDTO> getUserTransactionByCategory(Long userId, String category) {
         List<Transactions> transactions = transactionsRepository.findByUserIdAndCategory(userId, category);
         if (transactions.isEmpty()) {
@@ -156,7 +155,8 @@ public class TransactionsService {
         return transactions.stream().map(transactionsMapper::toTransactionDTO).toList();
     }
 
-    // @Cacheable(value = "transaction-filters", key = "#userId + '-' + #category + '-' + #pageable.pageNumber")
+    // @Cacheable(value = "transaction-filters", key = "#userId + '-' + #category +
+    // '-' + #pageable.pageNumber")
     public PaginatedTransactionDTO getTransactionFilter(Long userId, String category, LocalDateTime transactionDate,
             TransactionsType transactionsType, TransactionsStatus transactionsStatus, Pageable pageable) {
         Specification<Transactions> specification = Specification.where(null);

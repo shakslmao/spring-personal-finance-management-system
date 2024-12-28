@@ -21,7 +21,7 @@ public class KafkaPaymentConsumer {
     public void consumePaymentEvents(PaymentTransactionEventDTO paymentEvent) {
         try {
             PaymentResponse paymentResponse = paymentService.validatePayment(new PaymentRequest(
-                    paymentEvent.transactionId(), paymentEvent.userId(), paymentEvent.amount(), "GBP"
+                    paymentEvent.transactionId(), paymentEvent.userId(), paymentEvent.amount(), "GBP", ""
             ));
             Payment payment = Payment.builder()
                     .paymentStripeId(paymentResponse.paymentStripeId())
@@ -33,8 +33,6 @@ public class KafkaPaymentConsumer {
                     .gatewayResponse(paymentResponse.gatewayResponse())
                     .build();
             paymentRepository.save(payment);
-
-            // TODO: Transaction Service Needs to Consume This. topic payment-validated
 
             paymentEventProducer.sendEventToTransaction(new PaymentTransactionEventDTO(
                     paymentEvent.transactionId(), paymentEvent.userId(), paymentEvent.amount(), paymentEvent.status()
