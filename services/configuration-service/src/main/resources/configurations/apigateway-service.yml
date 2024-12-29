@@ -1,0 +1,67 @@
+spring:
+    security:
+        oauth2:
+            resourceserver:
+                jwt:
+                    issuer-uri: "http://localhost:9098/realms/personal-finance"
+    cloud:
+        gateway:
+            discovery:
+                locator:
+                    enabled: true
+            routes:
+                - id: user-service
+                  uri: lb://USER-SERVICE
+                  predicates:
+                      - Path=/api/v1/users/**
+                  filters:
+                      - RemoveRequestHeader=Cookie
+                      - AddRequestHeader=Authorization, "${request.headers['Authorization']:default-token}"
+
+                - id: transaction-service
+                  uri: lb://TRANSACTION-SERVICE
+                  predicates:
+                      - Path=/api/v1/transactions/**
+                  filters:
+                      - RemoveRequestHeader=Cookie
+                      - AddRequestHeader=Authorization, "${request.headers['Authorization']:default-token}"
+
+                - id: audit-service
+                  uri: lb://AUDIT-SERVICE
+                  predicates:
+                      - Path=/api/v1/audits/**
+                  filters:
+                      - RemoveRequestHeader=Cookie
+                      - AddRequestHeader=Authorization, "${request.headers['Authorization']:default-token}"
+
+                - id: budget-service
+                  uri: lb://BUDGET-SERVICE
+                  predicates:
+                      - Path=/api/v1/budgets/**
+                  filters:
+                      - RemoveRequestHeader=Cookie
+                      - AddRequestHeader=Authorization, "${request.headers['Authorization']:default-token}"
+
+                - id: payment-service
+                  uri: lb://PAYMENT-SERVICE
+                  predicates:
+                      - Path=/api/v1/payments/**
+                  filters:
+                      - RemoveRequestHeader=Cookie
+                      - AddRequestHeader=Authorization, "${request.headers['Authorization']:default-token}"
+
+
+logging:
+    level:
+        org.springframework.security.oauth2.server.resource: DEBUG
+
+#eureka:
+#   client:
+#      serviceUrl:
+#         defaultZone: http://localhost:8761/eureka/ # Use Docker container name
+#instance:
+#hostname: apigateway-service
+#preferIpAddress: false # Use hostname for Eureka registration
+
+server:
+    port: 8222
