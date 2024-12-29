@@ -28,7 +28,7 @@ public class Payment {
     @Column(nullable = false)
     private Long userId;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private Long transactionId;
 
     @Column(nullable = false, precision = 10, scale = 2)
