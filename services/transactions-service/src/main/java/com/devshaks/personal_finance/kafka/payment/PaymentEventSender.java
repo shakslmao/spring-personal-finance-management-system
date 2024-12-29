@@ -10,13 +10,12 @@ import java.math.BigDecimal;
 @Service
 @RequiredArgsConstructor
 public class PaymentEventSender {
-    private  final PaymentEventProducer paymentEventProducer;
+    private final PaymentEventProducer paymentEventProducer;
 
     public void sendEventToPayment(Long userId, Long transactionId, BigDecimal amount) {
         try {
             paymentEventProducer.sendEventToPayment(new PaymentTransactionEventDTO(
-                    userId, transactionId, amount, PaymentStatus.PAYMENT_PENDING
-            ));
+                    userId, transactionId, amount, PaymentStatus.PAYMENT_PENDING));
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

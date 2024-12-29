@@ -28,10 +28,13 @@ public class TransactionsController {
 
     @PostMapping("/new/{userId}")
     @Operation(summary = "Create a New Transaction For a User")
-    @ApiResponses(value = { @ApiResponse(responseCode = "201", description = "Transaction Created Successfully"), @ApiResponse(responseCode = "400", description = "Invalid input data") })
-    public ResponseEntity<TransactionsDTO> newTransaction(@PathVariable("userId") Long userId, @RequestBody @Valid TransactionsRequest transactionRequest) {
+    @ApiResponses(value = { @ApiResponse(responseCode = "201", description = "Transaction Created Successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid input data") })
+    public ResponseEntity<TransactionsDTO> newTransaction(@PathVariable("userId") Long userId,
+            @RequestBody @Valid TransactionsRequest transactionRequest) {
         TransactionsDTO transaction = transactionService.newTransaction(transactionRequest, userId);
-        URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(transaction.id()).toUri();
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(transaction.id())
+                .toUri();
         return ResponseEntity.created(location).body(transaction);
     }
 
@@ -53,15 +56,22 @@ public class TransactionsController {
     // Get Transactions By User ID & Category.
     @GetMapping("/user/{userId}/category/{category}")
     @Operation(summary = "Get Users Transactions By Their ID & Categories")
-    public ResponseEntity<List<TransactionsDTO>> getUserTransactionByCategory(@PathVariable("userId") Long userId, @PathVariable("category") String category) {
+    public ResponseEntity<List<TransactionsDTO>> getUserTransactionByCategory(@PathVariable("userId") Long userId,
+            @PathVariable("category") String category) {
         return ResponseEntity.ok(transactionService.getUserTransactionByCategory(userId, category));
     }
 
     // Get Transaction With Filtering and Pagination.
     @GetMapping("/filter")
     @Operation(summary = "Filter Transactions Through Various Parameters")
-    public ResponseEntity<PaginatedTransactionDTO> getTransactionFilter(@RequestParam(required = false) Long userId, @RequestParam(required = false) String category, @RequestParam(required = false) LocalDateTime transactionDate, @RequestParam(required = false) TransactionsType transactionsType, @RequestParam(required = false) TransactionsStatus transactionsStatus, @PageableDefault(size = 20, sort = "transactionDate", direction = Sort.Direction.DESC) Pageable pageable) {
-        PaginatedTransactionDTO transactionsFilter = transactionService.getTransactionFilter(userId, category, transactionDate, transactionsType, transactionsStatus, pageable);
+    public ResponseEntity<PaginatedTransactionDTO> getTransactionFilter(@RequestParam(required = false) Long userId,
+            @RequestParam(required = false) String category,
+            @RequestParam(required = false) LocalDateTime transactionDate,
+            @RequestParam(required = false) TransactionsType transactionsType,
+            @RequestParam(required = false) TransactionsStatus transactionsStatus,
+            @PageableDefault(size = 20, sort = "transactionDate", direction = Sort.Direction.DESC) Pageable pageable) {
+        PaginatedTransactionDTO transactionsFilter = transactionService.getTransactionFilter(userId, category,
+                transactionDate, transactionsType, transactionsStatus, pageable);
         return ResponseEntity.ok(transactionsFilter);
     }
 
@@ -78,7 +88,5 @@ public class TransactionsController {
         transactionService.deleteTransaction(id);
         return ResponseEntity.noContent().build();
     }
-
-    // TODO: Delete Transaction - Only if Status.FAILED.   Update Transaction -> From Pending to Completed.
 
 }
