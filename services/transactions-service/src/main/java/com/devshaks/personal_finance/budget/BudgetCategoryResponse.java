@@ -6,6 +6,5 @@ public record BudgetCategoryResponse(
         Long id,
         String name,
         BigDecimal categoryLimit,
-        BigDecimal spentAmount
-) {
+        BigDecimal spentAmount) {
 }

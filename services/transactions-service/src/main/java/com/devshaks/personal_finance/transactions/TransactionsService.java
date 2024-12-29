@@ -74,6 +74,7 @@ public class TransactionsService {
 
         String transactionCategory = transactionRequest.category();
         if (transactionCategory != null) {
+            @SuppressWarnings("null")
             BudgetCategoryResponse category = currentMonthBudget.categories().stream()
                     .filter(cat -> cat.name().equalsIgnoreCase(transactionCategory))
                     .findFirst()

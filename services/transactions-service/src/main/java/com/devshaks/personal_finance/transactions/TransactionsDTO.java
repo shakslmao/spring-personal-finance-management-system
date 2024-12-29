@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
-public record TransactionsDTO (
+public record TransactionsDTO(
         Long id,
         Long userId,
         String category,
@@ -13,6 +13,5 @@ public record TransactionsDTO (
         TransactionsType transactionType,
         TransactionsStatus transactionStatus,
         String description,
-        List<String> tags
-) {
+        List<String> tags) {
 }
