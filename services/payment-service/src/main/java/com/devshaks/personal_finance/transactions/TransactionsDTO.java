@@ -13,7 +13,6 @@ public record TransactionsDTO(
         TransactionsType transactionType,
         TransactionsStatus transactionStatus,
         String description,
-        List<String> tags
-) {
+        List<String> tags) {
 
 }
