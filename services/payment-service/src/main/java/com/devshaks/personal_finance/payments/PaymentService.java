@@ -1,6 +1,9 @@
 package com.devshaks.personal_finance.payments;
 
 import com.devshaks.personal_finance.exceptions.PaymentValidationException;
+import com.devshaks.personal_finance.transactions.TransactionFeignClient;
+import com.devshaks.personal_finance.transactions.TransactionsDTO;
+import com.devshaks.personal_finance.transactions.TransactionsStatus;
 import com.stripe.exception.StripeException;
 import com.stripe.model.PaymentIntent;
 import com.stripe.param.PaymentIntentCreateParams;
@@ -18,17 +21,27 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class PaymentService {
     private final PaymentRepository paymentRepository;
+    private final TransactionFeignClient transactionFeignClient;
 
     public PaymentResponse validatePayment(@Valid PaymentRequest paymentRequest) {
         try {
+            TransactionsDTO transaction = transactionFeignClient.getTransactionsById(paymentRequest.transactionId());
+            if (!transaction.transactionStatus().equals(TransactionsStatus.APPROVED)) {
+                throw new IllegalArgumentException(
+                        "Transaction is not valid for processing: " + paymentRequest.transactionId());
+            }
+
+            if (!transaction.userId().equals(paymentRequest.userId())) {
+                throw new IllegalArgumentException(
+                        "Transaction does not belong to the user: " + paymentRequest.userId());
+            }
+
             Optional<Payment> existingPayment = paymentRepository
-                    .findByPaymentStripeId(paymentRequest.paymentStripeId());
+                    .findByTransactionId(paymentRequest.transactionId());
             if (existingPayment.isPresent()) {
-                log.info("Payment with stripePaymentId {} already exists", paymentRequest.paymentStripeId());
                 Payment payment = existingPayment.get();
                 return new PaymentResponse(payment.getPaymentStripeId(), payment.getStatus(),
                         payment.getGatewayResponse());
-
             }
 
             // create payment intent.
