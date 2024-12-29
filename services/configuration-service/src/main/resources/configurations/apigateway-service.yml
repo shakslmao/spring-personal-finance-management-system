@@ -50,7 +50,6 @@ spring:
                       - RemoveRequestHeader=Cookie
                       - AddRequestHeader=Authorization, "${request.headers['Authorization']:default-token}"
 
-
 logging:
     level:
         org.springframework.security.oauth2.server.resource: DEBUG
