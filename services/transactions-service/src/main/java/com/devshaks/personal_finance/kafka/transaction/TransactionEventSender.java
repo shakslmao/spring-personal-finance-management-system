@@ -14,14 +14,7 @@ public class TransactionEventSender {
 
     public void sendEventToBudget(Long transactionId, Long userId, String category, BigDecimal amount, String description) {
         try {
-            transactionEventProducer.sendEventToBudgetFromTransaction(new TransactionCreatedEventDTO(
-                    transactionId,
-                    userId,
-                    category,
-                    amount,
-                    TransactionsType.EXPENSE,
-                    description
-            ));
+            transactionEventProducer.sendEventToBudgetFromTransaction(new TransactionCreatedEventDTO(transactionId, userId, category, amount, TransactionsType.EXPENSE, description));
 
         } catch (Exception e) {
             throw new RuntimeException("Error Sending Event to Budget", e);

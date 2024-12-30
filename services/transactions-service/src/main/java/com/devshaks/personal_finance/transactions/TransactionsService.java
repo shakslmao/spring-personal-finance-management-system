@@ -60,33 +60,25 @@ public class TransactionsService {
 
         // find the current month budget
         YearMonth currentMonth = YearMonth.now();
-        BudgetResponse currentMonthBudget = budgets.stream()
-                .filter(b -> b.month().equals(currentMonth))
-                .findFirst()
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.CONFLICT, "No budget found for the current month"));
+        BudgetResponse currentMonthBudget = budgets.stream().filter(b -> b.month().equals(currentMonth)).findFirst().orElseThrow(() -> new ResponseStatusException(HttpStatus.CONFLICT, "No budget found for the current month"));
 
         // check if the transaction amount exceeds remaining budget
         BigDecimal transactionAmount = transactionRequest.amount();
         if (currentMonthBudget != null && currentMonthBudget.remainingAmount().compareTo(transactionAmount) < 0) {
-            auditEventSender.sendEventToAudit(TRANSACTION_FAILED_BUDGET_EXCEEDED, userId,
-                    "Failed Transaction, User Attempted to Breach Budget");
+            auditEventSender.sendEventToAudit(TRANSACTION_FAILED_BUDGET_EXCEEDED, userId, "Failed Transaction, User Attempted to Breach Budget");
             throw new BudgetExceededException("Monthly Budget exceeded");
         }
 
         String transactionCategory = transactionRequest.category();
         if (transactionCategory != null) {
+
             @SuppressWarnings("null")
-            BudgetCategoryResponse category = currentMonthBudget.categories().stream()
-                    .filter(cat -> cat.name().equalsIgnoreCase(transactionCategory))
-                    .findFirst()
-                    .orElse(null);
+            BudgetCategoryResponse category = currentMonthBudget.categories().stream().filter(cat -> cat.name().equalsIgnoreCase(transactionCategory)).findFirst().orElse(null);
 
             if (category != null && category.categoryLimit() != null) {
                 BigDecimal categoryRemaining = category.categoryLimit().subtract(category.spentAmount());
                 if (categoryRemaining.compareTo(transactionAmount) < 0) {
-                    auditEventSender.sendEventToAudit(TRANSACTION_FAILED_BUDGET_EXCEEDED, userId,
-                            "Failed Transaction, User Attempted to Breach Budget");
+                    auditEventSender.sendEventToAudit(TRANSACTION_FAILED_BUDGET_EXCEEDED, userId, "Failed Transaction, User Attempted to Breach Budget");
                     throw new BudgetExceededException("Budget Limit Exceeded For Category");
                 }
             }
@@ -101,12 +93,7 @@ public class TransactionsService {
         transactionsRepository.flush();
 
         try {
-            transactionEventSender.sendEventToBudget(
-                    transactions.getId(),
-                    transactions.getUserId(),
-                    transactions.getCategory(),
-                    transactions.getAmount(),
-                    transactions.getDescription());
+            transactionEventSender.sendEventToBudget(transactions.getId(), transactions.getUserId(), transactions.getCategory(), transactions.getAmount(), transactions.getDescription());
         } catch (BudgetExceededException | BudgetNotFoundException ex) {
             savedTransaction.setTransactionStatus(TransactionsStatus.REJECTED);
             transactionsRepository.save(savedTransaction);
@@ -118,16 +105,12 @@ public class TransactionsService {
         }
 
         try {
-            paymentEventSender.sendEventToPayment(
-                    transactions.getUserId(),
-                    transactions.getId(),
-                    transactions.getAmount());
+            paymentEventSender.sendEventToPayment(transactions.getUserId(), transactions.getId(), transactions.getAmount());
 
         } catch (PaymentValidationException ex) {
             savedTransaction.setPaymentStatus(PaymentStatus.PAYMENT_FAILED);
             transactionsRepository.save(savedTransaction);
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
-                    "Failed to send payment validation event");
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to send payment validation event");
         }
 
         auditEventSender.sendEventToAudit(TRANSACTION_CREATED, userId, "New Transaction Created");
@@ -145,9 +128,7 @@ public class TransactionsService {
 
     // @Cacheable(value = "transactions", key = "#id")
     public TransactionsDTO getTransactionById(Long id) {
-        return transactionsRepository.findById(id)
-                .map(transactionsMapper::toTransactionDTO)
-                .orElseThrow(() -> new TransactionNotFoundException("Cannot Find Transaction With ID"));
+        return transactionsRepository.findById(id).map(transactionsMapper::toTransactionDTO).orElseThrow(() -> new TransactionNotFoundException("Cannot Find Transaction With ID"));
     }
 
     // @Cacheable(value = "transactions", key = "T(String).format('%d-%s', #userId,
@@ -162,8 +143,7 @@ public class TransactionsService {
 
     // @Cacheable(value = "transaction-filters", key = "#userId + '-' + #category +
     // '-' + #pageable.pageNumber")
-    public PaginatedTransactionDTO getTransactionFilter(Long userId, String category, LocalDateTime transactionDate,
-            TransactionsType transactionsType, TransactionsStatus transactionsStatus, Pageable pageable) {
+    public PaginatedTransactionDTO getTransactionFilter(Long userId, String category, LocalDateTime transactionDate, TransactionsType transactionsType, TransactionsStatus transactionsStatus, Pageable pageable) {
         Specification<Transactions> specification = Specification.where(null);
         if (userId != null) {
             specification.and((root, query, cb) -> cb.equal(root.get("userId"), userId));
@@ -178,15 +158,12 @@ public class TransactionsService {
             specification.and((root, query, cb) -> cb.equal(root.get("transactionType"), transactionsType));
         }
         if (transactionsStatus != null) {
-            specification = specification
-                    .and((root, query, cb) -> cb.equal(root.get("transactionStatus"), transactionsStatus));
+            specification = specification.and((root, query, cb) -> cb.equal(root.get("transactionStatus"), transactionsStatus));
         }
 
         Page<Transactions> transactionsPage = transactionsRepository.findAll(specification, pageable);
-        List<TransactionsDTO> content = transactionsPage.getContent().stream().map(transactionsMapper::toTransactionDTO)
-                .collect(Collectors.toList());
-        return new PaginatedTransactionDTO(content, transactionsPage.getNumber(), transactionsPage.getSize(),
-                transactionsPage.getTotalElements(), transactionsPage.getTotalPages(), transactionsPage.isLast());
+        List<TransactionsDTO> content = transactionsPage.getContent().stream().map(transactionsMapper::toTransactionDTO).collect(Collectors.toList());
+        return new PaginatedTransactionDTO(content, transactionsPage.getNumber(), transactionsPage.getSize(), transactionsPage.getTotalElements(), transactionsPage.getTotalPages(), transactionsPage.isLast());
     }
 
     public UserTransactionStatisticsDTO getUserTransactionStats(Long userId) {
@@ -195,45 +172,26 @@ public class TransactionsService {
         LocalDateTime startOfWeek = now.minusDays(now.getDayOfWeek().getValue() - 1).toLocalDate().atStartOfDay();
         LocalDateTime startOfMonth = now.withDayOfMonth(1).toLocalDate().atStartOfDay();
 
-        List<Transactions> dailyTransactions = transactionsRepository.findByUserIdAndTransactionDateBetween(userId,
-                startOfDay, now);
-        List<Transactions> weeklyTransactions = transactionsRepository.findByUserIdAndTransactionDateBetween(userId,
-                startOfWeek, now);
-        List<Transactions> monthlyTransactions = transactionsRepository.findByUserIdAndTransactionDateBetween(userId,
-                startOfMonth, now);
+        List<Transactions> dailyTransactions = transactionsRepository.findByUserIdAndTransactionDateBetween(userId, startOfDay, now);
+        List<Transactions> weeklyTransactions = transactionsRepository.findByUserIdAndTransactionDateBetween(userId, startOfWeek, now);
+        List<Transactions> monthlyTransactions = transactionsRepository.findByUserIdAndTransactionDateBetween(userId, startOfMonth, now);
 
-        double dailySpending = dailyTransactions.stream()
-                .mapToDouble(transaction -> transaction.getAmount().doubleValue()).sum();
+        double dailySpending = dailyTransactions.stream().mapToDouble(transaction -> transaction.getAmount().doubleValue()).sum();
         int dailyCount = dailyTransactions.size();
 
-        double weeklySpending = weeklyTransactions.stream()
-                .mapToDouble(transaction -> transaction.getAmount().doubleValue()).sum();
+        double weeklySpending = weeklyTransactions.stream().mapToDouble(transaction -> transaction.getAmount().doubleValue()).sum();
         int weeklyCount = weeklyTransactions.size();
 
-        double monthlySpending = monthlyTransactions.stream()
-                .mapToDouble(transaction -> transaction.getAmount().doubleValue()).sum();
+        double monthlySpending = monthlyTransactions.stream().mapToDouble(transaction -> transaction.getAmount().doubleValue()).sum();
         int monthlyCount = monthlyTransactions.size();
 
         double averageDailySpending = dailySpending / (dailyCount == 0 ? 1 : dailySpending);
         double averageWeeklySpending = weeklySpending / 7;
         double averageMonthlySpending = monthlySpending / 30;
 
-        Map<String, Double> categoryBreakdown = monthlyTransactions.stream()
-                .collect(Collectors.groupingBy(
-                        Transactions::getCategory,
-                        Collectors.summingDouble(transaction -> transaction.getAmount().doubleValue())));
+        Map<String, Double> categoryBreakdown = monthlyTransactions.stream().collect(Collectors.groupingBy(Transactions::getCategory, Collectors.summingDouble(transaction -> transaction.getAmount().doubleValue())));
 
-        return new UserTransactionStatisticsDTO(
-                dailySpending,
-                dailyCount,
-                weeklySpending,
-                weeklyCount,
-                monthlySpending,
-                monthlyCount,
-                averageDailySpending,
-                averageWeeklySpending,
-                averageMonthlySpending,
-                categoryBreakdown);
+        return new UserTransactionStatisticsDTO(dailySpending, dailyCount, weeklySpending, weeklyCount, monthlySpending, monthlyCount, averageDailySpending, averageWeeklySpending, averageMonthlySpending, categoryBreakdown);
 
     }
 
