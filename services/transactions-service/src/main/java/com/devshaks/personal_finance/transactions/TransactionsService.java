@@ -53,12 +53,19 @@ public class TransactionsService {
         // Get all budgets for this user
         List<BudgetResponse> budgets = budgetFeignClient.getUserBudgets(userId);
         if (budgets == null || budgets.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "No budgets found for user");
+            Transactions transactions = transactionsMapper.toNewTransaction(transactionRequest);
+            transactions.setUserId(userId);
+            transactions.setTransactionStatus(TransactionsStatus.APPROVED);
+            Transactions savedTransaction = transactionsRepository.save(transactions);
+            auditEventSender.sendEventToAudit(TRANSACTION_CREATED, userId, "Transaction Approved - No Budget Set");
+            return transactionsMapper.toTransactionDTO(savedTransaction);
         }
 
         // find the current month budget
         YearMonth currentMonth = YearMonth.now();
-        BudgetResponse currentMonthBudget = budgets.stream().filter(b -> b.month().equals(currentMonth)).findFirst()
+        BudgetResponse currentMonthBudget = budgets.stream().filter(b -> b.month()
+                .equals(currentMonth))
+                .findFirst()
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.CONFLICT,
                         "No budget found for the current month"));
 
@@ -72,10 +79,11 @@ public class TransactionsService {
 
         String transactionCategory = transactionRequest.category();
         if (transactionCategory != null) {
-
             @SuppressWarnings("null")
             BudgetCategoryResponse category = currentMonthBudget.categories().stream()
-                    .filter(cat -> cat.name().equalsIgnoreCase(transactionCategory)).findFirst().orElse(null);
+                    .filter(cat -> cat.name().equalsIgnoreCase(transactionCategory))
+                    .findFirst()
+                    .orElse(null);
 
             if (category != null && category.categoryLimit() != null) {
                 BigDecimal categoryRemaining = category.categoryLimit().subtract(category.spentAmount());
@@ -89,16 +97,18 @@ public class TransactionsService {
 
         Transactions transactions = transactionsMapper.toNewTransaction(transactionRequest);
         transactions.setUserId(userId);
-        // transactions.setPaymentStatus(PaymentStatus.PAYMENT_PENDING);
         transactions.setTransactionStatus(TransactionsStatus.PENDING);
         Transactions savedTransaction = transactionsRepository.save(transactions);
 
         transactionsRepository.flush();
 
-
         try {
-            transactionEventSender.sendEventToBudget(transactions.getId(), transactions.getUserId(),
-                    transactions.getCategory(), transactions.getAmount(), transactions.getDescription());
+            transactionEventSender.sendEventToBudget(
+                    transactions.getId(),
+                    transactions.getUserId(),
+                    transactions.getCategory(),
+                    transactions.getAmount(),
+                    transactions.getDescription());
         } catch (BudgetExceededException | BudgetNotFoundException ex) {
             savedTransaction.setTransactionStatus(TransactionsStatus.REJECTED);
             transactionsRepository.save(savedTransaction);
