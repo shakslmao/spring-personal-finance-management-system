@@ -44,32 +44,37 @@ public class TransactionsService {
 
     @Transactional
     public TransactionsDTO newTransaction(@Valid TransactionsRequest transactionRequest, Long userId) {
-        // Confirm user exists
+        // Confirm the user exists by querying the User Service
         UserDetailsResponse user = userFeignClient.getUserProfileDetails(userId);
         if (user == null || user.userId() == null) {
             throw new UserNotFoundException("User not found");
         }
 
-        // Get all budgets for this user
+        // Retrieve all budgets associated with this user
         List<BudgetResponse> budgets = budgetFeignClient.getUserBudgets(userId);
+
+        // If no budgets are found, approve the transaction by default
         if (budgets == null || budgets.isEmpty()) {
             Transactions transactions = transactionsMapper.toNewTransaction(transactionRequest);
             transactions.setUserId(userId);
-            transactions.setTransactionStatus(TransactionsStatus.APPROVED);
+            transactions.setTransactionStatus(TransactionsStatus.APPROVED); // Default status
             Transactions savedTransaction = transactionsRepository.save(transactions);
+
+            // Send an audit event indicating the transaction was approved without a budget
             auditEventSender.sendEventToAudit(TRANSACTION_CREATED, userId, "Transaction Approved - No Budget Set");
+
             return transactionsMapper.toTransactionDTO(savedTransaction);
         }
 
-        // find the current month budget
+        // Determine the budget for the current month
         YearMonth currentMonth = YearMonth.now();
-        BudgetResponse currentMonthBudget = budgets.stream().filter(b -> b.month()
-                .equals(currentMonth))
+        BudgetResponse currentMonthBudget = budgets.stream()
+                .filter(b -> b.month().equals(currentMonth))
                 .findFirst()
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.CONFLICT,
                         "No budget found for the current month"));
 
-        // check if the transaction amount exceeds remaining budget
+        // Check if the transaction amount exceeds the remaining budget
         BigDecimal transactionAmount = transactionRequest.amount();
         if (currentMonthBudget != null && currentMonthBudget.remainingAmount().compareTo(transactionAmount) < 0) {
             auditEventSender.sendEventToAudit(TRANSACTION_FAILED_BUDGET_EXCEEDED, userId,
@@ -77,6 +82,7 @@ public class TransactionsService {
             throw new BudgetExceededException("Monthly Budget exceeded");
         }
 
+        // Check if the transaction exceeds the category-specific budget (if applicable)
         String transactionCategory = transactionRequest.category();
         if (transactionCategory != null) {
             @SuppressWarnings("null")
@@ -95,13 +101,16 @@ public class TransactionsService {
             }
         }
 
+        // Create a new transaction and set its status to pending
         Transactions transactions = transactionsMapper.toNewTransaction(transactionRequest);
         transactions.setUserId(userId);
         transactions.setTransactionStatus(TransactionsStatus.PENDING);
         Transactions savedTransaction = transactionsRepository.save(transactions);
 
+        // Ensure the transaction is persisted in the database
         transactionsRepository.flush();
 
+        // Try to send the transaction event to the Budget Service
         try {
             transactionEventSender.sendEventToBudget(
                     transactions.getId(),
@@ -110,15 +119,18 @@ public class TransactionsService {
                     transactions.getAmount(),
                     transactions.getDescription());
         } catch (BudgetExceededException | BudgetNotFoundException ex) {
+            // If budget validation fails, reject the transaction and log the reason
             savedTransaction.setTransactionStatus(TransactionsStatus.REJECTED);
             transactionsRepository.save(savedTransaction);
             throw new ResponseStatusException(HttpStatus.CONFLICT, ex.getMessage());
         } catch (Exception ex) {
+            // Handle unexpected errors, mark transaction as rejected
             savedTransaction.setTransactionStatus(TransactionsStatus.REJECTED);
             transactionsRepository.save(savedTransaction);
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to validate transaction");
         }
 
+        // Log and audit the successful creation of the transaction
         auditEventSender.sendEventToAudit(TRANSACTION_CREATED, userId, "New Transaction Created");
         return transactionsMapper.toTransactionDTO(savedTransaction);
     }
