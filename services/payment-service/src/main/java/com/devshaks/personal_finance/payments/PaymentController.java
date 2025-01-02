@@ -25,8 +25,4 @@ public class PaymentController {
         paymentService.processStripeWebhook(payload, signatureHeader);
         return ResponseEntity.ok().build();
     }
-
-
-
-
 }
