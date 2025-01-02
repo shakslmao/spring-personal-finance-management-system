@@ -23,17 +23,27 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+/**
+ * Service class for managing user budgets.
+ * Handles CRUD operations and interactions with Kafka for audit events.
+ */
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class BudgetService {
-    private final BudgetRepository budgetRepository;
-    private final BudgetMapper budgetMapper;
-    private final UserFeignClient userFeignClient;
-    private final AuditEventSender auditEventSender;
+    private final BudgetRepository budgetRepository; // Repository for budget persistence.
+    private final BudgetMapper budgetMapper; // Mapper for converting between entities and DTOs.
+    private final UserFeignClient userFeignClient; // Feign client to communicate with the User Service.
+    private final AuditEventSender auditEventSender; // Sends audit events to Kafka.
 
+    /**
+     * Creates a new budget for a user.
+     * Validates the user's existence and ensures no duplicate budgets exist for the
+     * specified month.
+     */
     @Transactional
     public BudgetResponse createUserBudget(Long userId, BudgetRequest budgetRequest) {
+        // Fetch user details via Feign client.
         UserDetailsResponse userDetails;
         try {
             userDetails = userFeignClient.getUserProfileDetails(userId);
@@ -41,32 +51,46 @@ public class BudgetService {
             throw new RuntimeException("Failed to fetch user details", e);
         }
 
+        // Validate user existence.
         if (userDetails == null || userDetails.userId() == null) {
             throw new UserNotFoundException("User not found");
         }
+
+        // Ensure no existing budget for the same month.
         String month = budgetRequest.month().toString();
         budgetRepository.findByUserIdAndMonth(userId, month).ifPresent(existingBudget -> {
             throw new RuntimeException("Budget already exists for this Month");
         });
 
+        // Map the request to a new budget entity and save it.
         Budget budget = budgetMapper.toNewBudget(budgetRequest);
         budget.setUserId(userId);
         Budget savedBudget = budgetRepository.save(budget);
+
+        // Send an audit event.
         try {
             auditEventSender.sendEventToAudit(BudgetEvents.BUDGET_CREATED, userId, "User Set a New Budget");
-
         } catch (Exception e) {
             throw new AuditEventException("Failed to send Event to Audit.");
         }
+
         return budgetMapper.mapBudgetToResponse(savedBudget);
     }
 
+    /**
+     * Retrieves a budget by its ID.
+     * Throws an exception if the budget does not exist.
+     */
     public BudgetResponse getBudgetById(Long id) {
         return budgetRepository.findById(id)
                 .map(budgetMapper::mapBudgetToResponse)
                 .orElseThrow(() -> new BudgetNotFoundException("Budget Was Not Found"));
     }
 
+    /**
+     * Retrieves all budgets associated with a user.
+     * Throws an exception if no budgets are found.
+     */
     public List<BudgetResponse> getUserBudgets(Long userId) {
         List<Budget> budgets = budgetRepository.findByUserId(userId);
         if (budgets.isEmpty()) {
@@ -77,24 +101,36 @@ public class BudgetService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Deletes a budget for a user by its ID.
+     * Sends an audit event upon successful deletion.
+     */
     public void deleteBudget(Long id, Long userId) {
+        // Verify if the budget exists.
         if (!budgetRepository.existsByIdAndUserId(id, userId)) {
             throw new BudgetNotFoundException("Budget Was Not Found");
         }
+
+        // Attempt to delete the budget and log errors if they occur.
         try {
             budgetRepository.deleteByIdAndUserId(id, userId);
             auditEventSender.sendEventToAudit(BudgetEvents.BUDGET_DELETED, userId, "User Deleted Budget");
-
         } catch (Exception e) {
             log.error("Failed to delete budget with ID: {} for user ID: {}. Error: {}", id, userId, e.getMessage());
             throw new AuditEventException("Failed to delete budget");
         }
     }
 
+    /**
+     * Updates a user's budget with specific fields.
+     * Handles dynamic updates such as monthly limits, categories, or month changes.
+     */
     public BudgetResponse updateBudget(Long userId, Long id, Map<String, Object> updates) {
+        // Fetch the budget to update or throw an exception if not found.
         Budget budget = budgetRepository.findByIdAndUserId(id, userId)
                 .orElseThrow(() -> new BudgetNotFoundException("Budget Was Not Found"));
 
+        // Process updates based on the provided fields.
         updates.forEach((key, value) -> {
             switch (key) {
                 case "monthlyLimit":
@@ -109,10 +145,8 @@ public class BudgetService {
                     @SuppressWarnings("unchecked")
                     List<Map<String, Object>> categoryUpdates = (List<Map<String, Object>>) value;
 
-                    // Get existing categories
+                    // Handle category updates or additions.
                     List<BudgetCategory> existingCategories = budget.getCategories();
-
-                    // map new categories
                     List<BudgetCategory> updatedCategories = categoryUpdates.stream().map(categoryRequest -> {
                         String name = categoryRequest.get("name") != null
                                 ? categoryRequest.get("name").toString()
@@ -125,7 +159,7 @@ public class BudgetService {
                             throw new BudgetUpdateException("Category Name and Category Limit cannot be null");
                         }
 
-                        // check if the category exists
+                        // Check if the category already exists.
                         return existingCategories.stream()
                                 .filter(c -> c.getCategoryName().equals(name))
                                 .findFirst()
@@ -139,10 +173,9 @@ public class BudgetService {
                                     newCategory.setBudget(budget);
                                     return newCategory;
                                 });
-
                     }).toList();
 
-                    // set the updated categories
+                    // Update the existing categories list.
                     existingCategories.clear();
                     existingCategories.addAll(updatedCategories);
                     break;
@@ -151,17 +184,22 @@ public class BudgetService {
             }
         });
 
+        // Save the updated budget and send an audit event.
         Budget updatedBudget = budgetRepository.save(budget);
         auditEventSender.sendEventToAudit(BudgetEvents.BUDGET_UPDATED, userId, "User Updated Their Budget");
         return budgetMapper.mapBudgetToResponse(updatedBudget);
     }
 
+    /**
+     * Adds a new category to an existing budget.
+     * Validates category uniqueness before addition.
+     */
     public BudgetCategoryResponse addCategoryToBudget(Long userId, Long id, @Valid BudgetCategoryRequest request) {
-        // find budget by id.
+        // Find the budget associated with the user.
         Budget budget = budgetRepository.findByIdAndUserId(id, userId)
                 .orElseThrow(() -> new BudgetNotFoundException("Budget Was Not Found"));
 
-        // validate that the category name doest not already exist.
+        // Check for duplicate category names.
         boolean categoryExists = budget.getCategories()
                 .stream()
                 .anyMatch(category -> category.getCategoryName().equalsIgnoreCase(request.name()));
@@ -170,10 +208,12 @@ public class BudgetService {
             throw new BudgetUpdateException("Category Name already exists");
         }
 
-        // create the new category
+        // Map and save the new category to the budget.
         BudgetCategory category = budgetMapper.toNewCategory(request, budget);
         budget.getCategories().add(category);
         budgetRepository.save(budget);
+
+        // Send an audit event for the new category addition.
         auditEventSender.sendEventToAudit(BudgetEvents.BUDGET_CATEGORY_CREATED, userId, "User Added a New Category");
         return budgetMapper.toNewCategoryResponse(category);
     }
