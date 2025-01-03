@@ -1,5 +1,6 @@
 package com.devshaks.personal_finance.kafka.consumer;
 
+// Import statements for necessary dependencies and classes.
 import com.devshaks.personal_finance.budget.Budget;
 import com.devshaks.personal_finance.budget.BudgetRepository;
 import com.devshaks.personal_finance.budget.category.BudgetCategory;
@@ -28,67 +29,94 @@ public class KafkaBudgetConsumer {
     private final TransactionEventSender transactionEventSender;
     private final AuditEventSender auditEventSender;
 
+    /**
+     * Kafka listener method to consume events from the "transaction-created" topic.
+     * Processes the transaction event and validates it against the user's budget.
+     *
+     * @param transactionEvent The transaction event received from Kafka.
+     */
     @KafkaListener(topics = "transaction-created", groupId = "budgetGroup", containerFactory = "kafkaListenerContainerFactory")
     public void consumeBudgetEvents(TransactionCreatedEventDTO transactionEvent) {
         try {
+            // Validate the budget and update if successful
             boolean isSuccessful = validateAndUpdateBudget(transactionEvent);
+
+            // Notify transaction service of successful validation
             transactionEventSender.sendEventToTransaction(
                     transactionEvent.transactionId(),
                     transactionEvent.userId(),
                     isSuccessful,
                     "Transaction approved and budget updated");
         } catch (BudgetExceededException | BudgetNotFoundException | BudgetCategoryNotFoundException ex) {
+            // Handle specific budget validation errors
             log.error("Validation failed for transaction {}: {}", transactionEvent.transactionId(), ex.getMessage());
             transactionEventSender.sendEventToTransaction(
                     transactionEvent.transactionId(),
                     transactionEvent.userId(),
                     false,
                     ex.getMessage());
+
+            // Send audit event for failed validation
             auditEventSender.sendEventToAudit(
                     TRANSACTION_BUDGET_VALIDATION_FAILED,
                     transactionEvent.userId(),
                     "Transaction Failed Budget Validation: " + ex.getMessage());
 
         } catch (Exception ex) {
-            log.error("Unexpected error occurred for transaction {}: {}", transactionEvent.transactionId(), ex.getMessage());
+            // Handle unexpected errors
+            log.error("Unexpected error occurred for transaction {}: {}", transactionEvent.transactionId(),
+                    ex.getMessage());
             transactionEventSender.sendEventToTransaction(
                     transactionEvent.transactionId(),
                     transactionEvent.userId(),
                     false,
-                    "Unexpected error occurred" + ex.getMessage());
+                    "Unexpected error occurred: " + ex.getMessage());
         }
     }
 
+    /**
+     * Validates the transaction against the user's budget and updates the budget
+     * records.
+     *
+     * @param transactionEvent The transaction event containing transaction details.
+     * @return true if the transaction is valid and budget updated successfully.
+     */
     private boolean validateAndUpdateBudget(TransactionCreatedEventDTO transactionEvent) {
+        // Retrieve the user's current monthly budget
         Budget budget = budgetRepository.findByUserIdAndMonth(transactionEvent.userId(), YearMonth.now().toString())
                 .orElseThrow(() -> new BudgetNotFoundException("Could not find budget"));
 
-        // Check if transaction exceeds monthly limit.
+        // Check if the transaction exceeds the overall monthly budget limit
         if (budget.getRemainingAmount().compareTo(transactionEvent.amount()) < 0) {
             throw new BudgetExceededException("Transaction Exceeds Monthly Budget Limit");
         }
 
-        // check category limit if category exists
+        // Check if the transaction exceeds the category limit (if a category is
+        // specified)
         if (transactionEvent.category() != null) {
-            BudgetCategory category = budgetCategoryRepository.findByBudgetAndCategoryName(budget, transactionEvent.category())
+            BudgetCategory category = budgetCategoryRepository
+                    .findByBudgetAndCategoryName(budget, transactionEvent.category())
                     .orElse(null);
 
+            // Validate category limits if the category exists
             if (category != null) {
                 if (category.getCategoryLimit() != null &&
-                        category.getCategoryLimit().subtract(category.getSpentAmount()).compareTo(transactionEvent.amount()) < 0) {
-                    throw new BudgetExceededException("Transaction Exceeds Monthly Budget Limit");
+                        category.getCategoryLimit().subtract(category.getSpentAmount())
+                                .compareTo(transactionEvent.amount()) < 0) {
+                    throw new BudgetExceededException("Transaction Exceeds Category Limit");
                 }
 
-                // Update category spent amount
+                // Update the category's spent amount
                 category.setSpentAmount(category.getSpentAmount().add(transactionEvent.amount()));
                 budgetCategoryRepository.save(category);
             }
         }
 
-        // Update budget spent and remaining amounts
+        // Update the budget's spent and remaining amounts
         budget.setSpentAmount(budget.getSpentAmount().add(transactionEvent.amount()));
         budget.setRemainingAmount(budget.getMonthlyLimit().subtract(budget.getSpentAmount()));
         budgetRepository.save(budget);
-        return true;
+
+        return true; // Validation and update successful
     }
 }
