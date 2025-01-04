@@ -135,6 +135,15 @@ public class TransactionsService {
         return transactionsMapper.toTransactionDTO(savedTransaction);
     }
 
+    /**
+     * Retrieves all transactions for a specific user.
+     * Caches the result for future lookups based on the userId.
+     *
+     * @param userId the ID of the user whose transactions are to be retrieved
+     * @return a list of transactions mapped to TransactionsResponse
+     * @throws TransactionNotFoundException if no transactions are found for the
+     *                                      user
+     */
     // @Cacheable(value = "transactions", key = "#userId")
     public List<TransactionsResponse> getUsersTransactions(Long userId) {
         List<Transactions> transactions = transactionsRepository.findByUserId(userId);
@@ -144,12 +153,31 @@ public class TransactionsService {
         return transactions.stream().map(transactionsMapper::mapUserToTransactionResponse).toList();
     }
 
+    /**
+     * Retrieves a specific transaction by its ID.
+     * Caches the result for future lookups based on the transaction ID.
+     *
+     * @param id the ID of the transaction to be retrieved
+     * @return a TransactionsDTO representing the transaction
+     * @throws TransactionNotFoundException if no transaction is found with the
+     *                                      given ID
+     */
     // @Cacheable(value = "transactions", key = "#id")
     public TransactionsDTO getTransactionById(Long id) {
         return transactionsRepository.findById(id).map(transactionsMapper::toTransactionDTO)
                 .orElseThrow(() -> new TransactionNotFoundException("Cannot Find Transaction With ID"));
     }
 
+    /**
+     * Retrieves transactions for a specific user filtered by category.
+     * Caches the result for future lookups based on userId and category.
+     *
+     * @param userId   the ID of the user whose transactions are to be retrieved
+     * @param category the category of transactions to filter by
+     * @return a list of TransactionsDTO for the specified user and category
+     * @throws TransactionNotFoundException if no transactions are found for the
+     *                                      category
+     */
     // @Cacheable(value = "transactions", key = "T(String).format('%d-%s', #userId,
     // #category)")
     public List<TransactionsDTO> getUserTransactionByCategory(Long userId, String category) {
@@ -160,6 +188,21 @@ public class TransactionsService {
         return transactions.stream().map(transactionsMapper::toTransactionDTO).toList();
     }
 
+    /**
+     * Filters and paginates transactions based on various criteria.
+     * Caches the result for future lookups based on userId, category, and pageable
+     * parameters.
+     *
+     * @param userId             the ID of the user whose transactions are being
+     *                           filtered
+     * @param category           the category to filter by
+     * @param transactionDate    the transaction date to filter by
+     * @param transactionsType   the type of transactions to filter by
+     * @param transactionsStatus the status of transactions to filter by
+     * @param pageable           pagination details
+     * @return a PaginatedTransactionDTO containing the filtered and paginated
+     *         transactions
+     */
     // @Cacheable(value = "transaction-filters", key = "#userId + '-' + #category +
     // '-' + #pageable.pageNumber")
     public PaginatedTransactionDTO getTransactionFilter(Long userId, String category, LocalDateTime transactionDate,
@@ -189,6 +232,15 @@ public class TransactionsService {
                 transactionsPage.getTotalElements(), transactionsPage.getTotalPages(), transactionsPage.isLast());
     }
 
+    /**
+     * Calculates statistics for a user's transactions, including daily, weekly, and
+     * monthly spending and counts.
+     *
+     * @param userId the ID of the user whose transaction statistics are to be
+     *               calculated
+     * @return a UserTransactionStatisticsDTO containing transaction statistics and
+     *         category breakdown
+     */
     public UserTransactionStatisticsDTO getUserTransactionStats(Long userId) {
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime startOfDay = now.toLocalDate().atStartOfDay();
@@ -227,8 +279,14 @@ public class TransactionsService {
 
     }
 
+    /**
+     * Deletes a transaction by its ID and evicts it from the cache.
+     *
+     * @param id the ID of the transaction to be deleted
+     */
     @CacheEvict(value = "transactions", key = "#id")
     public void deleteTransaction(Long id) {
 
     }
+
 }
