@@ -4,7 +4,7 @@ Microservices to Create
 01. User Service: Handles user Authentication, Authorisation, and Profile Management ✅
 02. Transaction Service: Manages transaction records, Categories (e.g., groceries, bills), entertainment, and tags ✅
 03. Budget Service: Allows users to set monthly/weekly budgets and provides alerts when thresholds are crossed. ✅
-04. Payment Service: Use a payment Gateway (e.g., Stripe) to Authenticate and Validate Incoming Payments Securely.
+04. Payment Service: Use a payment Gateway (e.g., Stripe) to Authenticate and Validate Incoming Payments Securely. ✅
 05. Savings Service: Tracks savings goals and progress, including automated saving calculations.
 06. Reporting Service: Generates detailed financial reports, graphs, and insights for users based on their transactions.
 07. Notification Service: Sends reminders, budget alerts, and monthly summaries via email or SMS.
