@@ -1,0 +1,9 @@
+spring:
+    data:
+        mongodb:
+            host: localhost
+            port: 27017
+            database: notificationsdb
+
+server:
+    port: 8040
