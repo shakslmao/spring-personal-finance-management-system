@@ -1,0 +1,19 @@
+package com.devshaks.personal_finance;
+
+import io.github.cdimascio.dotenv.Dotenv;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@EnableMongoAuditing
+@EnableMongoRepositories
+@SpringBootApplication
+public class NotificationServiceApplication {
+
+    public static void main(String[] args) {
+        Dotenv dotenv = Dotenv.load();
+        System.setProperty("MONGO_INITDB_ROOT_USERNAME", dotenv.get("MONGO_INITDB_ROOT_USERNAME"));
+        System.setProperty("MONGO_INITDB_ROOT_PASSWORD", dotenv.get("MONGO_INITDB_ROOT_PASSWORD"));
+        SpringApplication.run(NotificationServiceApplication.class, args);
+    }
+
+}
