@@ -17,5 +17,4 @@ public class NotificationServiceApplication {
         System.setProperty("MONGO_INITDB_ROOT_PASSWORD", dotenv.get("MONGO_INITDB_ROOT_PASSWORD"));
         SpringApplication.run(NotificationServiceApplication.class, args);
     }
-
 }
