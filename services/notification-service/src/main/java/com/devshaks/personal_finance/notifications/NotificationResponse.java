@@ -2,8 +2,6 @@ package com.devshaks.personal_finance.notifications;
 
 import java.time.LocalDateTime;
 
-import com.devshaks.personal_finance.NotificationType;
-
 public record NotificationResponse(
         String id,
         String recipientId,
