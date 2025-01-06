@@ -1,6 +1,7 @@
 package com.devshaks.personal_finance.config;
 
-import java.io.FileInputStream;
+import java.io.ByteArrayInputStream;
+import java.nio.charset.StandardCharsets;
 
 import org.springframework.context.annotation.Configuration;
 
@@ -22,15 +23,14 @@ public class FirebaseConfig {
                 throw new IllegalArgumentException("FIREBASE_CREDENTIALS environment variable is not set.");
             }
 
-            FileInputStream serviceAccount = new FileInputStream(firebaseCredentials);
             FirebaseOptions options = FirebaseOptions.builder()
-                    .setCredentials(GoogleCredentials.fromStream(serviceAccount))
+                    .setCredentials(GoogleCredentials
+                            .fromStream(new ByteArrayInputStream(firebaseCredentials.getBytes(StandardCharsets.UTF_8))))
                     .build();
             FirebaseApp.initializeApp(options);
 
         } catch (Exception e) {
             throw new RuntimeException("Error Fetching FCM Configuration", e);
         }
-
     }
 }
