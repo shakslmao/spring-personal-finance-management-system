@@ -29,7 +29,8 @@ public class KafkaAuditConsumer {
     private Map<Class<?>, Function<Object, Audit>> eventMapperRegistry;
 
     // Listens to multiple Kafka topics and processes events.
-    @KafkaListener(topics = {"user-topic", "transaction-topic", "budget-topic"}, groupId = "auditGroup", containerFactory = "kafkaListenerContainerFactory")
+    @KafkaListener(topics = { "user-topic", "transaction-topic",
+            "budget-topic" }, groupId = "auditGroup", containerFactory = "kafkaListenerContainerFactory")
     public void consumeAuditEvent(@Payload String payload, @Header("kafka_receivedTopic") String topic) {
         try {
             log.info("Receiving Event From : {}, {}", payload, topic);
@@ -51,8 +52,9 @@ public class KafkaAuditConsumer {
 
     /**
      * Parses the JSON payload into a specific event DTO based on the topic.
+     * 
      * @param payload - The raw JSON payload received from Kafka.
-     * @param topic - The topic name the event was published to.
+     * @param topic   - The topic name the event was published to.
      * @return The parsed event DTO.
      * @throws JsonProcessingException if the payload cannot be deserialized.
      */
@@ -66,7 +68,8 @@ public class KafkaAuditConsumer {
     }
 
     /**
-     * Initialises a registry mapping event DTO types to functions that transform them into Audit objects.
+     * Initialises a registry mapping event DTO types to functions that transform
+     * them into Audit objects.
      * This runs after the bean is constructed due to the @PostConstruct annotation.
      */
     @PostConstruct
@@ -76,7 +79,8 @@ public class KafkaAuditConsumer {
                 AuditUserEventDTO.class, event -> {
                     AuditUserEventDTO userEvent = (AuditUserEventDTO) event;
                     return Audit.builder()
-                            .eventType(eventMapper.mapEventToSpecificType(userEvent.eventType())) // Map event type to a standardized value.
+                            .eventType(eventMapper.mapEventToSpecificType(userEvent.eventType())) // Map event type to a
+                                                                                                  // standardized value.
                             .serviceName(userEvent.serviceName()) // Set the service that generated the event.
                             .userId(userEvent.userId()) // Set the associated user ID.
                             .description(userEvent.description()) // Add a descriptive message about the event.
@@ -104,12 +108,12 @@ public class KafkaAuditConsumer {
                             .description(budgetEvent.description())
                             .timestamp(budgetEvent.timestamp())
                             .build();
-                }
-        );
+                });
     }
 
     /**
      * Maps a parsed event object to an Audit entity using the registry.
+     * 
      * @param event - The parsed event object.
      * @return The Audit entity corresponding to the event.
      * @throws IllegalArgumentException if the event type is not in the registry.
