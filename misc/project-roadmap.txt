@@ -113,9 +113,11 @@ Phase 8: Notification Service
     1. Core Features
         - Send email and SMS notifications (e.g., Twilio or AWS SES).
         - Schedule reminders for bills or savings goals.
-        - Use RabbitMQ for asynchronous communication.
+        - Use Kafka for sending notifrcatiosn to Email, SMS, and WebSocket Consumers
+        - Web Sockets for Delivering alerts with minimal latency, real-time budget or transaction alerts.
     2. Database
         - Store notification logs in MongoDB for quick access.
+        3. 
 
 Phase 9: Monitoring, Security, and DevOps
     1. Monitoring

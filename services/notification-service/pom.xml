@@ -54,6 +54,10 @@
             <artifactId>ses</artifactId>
             <version>2.29.44</version>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-websocket</artifactId>
+        </dependency>
 
         <!-- 
         push Notifications [Implement Later]
@@ -62,13 +66,14 @@
             <artifactId>pushy</artifactId>
             <version>0.15.4</version>
         </dependency>
+        -->
 
         <dependency>
             <groupId>com.google.firebase</groupId>
             <artifactId>firebase-admin</artifactId>
             <version>9.1.1</version> 
         </dependency>
-        -->
+
         <dependency>
 			<groupId>io.github.cdimascio</groupId>
 			<artifactId>dotenv-java</artifactId>
@@ -179,5 +184,4 @@
 			</plugin>
 		</plugins>
 	</build>
-
 </project>
