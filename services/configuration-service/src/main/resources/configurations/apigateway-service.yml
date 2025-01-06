@@ -50,6 +50,11 @@ spring:
                       - RemoveRequestHeader=Cookie
                       - AddRequestHeader=Authorization, "${request.headers['Authorization']:default-token}"
 
+                - id: notification-service
+                  uri: lb://NOTIFICATION-SERVICE
+                  predicates:
+                      - Path=/api/v1/notifications/**
+
 logging:
     level:
         org.springframework.security.oauth2.server.resource: DEBUG
