@@ -9,20 +9,21 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
+import com.devshaks.personal_finance.services.FCMService;
+
 @Slf4j
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("api/v1/notifications")
 @Tag(name = "Notification Controller", description = "Handles Notification Related Operations")
 public class NotificationController {
 
     private final NotificationService notificationService;
-
-    public NotificationController(NotificationService notificationService) {
-        this.notificationService = notificationService;
-    }
+    private final FCMService fcmService;
 
     @PostMapping
     @Operation(summary = "Create a new Notification for a User")
@@ -30,6 +31,7 @@ public class NotificationController {
     @ApiResponse(responseCode = "400", description = "Notification Creation Failed")
     public ResponseEntity<NotificationResponse> createNotification(@RequestBody @Valid NotificationRequest request) {
         NotificationResponse response = notificationService.createNotification(request);
+        fcmService.sendFCMNotification(request.deviceToken(), request.title(), request.message());
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
