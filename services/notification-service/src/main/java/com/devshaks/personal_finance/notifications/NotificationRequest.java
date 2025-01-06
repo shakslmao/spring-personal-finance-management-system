@@ -9,6 +9,4 @@ public record NotificationRequest(
         Map<String, String> metaData,
         String deviceToken,
         String title,
-        String message) {
-
-}
+        Str

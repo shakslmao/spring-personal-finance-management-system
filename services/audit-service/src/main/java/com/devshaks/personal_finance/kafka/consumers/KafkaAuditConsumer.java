@@ -121,8 +121,4 @@ public class KafkaAuditConsumer {
     private Audit mapToAudit(Object event) {
         Function<Object, Audit> mapper = eventMapperRegistry.get(event.getClass());
         if (mapper == null) {
-            throw new IllegalArgumentException("Unknown event type: " + event.getClass());
-        }
-        return mapper.apply(event);
-    }
-}
+            th
