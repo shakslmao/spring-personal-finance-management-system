@@ -23,6 +23,7 @@ public class SecurityConfiguration {
                         .pathMatchers("/api/v1/transactions").authenticated()
                         .pathMatchers("/api/v1/users").authenticated()
                         .pathMatchers("/api/v1/payments").authenticated()
+                        .pathMatchers("/api/v1/notifications").authenticated()
                         .anyExchange()
                         .authenticated())
                 .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()));
