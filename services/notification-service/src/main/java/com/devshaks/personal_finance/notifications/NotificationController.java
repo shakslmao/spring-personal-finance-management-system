@@ -30,9 +30,14 @@ public class NotificationController {
     @ApiResponse(responseCode = "201", description = "Notification Created Successfully")
     @ApiResponse(responseCode = "400", description = "Notification Creation Failed")
     public ResponseEntity<NotificationResponse> createNotification(@RequestBody @Valid NotificationRequest request) {
-        NotificationResponse response = notificationService.createNotification(request);
-        fcmService.sendFCMNotification(request.deviceToken(), request.title(), request.message());
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        try {
+            NotificationResponse response = notificationService.createNotification(request);
+            fcmService.sendFCMNotification(request.deviceToken(), request.title(), request.message());
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
     }
 
     @PostMapping("/{id}/send")
