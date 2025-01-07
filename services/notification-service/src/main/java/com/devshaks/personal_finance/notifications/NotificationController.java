@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -17,6 +18,8 @@ import com.devshaks.personal_finance.email.EmailNotificationRequest;
 import com.devshaks.personal_finance.email.SESService;
 import com.devshaks.personal_finance.pushnotification.FCMService;
 import com.devshaks.personal_finance.pushnotification.PushNotificationRequest;
+import com.devshaks.personal_finance.sms.SMSNotificationRequest;
+import com.devshaks.personal_finance.sms.TwilioSMSService;
 
 @Slf4j
 @RestController
@@ -28,22 +31,27 @@ public class NotificationController {
     private final NotificationService notificationService;
     private final FCMService fcmService;
     private final SESService sesService;
-    
+    private final TwilioSMSService twilioSMSService;
+
     @PostMapping("/push")
     @Operation(summary = "Create a Push Notification for a User")
     @ApiResponse(responseCode = "201", description = "Push Notification Created Successfully")
     @ApiResponse(responseCode = "400", description = "Push Notification Creation Failed")
     public ResponseEntity<NotificationResponse> createPushNotification(
-            @RequestBody @Valid PushNotificationRequest request) {
+            @RequestBody @Valid PushNotificationRequest pushRequest) {
         try {
-            NotificationResponse response = notificationService.createPushNotification(request);
-            fcmService.sendFCMNotification(request.deviceToken(), request.title(), request.message());
+            NotificationResponse response = notificationService.createPushNotification(pushRequest);
+            fcmService.sendFCMNotification(pushRequest.deviceToken(), pushRequest.title(), pushRequest.message());
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
 
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
     }
+
+    // use spring retry for failures
+    // use thymelefe for personalised sms messages & emails.
+    // impl twilio web hoook.
 
     @PostMapping("/email")
     @Operation(summary = "Create a Email Notification for a User")
@@ -62,22 +70,19 @@ public class NotificationController {
         }
     }
 
-    @PostMapping("/{id}/send")
-    @Operation(summary = "Send the Notification for User")
-    @ApiResponse(responseCode = "201", description = "Notification Sent Successfully")
-    @ApiResponse(responseCode = "400", description = "Notification Sent Failed")
-    public ResponseEntity<Void> sendNotification(@PathVariable("id") String id) {
-        notificationService.sendNotification(id);
-        return ResponseEntity.noContent().build();
-    }
-
-    @PutMapping("/{id}/read")
-    @Operation(summary = "Send the Notification for User")
-    @ApiResponse(responseCode = "201", description = "Notification Read Successfully")
-    @ApiResponse(responseCode = "400", description = "Notification Read Failed")
-    public ResponseEntity<?> markNotificationAsRead(@PathVariable("id") String id) {
-        notificationService.markNotificationAsRead(id);
-        return ResponseEntity.noContent().build();
+    @PostMapping("/sms")
+    @Operation(summary = "Create a SMS Notification for a User")
+    @ApiResponse(responseCode = "201", description = "SMS Notification Created Successfully")
+    @ApiResponse(responseCode = "400", description = "SMS Notification Creation Failed")
+    public ResponseEntity<NotificationResponse> sendSMSNotification(
+            @RequestBody @Valid SMSNotificationRequest smsRequest) {
+        try {
+            NotificationResponse response = notificationService.createSMSNotification(smsRequest);
+            twilioSMSService.sendSMS(smsRequest.to(), smsRequest.body());
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
     }
 
     @GetMapping
