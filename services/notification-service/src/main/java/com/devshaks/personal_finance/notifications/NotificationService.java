@@ -4,13 +4,20 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import com.devshaks.personal_finance.email.EmailNotificationRequest;
+import com.devshaks.personal_finance.pushnotification.PushNotificationRequest;
+
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
 public class NotificationService {
 
-    public NotificationResponse createNotification(NotificationRequest request) {
+    public NotificationResponse createPushNotification(PushNotificationRequest request) {
+        return null;
+    }
+
+    public NotificationResponse createEmailNotification(EmailNotificationRequest request) {
         return null;
     }
 
