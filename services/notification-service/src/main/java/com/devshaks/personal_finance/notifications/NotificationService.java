@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 
 import com.devshaks.personal_finance.email.EmailNotificationRequest;
 import com.devshaks.personal_finance.pushnotification.PushNotificationRequest;
+import com.devshaks.personal_finance.sms.SMSNotificationRequest;
 
 import lombok.RequiredArgsConstructor;
 
@@ -21,12 +22,8 @@ public class NotificationService {
         return null;
     }
 
-    public void sendNotification(String id) {
-
-    }
-
-    public void markNotificationAsRead(String id) {
-
+    public NotificationResponse createSMSNotification(SMSNotificationRequest request) {
+        return null;
     }
 
     public List<NotificationResponse> getNotificationsByRecipient(String recipientId, NotificationStatus status) {
