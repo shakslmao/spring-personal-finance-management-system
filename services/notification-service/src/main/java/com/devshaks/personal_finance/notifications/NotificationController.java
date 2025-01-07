@@ -13,7 +13,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
-import com.devshaks.personal_finance.services.FCMService;
+import com.devshaks.personal_finance.email.EmailNotificationRequest;
+import com.devshaks.personal_finance.email.SESService;
+import com.devshaks.personal_finance.pushnotification.FCMService;
+import com.devshaks.personal_finance.pushnotification.PushNotificationRequest;
 
 @Slf4j
 @RestController
@@ -24,15 +27,34 @@ public class NotificationController {
 
     private final NotificationService notificationService;
     private final FCMService fcmService;
-
-    @PostMapping
-    @Operation(summary = "Create a new Notification for a User")
-    @ApiResponse(responseCode = "201", description = "Notification Created Successfully")
-    @ApiResponse(responseCode = "400", description = "Notification Creation Failed")
-    public ResponseEntity<NotificationResponse> createNotification(@RequestBody @Valid NotificationRequest request) {
+    private final SESService sesService;
+    
+    @PostMapping("/push")
+    @Operation(summary = "Create a Push Notification for a User")
+    @ApiResponse(responseCode = "201", description = "Push Notification Created Successfully")
+    @ApiResponse(responseCode = "400", description = "Push Notification Creation Failed")
+    public ResponseEntity<NotificationResponse> createPushNotification(
+            @RequestBody @Valid PushNotificationRequest request) {
         try {
-            NotificationResponse response = notificationService.createNotification(request);
+            NotificationResponse response = notificationService.createPushNotification(request);
             fcmService.sendFCMNotification(request.deviceToken(), request.title(), request.message());
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
+    }
+
+    @PostMapping("/email")
+    @Operation(summary = "Create a Email Notification for a User")
+    @ApiResponse(responseCode = "201", description = "Email Notification Created Successfully")
+    @ApiResponse(responseCode = "400", description = "Email Notification Creation Failed")
+    public ResponseEntity<NotificationResponse> sendEmailNotification(
+            @RequestBody @Valid EmailNotificationRequest emailRequest) {
+        try {
+            NotificationResponse response = notificationService.createEmailNotification(emailRequest);
+            sesService.sendEmailNotification(emailRequest.to(), emailRequest.subject(), emailRequest.body(),
+                    emailRequest.from());
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
 
         } catch (Exception e) {
