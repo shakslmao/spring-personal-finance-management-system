@@ -17,6 +17,9 @@ public class NotificationServiceApplication {
         System.setProperty("MONGO_INITDB_ROOT_PASSWORD", dotenv.get("MONGO_INITDB_ROOT_PASSWORD"));
         System.setProperty("SES_ACCESS_KEY", dotenv.get("SES_ACCESS_KEY"));
         System.setProperty("SES_SECRET_ACCESS_KEY", dotenv.get("SES_SECRET_ACCESS_KEY"));
+        System.setProperty("TWILIO_ACCOUNT_SID", dotenv.get("TWILIO_ACCOUNT_SID"));
+        System.setProperty("TWILIO_AUTH_TOKEN", dotenv.get("TWILIO_AUTH_TOKEN"));
+        System.setProperty("TWILIO_PHONE_NUM", dotenv.get("TWILIO_PHONE_NUM"));
         SpringApplication.run(NotificationServiceApplication.class, args);
     }
 }
