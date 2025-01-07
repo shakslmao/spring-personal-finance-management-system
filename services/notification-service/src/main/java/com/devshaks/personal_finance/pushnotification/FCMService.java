@@ -1,4 +1,4 @@
-package com.devshaks.personal_finance.services;
+package com.devshaks.personal_finance.pushnotification;
 
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
