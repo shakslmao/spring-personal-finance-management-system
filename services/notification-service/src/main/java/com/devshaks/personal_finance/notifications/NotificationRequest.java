@@ -2,11 +2,12 @@ package com.devshaks.personal_finance.notifications;
 
 import java.util.Map;
 
+import com.google.firebase.database.annotations.NotNull;
+
 public record NotificationRequest(
-        String recipientId,
-        NotificationType notificationType,
-        String notificationMessage,
-        Map<String, String> metaData,
-        String deviceToken,
-        String title,
-        Str
+        @NotNull String recipientId,
+        @NotNull NotificationType notificationType,
+        @NotNull String notificationMessage,
+        @NotNull Map<String, String> metaData) {
+
+}
