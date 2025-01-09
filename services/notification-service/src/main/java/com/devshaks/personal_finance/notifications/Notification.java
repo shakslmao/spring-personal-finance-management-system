@@ -30,6 +30,9 @@ public class Notification {
     private LocalDateTime createdAt;
     private LocalDateTime sentAt;
     private LocalDateTime readAt;
+    private String senderId;
+    private String subject;
+    private String messageTemplate;
 }
 
 // FCM for Notifications - Configure
