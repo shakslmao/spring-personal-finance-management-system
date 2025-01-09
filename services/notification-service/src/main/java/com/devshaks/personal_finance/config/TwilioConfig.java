@@ -6,9 +6,7 @@ import com.google.api.client.util.Value;
 import com.twilio.Twilio;
 
 import jakarta.annotation.PostConstruct;
-import lombok.Getter;
 
-@Getter
 @Configuration
 public class TwilioConfig {
 
@@ -22,8 +20,15 @@ public class TwilioConfig {
     private String twilioPhoneNumber;
 
     @PostConstruct
-    public void init() {
+    public void initializeTwilio() {
+        if (twilioAccountSID == null || twilioAuthToken == null) {
+            throw new IllegalArgumentException("Credentails are Not Set.");
+        }
         Twilio.init(twilioAccountSID, twilioAuthToken);
+    }
+
+    public String getTwilioPhoneNumber() {
+        return twilioPhoneNumber;
     }
 
 }

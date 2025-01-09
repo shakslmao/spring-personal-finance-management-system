@@ -21,6 +21,10 @@ import com.devshaks.personal_finance.pushnotification.PushNotificationRequest;
 import com.devshaks.personal_finance.sms.SMSNotificationRequest;
 import com.devshaks.personal_finance.sms.TwilioSMSService;
 
+// use spring retry for failures
+// use thymelefe for personalised sms messages & emails.
+// impl twilio web hoook.
+
 @Slf4j
 @RestController
 @RequiredArgsConstructor
@@ -48,10 +52,6 @@ public class NotificationController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
     }
-
-    // use spring retry for failures
-    // use thymelefe for personalised sms messages & emails.
-    // impl twilio web hoook.
 
     @PostMapping("/email")
     @Operation(summary = "Create a Email Notification for a User")
