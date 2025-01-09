@@ -14,16 +14,25 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class NotificationService {
 
+    private final NotificationRepository notificationRepository;
+    private final NotificationMapper notificationMapper;
+
     public NotificationResponse createPushNotification(PushNotificationRequest request) {
-        return null;
+        Notification notification = notificationMapper.toNewPushNotification(request);
+        Notification savedNotification = notificationRepository.save(notification);
+        return notificationMapper.mapToNotificationResponse(savedNotification);
     }
 
     public NotificationResponse createEmailNotification(EmailNotificationRequest request) {
-        return null;
+        Notification notification = notificationMapper.toNewEmailNotification(request);
+        Notification savedNotification = notificationRepository.save(notification);
+        return notificationMapper.mapToNotificationResponse(savedNotification);
     }
 
     public NotificationResponse createSMSNotification(SMSNotificationRequest request) {
-        return null;
+        Notification notification = notificationMapper.toNewSMSNotification(request);
+        Notification savedNotification = notificationRepository.save(notification);
+        return notificationMapper.mapToNotificationResponse(savedNotification);
     }
 
     public List<NotificationResponse> getNotificationsByRecipient(String recipientId, NotificationStatus status) {
