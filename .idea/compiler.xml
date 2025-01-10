@@ -22,8 +22,18 @@
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="false">
           <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/unknown/lombok-unknown.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/unknown/lombok-unknown.jar" />
         </processorPath>
         <module name="notification-service" />
+      </profile>
+      <profile name="Annotation profile for notifications-service" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="false">
+          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/unknown/lombok-unknown.jar" />
+        </processorPath>
+        <module name="notifications-service" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
@@ -38,6 +48,7 @@
       <module name="configuration-service" options="-parameters" />
       <module name="discovery-service" options="-parameters" />
       <module name="notification-service" options="-parameters" />
+      <module name="notifications-service" options="-parameters" />
       <module name="payment-service" options="-parameters" />
       <module name="transaction-service" options="-parameters" />
       <module name="transactions-service" options="-parameters" />

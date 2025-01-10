@@ -10,50 +10,50 @@ spring:
                 locator:
                     enabled: true
             routes:
-                - id: user-service
-                  uri: lb://USER-SERVICE
-                  predicates:
-                      - Path=/api/v1/users/**
-                  filters:
-                      - RemoveRequestHeader=Cookie
-                      - AddRequestHeader=Authorization, "${request.headers['Authorization']:default-token}"
+                -   id: user-service
+                    uri: lb://USER-SERVICE
+                    predicates:
+                        - Path=/api/v1/users/**
+                    filters:
+                        - RemoveRequestHeader=Cookie
+                        - AddRequestHeader=Authorization, "${request.headers['Authorization']:default-token}"
 
-                - id: transaction-service
-                  uri: lb://TRANSACTION-SERVICE
-                  predicates:
-                      - Path=/api/v1/transactions/**
-                  filters:
-                      - RemoveRequestHeader=Cookie
-                      - AddRequestHeader=Authorization, "${request.headers['Authorization']:default-token}"
+                -   id: transaction-service
+                    uri: lb://TRANSACTION-SERVICE
+                    predicates:
+                        - Path=/api/v1/transactions/**
+                    filters:
+                        - RemoveRequestHeader=Cookie
+                        - AddRequestHeader=Authorization, "${request.headers['Authorization']:default-token}"
 
-                - id: audit-service
-                  uri: lb://AUDIT-SERVICE
-                  predicates:
-                      - Path=/api/v1/audits/**
-                  filters:
-                      - RemoveRequestHeader=Cookie
-                      - AddRequestHeader=Authorization, "${request.headers['Authorization']:default-token}"
+                -   id: audit-service
+                    uri: lb://AUDIT-SERVICE
+                    predicates:
+                        - Path=/api/v1/audits/**
+                    filters:
+                        - RemoveRequestHeader=Cookie
+                        - AddRequestHeader=Authorization, "${request.headers['Authorization']:default-token}"
 
-                - id: budget-service
-                  uri: lb://BUDGET-SERVICE
-                  predicates:
-                      - Path=/api/v1/budgets/**
-                  filters:
-                      - RemoveRequestHeader=Cookie
-                      - AddRequestHeader=Authorization, "${request.headers['Authorization']:default-token}"
+                -   id: budget-service
+                    uri: lb://BUDGET-SERVICE
+                    predicates:
+                        - Path=/api/v1/budgets/**
+                    filters:
+                        - RemoveRequestHeader=Cookie
+                        - AddRequestHeader=Authorization, "${request.headers['Authorization']:default-token}"
 
-                - id: payment-service
-                  uri: lb://PAYMENT-SERVICE
-                  predicates:
-                      - Path=/api/v1/payments/**
-                  filters:
-                      - RemoveRequestHeader=Cookie
-                      - AddRequestHeader=Authorization, "${request.headers['Authorization']:default-token}"
+                -   id: payment-service
+                    uri: lb://PAYMENT-SERVICE
+                    predicates:
+                        - Path=/api/v1/payments/**
+                    filters:
+                        - RemoveRequestHeader=Cookie
+                        - AddRequestHeader=Authorization, "${request.headers['Authorization']:default-token}"
 
-                - id: notification-service
-                  uri: lb://NOTIFICATION-SERVICE
-                  predicates:
-                      - Path=/api/v1/notifications/**
+                -   id: notification-service
+                    uri: lb://NOTIFICATION-SERVICE
+                    predicates:
+                        - Path=/api/v1/notifications/**
 
 logging:
     level:

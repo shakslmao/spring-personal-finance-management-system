@@ -1,16 +1,14 @@
 package com.devshaks.personal_finance.notifications;
 
-import java.util.List;
-import java.util.function.Supplier;
-
-import org.springframework.stereotype.Service;
-
 import com.devshaks.personal_finance.email.EmailNotificationRequest;
 import com.devshaks.personal_finance.pushnotification.PushNotificationRequest;
 import com.devshaks.personal_finance.sms.SMSNotificationRequest;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.function.Supplier;
 
 @Slf4j
 @Service
@@ -67,7 +65,7 @@ public class NotificationService {
 
     private void validateNotification(Notification notification) {
         if (notification.getRecipientId() == null || notification.getRecipientId().isEmpty()) {
-            throw new IllegalArgumentException("Recepient ID Must not be Null or Empty!");
+            throw new IllegalArgumentException("Recipient ID Must not be Null or Empty!");
         }
 
         if (notification.getNotificationMessage() == null || notification.getNotificationMessage().isEmpty()) {

@@ -69,7 +69,7 @@ public class NotificationController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
     }
-
+    
     @PostMapping("/sms")
     @Operation(summary = "Create a SMS Notification for a User")
     @ApiResponse(responseCode = "201", description = "SMS Notification Created Successfully")

@@ -1,13 +1,11 @@
 package com.devshaks.personal_finance.sms;
 
-import org.springframework.stereotype.Service;
-
 import com.devshaks.personal_finance.config.TwilioConfig;
 import com.twilio.rest.api.v2010.account.Message;
 import com.twilio.type.PhoneNumber;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
