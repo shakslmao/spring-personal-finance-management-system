@@ -1,13 +1,12 @@
 package com.devshaks.personal_finance.notifications;
 
-import java.time.LocalDateTime;
-import java.util.Map;
-
-import org.springframework.stereotype.Service;
-
 import com.devshaks.personal_finance.email.EmailNotificationRequest;
 import com.devshaks.personal_finance.pushnotification.PushNotificationRequest;
 import com.devshaks.personal_finance.sms.SMSNotificationRequest;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+import java.util.Map;
 
 @Service
 public class NotificationMapper {
@@ -34,6 +33,9 @@ public class NotificationMapper {
     }
 
     public Notification toNewSMSNotification(SMSNotificationRequest smsRequest) {
+        if (smsRequest.to() == null || smsRequest.to().isEmpty()) {
+            throw new IllegalArgumentException("RecipientId cannot be null or empty");
+        }
         return Notification.builder()
                 .recipientId(smsRequest.to())
                 .notificationType(NotificationType.SMS)

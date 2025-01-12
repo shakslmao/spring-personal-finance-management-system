@@ -26,11 +26,9 @@ public class FCMService {
         CompletableFuture.runAsync(() -> {
             try {
                 String response = FirebaseMessaging.getInstance().send(message);
-                log.info("Successfully Sent FCM Notification: {}", response);
                 messagingTemplate.convertAndSend("/topic/notifications", body);
 
             } catch (Exception e) {
-                log.error("Failed to Send Notification", e);
                 throw new RuntimeException("Failed to Send Notification", e);
             }
         });
