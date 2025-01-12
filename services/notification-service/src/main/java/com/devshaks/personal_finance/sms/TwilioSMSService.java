@@ -15,11 +15,13 @@ public class TwilioSMSService {
     private final TwilioConfig twilioConfig;
 
     public void sendSMS(String to, String body) {
+        log.info("Preparing SMS to: {}: {}", to, body);
         try {
             Message message = Message
                     .creator(new PhoneNumber(to), new PhoneNumber(twilioConfig.getTwilioPhoneNumber()), body).create();
             log.info("Sending SMS. SID: {}", message.getSid());
         } catch (Exception e) {
+            log.error("Failed to send SMS to {}. Error: {}", to, e.getMessage(), e);
             throw new RuntimeException("Failed to send SMS", e);
         }
     }
