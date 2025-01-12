@@ -1,7 +1,11 @@
 package com.devshaks.personal_finance.exceptions;
 
-public class SMSException extends RuntimeException {
-  public SMSException(String message) {
-    super(message);
-  }
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
+@Data
+@EqualsAndHashCode(callSuper = true)
+public class TwilioSMSException extends RuntimeException {
+    private final String exceptionMessage;
+
 }
