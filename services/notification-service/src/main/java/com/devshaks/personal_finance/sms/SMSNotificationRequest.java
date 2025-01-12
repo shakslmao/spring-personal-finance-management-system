@@ -1,7 +1,8 @@
 package com.devshaks.personal_finance.sms;
 
-public record SMSNotificationRequest(
-        String to,
-        String body) {
+import jakarta.validation.constraints.NotBlank;
 
+public record SMSNotificationRequest(
+        @NotBlank(message = "Recipient ID cannot be blank") String to,
+        @NotBlank(message = "Message Body cannot be blank") String body) {
 }
