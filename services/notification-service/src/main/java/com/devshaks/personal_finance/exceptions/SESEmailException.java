@@ -1,7 +1,10 @@
 package com.devshaks.personal_finance.exceptions;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
+@Data
+@EqualsAndHashCode(callSuper = true)
 public class SESEmailException extends RuntimeException {
-  public SESEmailException(String message) {
-    super(message);
-  }
+    private final String exceptionMessage;
 }
