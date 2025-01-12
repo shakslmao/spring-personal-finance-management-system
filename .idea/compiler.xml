@@ -14,29 +14,12 @@
         <module name="user-service" />
         <module name="budget-service" />
         <module name="discovery-service" />
-        <module name="transactions-service" />
-      </profile>
-      <profile name="Annotation profile for notification-service" enabled="true">
-        <sourceOutputDir name="target/generated-sources/annotations" />
-        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
-        <outputRelativeToContentRoot value="true" />
-        <processorPath useClasspath="false">
-          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/unknown/lombok-unknown.jar" />
-          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/unknown/lombok-unknown.jar" />
-        </processorPath>
         <module name="notification-service" />
-      </profile>
-      <profile name="Annotation profile for notifications-service" enabled="true">
-        <sourceOutputDir name="target/generated-sources/annotations" />
-        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
-        <outputRelativeToContentRoot value="true" />
-        <processorPath useClasspath="false">
-          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/unknown/lombok-unknown.jar" />
-        </processorPath>
-        <module name="notifications-service" />
+        <module name="transactions-service" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
+      <module name="notifications-service" target="17" />
       <module name="transaction-service" target="17" />
     </bytecodeTargetLevel>
   </component>

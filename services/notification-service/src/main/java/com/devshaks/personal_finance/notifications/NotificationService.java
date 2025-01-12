@@ -41,6 +41,7 @@ public class NotificationService {
     }
 
     public NotificationResponse createSMSNotification(SMSNotificationRequest request) {
+        log.info("Creating new SMS notification: {}", request);
         return saveAndRespond(() -> notificationMapper.toNewSMSNotification(request));
 
         /*
@@ -53,12 +54,16 @@ public class NotificationService {
     private NotificationResponse saveAndRespond(Supplier<Notification> notificationSupplier) {
         try {
             Notification notification = notificationSupplier.get();
+            log.info("Notification generated: {}", notification);
+
             validateNotification(notification);
             Notification savedNotification = notificationRepository.save(notification);
+            log.info("Notification generated: {}", notification);
+
             return notificationMapper.mapToNotificationResponse(savedNotification);
 
         } catch (Exception e) {
-            log.error("Failed to create Notification: {}", e.getMessage());
+            log.error("Error During Notification creation", e);
             throw new RuntimeException("Error, Notification Creation Failed", e);
         }
     }

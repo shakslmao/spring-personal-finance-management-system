@@ -1,10 +1,11 @@
 package com.devshaks.personal_finance.notifications;
 
-import java.util.List;
-
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-
+import com.devshaks.personal_finance.email.EmailNotificationRequest;
+import com.devshaks.personal_finance.email.SESService;
+import com.devshaks.personal_finance.pushnotification.FCMService;
+import com.devshaks.personal_finance.pushnotification.PushNotificationRequest;
+import com.devshaks.personal_finance.sms.SMSNotificationRequest;
+import com.devshaks.personal_finance.sms.TwilioSMSService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -12,14 +13,11 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.devshaks.personal_finance.email.EmailNotificationRequest;
-import com.devshaks.personal_finance.email.SESService;
-import com.devshaks.personal_finance.pushnotification.FCMService;
-import com.devshaks.personal_finance.pushnotification.PushNotificationRequest;
-import com.devshaks.personal_finance.sms.SMSNotificationRequest;
-import com.devshaks.personal_finance.sms.TwilioSMSService;
+import java.util.List;
 
 // use spring retry for failures
 // use thymelefe for personalised sms messages & emails.
@@ -41,8 +39,7 @@ public class NotificationController {
     @Operation(summary = "Create a Push Notification for a User")
     @ApiResponse(responseCode = "201", description = "Push Notification Created Successfully")
     @ApiResponse(responseCode = "400", description = "Push Notification Creation Failed")
-    public ResponseEntity<NotificationResponse> createPushNotification(
-            @RequestBody @Valid PushNotificationRequest pushRequest) {
+    public ResponseEntity<NotificationResponse> createPushNotification(@RequestBody @Valid PushNotificationRequest pushRequest) {
         try {
             NotificationResponse response = notificationService.createPushNotification(pushRequest);
             fcmService.sendFCMNotification(pushRequest.deviceToken(), pushRequest.title(), pushRequest.message());
@@ -57,8 +54,7 @@ public class NotificationController {
     @Operation(summary = "Create a Email Notification for a User")
     @ApiResponse(responseCode = "201", description = "Email Notification Created Successfully")
     @ApiResponse(responseCode = "400", description = "Email Notification Creation Failed")
-    public ResponseEntity<NotificationResponse> sendEmailNotification(
-            @RequestBody @Valid EmailNotificationRequest emailRequest) {
+    public ResponseEntity<NotificationResponse> sendEmailNotification(@RequestBody @Valid EmailNotificationRequest emailRequest) {
         try {
             NotificationResponse response = notificationService.createEmailNotification(emailRequest);
             sesService.sendEmailNotification(emailRequest.to(), emailRequest.subject(), emailRequest.body(),
@@ -69,18 +65,23 @@ public class NotificationController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
     }
-    
+
     @PostMapping("/sms")
     @Operation(summary = "Create a SMS Notification for a User")
     @ApiResponse(responseCode = "201", description = "SMS Notification Created Successfully")
     @ApiResponse(responseCode = "400", description = "SMS Notification Creation Failed")
-    public ResponseEntity<NotificationResponse> sendSMSNotification(
-            @RequestBody @Valid SMSNotificationRequest smsRequest) {
+    public ResponseEntity<NotificationResponse> sendSMSNotification(@RequestBody @Valid SMSNotificationRequest smsRequest) {
+        log.info("Received SMS notification request: {}", smsRequest);
         try {
             NotificationResponse response = notificationService.createSMSNotification(smsRequest);
+            log.info("Notification created successfully: {}", response);
+
             twilioSMSService.sendSMS(smsRequest.to(), smsRequest.body());
+            log.info("SMS sent successfully for request: {}", smsRequest);
+
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
         } catch (Exception e) {
+            log.error("Failed to process SMS notification request: {}", smsRequest, e);
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
     }
@@ -89,9 +90,8 @@ public class NotificationController {
     @Operation(summary = "Retrieve the Notifications for User")
     @ApiResponse(responseCode = "201", description = "Notification Retrieved Successfully")
     @ApiResponse(responseCode = "400", description = "Notification Retrieval Failed")
-    public ResponseEntity<List<NotificationResponse>> getUsersNotifications(@RequestParam String recepientId,
-            @RequestParam(required = false) NotificationStatus status) {
-        List<NotificationResponse> response = notificationService.getNotificationsByRecipient(recepientId, status);
+    public ResponseEntity<List<NotificationResponse>> getUsersNotifications(@RequestParam String recipientId, @RequestParam(required = false) NotificationStatus status) {
+        List<NotificationResponse> response = notificationService.getNotificationsByRecipient(recipientId, status);
         return ResponseEntity.ok(response);
     }
 }
