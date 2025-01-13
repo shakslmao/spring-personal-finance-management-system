@@ -70,15 +70,11 @@ public class NotificationController {
     @Operation(summary = "Create a SMS Notification for a User")
     @ApiResponse(responseCode = "201", description = "SMS Notification Created Successfully")
     @ApiResponse(responseCode = "400", description = "SMS Notification Creation Failed")
-    public ResponseEntity<NotificationResponse> sendSMSNotification(@RequestBody @Valid SMSNotificationRequest smsRequest) {
+    public ResponseEntity<?> sendSMSNotification(@RequestBody @Valid SMSNotificationRequest smsRequest) {
         log.info("Received SMS notification request: {}", smsRequest);
         try {
             NotificationResponse response = notificationService.createSMSNotification(smsRequest);
-            log.info("Notification created successfully: {}", response);
-
             twilioSMSService.sendSMS(smsRequest.to(), smsRequest.body());
-            log.info("SMS sent successfully for request: {}", smsRequest);
-
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
         } catch (Exception e) {
             log.error("Failed to process SMS notification request: {}", smsRequest, e);
