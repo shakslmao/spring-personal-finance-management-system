@@ -1,6 +1,7 @@
 package com.devshaks.personal_finance.notifications;
 
 import com.devshaks.personal_finance.email.EmailNotificationRequest;
+import com.devshaks.personal_finance.exceptions.NotificationNotCreatedException;
 import com.devshaks.personal_finance.pushnotification.PushNotificationRequest;
 import com.devshaks.personal_finance.sms.SMSNotificationRequest;
 import lombok.RequiredArgsConstructor;
@@ -20,61 +21,34 @@ public class NotificationService {
 
     public NotificationResponse createPushNotification(PushNotificationRequest request) {
         return saveAndRespond(() -> notificationMapper.toNewPushNotification(request));
-
-        /*
-         * Notification notification =
-         * notificationMapper.toNewPushNotification(request);
-         * Notification savedNotification = notificationRepository.save(notification);
-         * return notificationMapper.mapToNotificationResponse(savedNotification);
-         */
     }
 
     public NotificationResponse createEmailNotification(EmailNotificationRequest request) {
         return saveAndRespond(() -> notificationMapper.toNewEmailNotification(request));
-
-        /*
-         * Notification notification =
-         * notificationMapper.toNewEmailNotification(request);
-         * Notification savedNotification = notificationRepository.save(notification);
-         * return notificationMapper.mapToNotificationResponse(savedNotification);
-         */
     }
 
     public NotificationResponse createSMSNotification(SMSNotificationRequest request) {
-        log.info("Creating new SMS notification: {}", request);
         return saveAndRespond(() -> notificationMapper.toNewSMSNotification(request));
-
-        /*
-         * Notification notification = notificationMapper.toNewSMSNotification(request);
-         * Notification savedNotification = notificationRepository.save(notification);
-         * return notificationMapper.mapToNotificationResponse(savedNotification);
-         */
     }
 
     private NotificationResponse saveAndRespond(Supplier<Notification> notificationSupplier) {
         try {
             Notification notification = notificationSupplier.get();
-            log.info("Notification generated: {}", notification);
-
             validateNotification(notification);
             Notification savedNotification = notificationRepository.save(notification);
-            log.info("Notification generated: {}", notification);
-
             return notificationMapper.mapToNotificationResponse(savedNotification);
-
         } catch (Exception e) {
-            log.error("Error During Notification creation", e);
-            throw new RuntimeException("Error, Notification Creation Failed", e);
+            throw new NotificationNotCreatedException("Error, Notification Creation Failed");
         }
     }
 
     private void validateNotification(Notification notification) {
         if (notification.getRecipientId() == null || notification.getRecipientId().isEmpty()) {
-            throw new IllegalArgumentException("Recipient ID Must not be Null or Empty!");
+            throw new NotificationNotCreatedException("Recipient ID Must not be Null or Empty!");
         }
 
         if (notification.getNotificationMessage() == null || notification.getNotificationMessage().isEmpty()) {
-            throw new IllegalArgumentException("Message Must have a Body to Send!");
+            throw new NotificationNotCreatedException("Message Must have a Body to Send!");
         }
 
     }
