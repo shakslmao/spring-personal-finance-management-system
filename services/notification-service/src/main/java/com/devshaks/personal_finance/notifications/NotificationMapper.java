@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.Map;
 
+// sub mod check
 @Service
 public class NotificationMapper {
     public Notification toNewPushNotification(PushNotificationRequest pushRequest) {
@@ -33,9 +34,6 @@ public class NotificationMapper {
     }
 
     public Notification toNewSMSNotification(SMSNotificationRequest smsRequest) {
-        if (smsRequest.to() == null || smsRequest.to().isEmpty()) {
-            throw new IllegalArgumentException("RecipientId cannot be null or empty");
-        }
         return Notification.builder()
                 .recipientId(smsRequest.to())
                 .notificationType(NotificationType.SMS)
