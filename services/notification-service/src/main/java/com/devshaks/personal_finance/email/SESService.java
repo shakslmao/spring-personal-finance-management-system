@@ -1,16 +1,10 @@
 package com.devshaks.personal_finance.email;
 
-import org.springframework.stereotype.Service;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 import software.amazon.awssdk.services.ses.SesClient;
-import software.amazon.awssdk.services.ses.model.Body;
-import software.amazon.awssdk.services.ses.model.Content;
-import software.amazon.awssdk.services.ses.model.Destination;
-import software.amazon.awssdk.services.ses.model.Message;
-import software.amazon.awssdk.services.ses.model.SendEmailRequest;
-import software.amazon.awssdk.services.ses.model.SesException;
+import software.amazon.awssdk.services.ses.model.*;
 
 @Slf4j
 @Service
@@ -41,11 +35,11 @@ public class SESService {
 }
 
 /*
- * {
- * "to": "recipient@example.com",
- * "from": "verified-sender@example.com",
- * "subject": "Test Notification",
- * "body": "This is a test email sent via Amazon SES."
- * }
- * 
+ {
+ "to": "recipient@example.com",
+ "from": "verified-sender@example.com",
+ "subject": "Test Notification",
+ "body": "This is a test email sent via Amazon SES."
+ }
+
  */
