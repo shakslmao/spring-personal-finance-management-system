@@ -1,5 +1,6 @@
 package com.devshaks.personal_finance.handlers;
 
+import com.devshaks.personal_finance.exceptions.NotificationNotCreatedException;
 import com.devshaks.personal_finance.exceptions.SESEmailException;
 import com.devshaks.personal_finance.exceptions.TwilioSMSException;
 import org.springframework.http.HttpStatus;
@@ -17,6 +18,12 @@ public class GlobalExceptionHandlers {
     @ExceptionHandler(TwilioSMSException.class)
     public ResponseEntity<String> handleException(TwilioSMSException e) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(e.getMessage());
+    }
+
+    @ExceptionHandler(NotificationNotCreatedException.class)
+    public ResponseEntity<String> handleException(NotificationNotCreatedException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(e.getMessage());
     }
 
