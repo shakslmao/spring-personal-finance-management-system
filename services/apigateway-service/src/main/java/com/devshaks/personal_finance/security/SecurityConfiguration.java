@@ -31,3 +31,11 @@ public class SecurityConfiguration {
                                 "/api/v1/users",
                                 "/api/v1/budgets",
                                 "/api/v1/transactions",
+                                "/api/v1/payments",
+                                "/api/v1/notifications")
+                        .authenticated()
+                        .anyExchange().authenticated())
+                .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()));
+        return serverHttpSecurity.build();
+    }
+}
