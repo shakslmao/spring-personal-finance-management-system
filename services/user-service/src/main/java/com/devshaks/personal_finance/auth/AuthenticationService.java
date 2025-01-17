@@ -3,6 +3,7 @@ package com.devshaks.personal_finance.auth;
 import java.time.LocalDate;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.messaging.MessagingException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
@@ -93,6 +94,22 @@ public class AuthenticationService {
 
     public AuthenticationResponse authenticateUser(AuthenticationRequest authRequest) {
         return null;
+    }
+
+    public void sendValidationEmail(User user) throws MessagingException {
+
+    }
+
+    public String generateAndSaveActivationToken(User user) {
+        return null;
+    }
+
+    public String generateActiviateCode(int length) {
+        return null;
+    }
+
+    public void activateUserAccount(String token) throws MessagingException {
+
     }
 
 }
