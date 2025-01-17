@@ -19,7 +19,6 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping("/register")
-    // @PreAuthorize("hasRole('')")
     @Operation(summary = "Register a new User")
     public ResponseEntity<UserDTO> registerUser(@RequestBody @Valid UserRegistrationRequest userRegistrationRequest) {
         UserDTO user = userService.registerUser(userRegistrationRequest);
@@ -46,14 +45,4 @@ public class UserController {
         userService.changeUserPassword(userId, passwordRequest);
         return ResponseEntity.noContent().build();
     }
-
-    // [GET] Get Audit Records
-
-    // [GET] View Activity Logs [cant implement yet]
-
-    // [GET] Get Notifications Preferences [cant implement yet]
-
-    // [PUT] Update Notification Preferences [cant implement yet]
-
-    // [POST] Add Favourite/Most Used Service [cant implement yet]
 }
