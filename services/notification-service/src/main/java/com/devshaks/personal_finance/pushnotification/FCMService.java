@@ -25,7 +25,7 @@ public class FCMService {
 
         CompletableFuture.runAsync(() -> {
             try {
-                String response = FirebaseMessaging.getInstance().send(message);
+                FirebaseMessaging.getInstance().send(message);
                 messagingTemplate.convertAndSend("/topic/notifications", body);
 
             } catch (Exception e) {

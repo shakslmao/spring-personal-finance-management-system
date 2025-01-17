@@ -68,7 +68,7 @@ public class User implements UserDetails, Principal {
     private List<Transactions> transactions;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    private List<Tokens> tokens;
+    private Tokens tokens;
 
     @PrePersist
     protected void onCreate() {
