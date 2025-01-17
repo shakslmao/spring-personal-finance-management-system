@@ -2,6 +2,8 @@ package com.devshaks.personal_finance.users;
 
 import org.springframework.stereotype.Service;
 
+import com.devshaks.personal_finance.auth.UserRegistrationRequest;
+
 @Service
 public class UserMapper {
     public User toUserRegistration(UserRegistrationRequest userRegistrationRequest) {

@@ -7,8 +7,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-import java.net.URI;
 
 @Slf4j
 @RestController
@@ -17,17 +15,6 @@ import java.net.URI;
 @Tag(name = "User Controller", description = "Handles User-Related Operations")
 public class UserController {
     private final UserService userService;
-
-    @PostMapping("/register")
-    @Operation(summary = "Register a new User")
-    public ResponseEntity<UserDTO> registerUser(@RequestBody @Valid UserRegistrationRequest userRegistrationRequest) {
-        UserDTO user = userService.registerUser(userRegistrationRequest);
-        URI location = ServletUriComponentsBuilder.fromCurrentRequest()
-                .path("/{id}")
-                .buildAndExpand(user.id())
-                .toUri();
-        return ResponseEntity.created(location).body(user);
-    }
 
     @GetMapping("/{userId}")
     // @PreAuthorize("hasRole('')")

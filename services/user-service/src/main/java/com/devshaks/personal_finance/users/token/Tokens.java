@@ -6,8 +6,6 @@ import com.devshaks.personal_finance.users.User;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
@@ -32,9 +30,6 @@ public class Tokens {
 
     @Column(nullable = false, unique = true)
     private String token;
-
-    @Enumerated(EnumType.STRING)
-    private TokensType tokenType;
 
     @Builder.Default
     private boolean isUsed = false;

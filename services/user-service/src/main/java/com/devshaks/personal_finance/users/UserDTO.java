@@ -9,6 +9,5 @@ public record UserDTO(
         String email,
         LocalDate dateOfBirth,
         UserRoles roles,
-        AccountStatus status
-) {
+        AccountStatus status) {
 }
