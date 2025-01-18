@@ -95,7 +95,7 @@ public class User implements UserDetails, Principal {
 
     @Override
     public String getUsername() {
-        return username;
+        return email;
     }
 
     @Override
@@ -120,7 +120,7 @@ public class User implements UserDetails, Principal {
 
     @Override
     public String getName() {
-        return firstname + lastname + username;
+        return firstname + " " + lastname;
     }
 
 }
