@@ -120,6 +120,13 @@ services:
             - personal-finance-microservices
         command: ["redis-server", "--appendonly", "yes"]
 
+    mail-dev:
+        container_name: maildev
+        image: maildev/maildev
+        ports:
+            - 1080:1080
+            - 1025:1025
+
 networks:
     personal-finance-microservices:
         driver: bridge
