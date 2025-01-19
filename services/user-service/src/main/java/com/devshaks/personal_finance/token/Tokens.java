@@ -1,4 +1,4 @@
-package com.devshaks.personal_finance.users.token;
+package com.devshaks.personal_finance.token;
 
 import java.time.LocalDateTime;
 
