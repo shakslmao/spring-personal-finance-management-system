@@ -1,7 +1,7 @@
 package com.devshaks.personal_finance.users;
 
 import com.devshaks.personal_finance.transactions.Transactions;
-import com.devshaks.personal_finance.users.token.Tokens;
+import com.devshaks.personal_finance.token.Tokens;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -68,7 +68,7 @@ public class User implements UserDetails, Principal {
     private List<Transactions> transactions;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    private Tokens tokens;
+    private List<Tokens> tokens;
 
     @PrePersist
     protected void onCreate() {
