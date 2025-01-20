@@ -1,17 +1,29 @@
 package com.devshaks.personal_finance.auth;
 
+import java.security.SecureRandom;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.HashMap;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
-import org.springframework.messaging.MessagingException;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 
+import com.devshaks.personal_finance.email.EmailService;
+import com.devshaks.personal_finance.email.EmailTemplateName;
 import com.devshaks.personal_finance.exceptions.UserRegistrationException;
 import com.devshaks.personal_finance.handlers.UnauthorizedException;
 import com.devshaks.personal_finance.kafka.audit.AuditEventSender;
 import com.devshaks.personal_finance.kafka.events.UserEvents;
+import com.devshaks.personal_finance.security.JwtService;
+import com.devshaks.personal_finance.token.Tokens;
+import com.devshaks.personal_finance.token.TokensRepository;
+import com.devshaks.personal_finance.users.AccountStatus;
 import com.devshaks.personal_finance.users.User;
 import com.devshaks.personal_finance.users.UserDTO;
 import com.devshaks.personal_finance.users.UserMapper;
@@ -19,6 +31,7 @@ import com.devshaks.personal_finance.users.UserRepository;
 import com.devshaks.personal_finance.utility.AgeVerification;
 import com.devshaks.personal_finance.utility.UsernameGenerator;
 
+import jakarta.mail.MessagingException;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -33,6 +46,13 @@ public class AuthenticationService {
     private final PasswordEncoder passwordEncoder; // Utility for encoding and verifying passwords.
     private final AgeVerification ageVerification; // Utility for age validation.
     private final AuditEventSender createKafkaAuditEvent; // Kafka event sender for audit logs.
+    private final EmailService emailService;
+    private final TokensRepository tokensRepository;
+    private final JwtService jwtService;
+    private final AuthenticationManager authenticationManager;
+
+    @Value("${application.mailing.frontend.activation-url}")
+    private String activiationURL;
 
     /**
      * Validates a user registration request.
@@ -80,6 +100,7 @@ public class AuthenticationService {
             createKafkaAuditEvent.sendAuditEventFromUser(UserEvents.USER_REGISTERED, user.getId(),
                     "User Registered Successfully");
 
+            sendValidationEmail(savedUser);
             return userMapper.toUserDTO(savedUser);
         } catch (HttpClientErrorException exception) {
             // Handle unauthorized exceptions specifically.
@@ -92,24 +113,64 @@ public class AuthenticationService {
         }
     }
 
+    private void sendValidationEmail(User user) throws MessagingException {
+        var newToken = generateAndSaveActivationToken(user);
+        emailService.sendEmail(user.getEmail(), user.getName(), EmailTemplateName.ACTIVATE_ACCOUNT, activiationURL,
+                newToken, "Account Activation");
+    }
+
     public AuthenticationResponse authenticateUser(AuthenticationRequest authRequest) {
-        return null;
+        var auth = authenticationManager
+                .authenticate(new UsernamePasswordAuthenticationToken(authRequest.email(), authRequest.password()));
+        var claims = new HashMap<String, Object>();
+        var user = ((User) auth.getPrincipal());
+        claims.put("name", user.getName());
+        var jwtToken = jwtService.generateToken(claims, user);
+        return new AuthenticationResponse(jwtToken);
     }
 
-    public void sendValidationEmail(User user) throws MessagingException {
+    private String generateAndSaveActivationToken(User user) {
+        String generatedToken = generateActiviateCode(6);
+        var token = Tokens.builder()
+                .token(generatedToken)
+                .createdAt(LocalDateTime.now())
+                .expiresAt(LocalDateTime.now().plusMinutes(15))
+                .user(user)
+                .build();
 
+        tokensRepository.save(token);
+        return generatedToken;
     }
 
-    public String generateAndSaveActivationToken(User user) {
-        return null;
+    private String generateActiviateCode(int length) {
+        String characters = "0123456789";
+        StringBuilder codeBuilder = new StringBuilder();
+        SecureRandom secureRandom = new SecureRandom();
+
+        for (int i = 0; i < length; i++) {
+            int randomIndex = secureRandom.nextInt(characters.length());
+            codeBuilder.append(characters.charAt(randomIndex));
+        }
+
+        return codeBuilder.toString();
     }
 
-    public String generateActiviateCode(int length) {
-        return null;
-    }
-
+    @Transactional
     public void activateUserAccount(String token) throws MessagingException {
+        Tokens savedToken = tokensRepository.findByToken(token)
+                .orElseThrow(() -> new RuntimeException("Invalid Token"));
+        if (LocalDateTime.now().isAfter(savedToken.getExpiresAt())) {
+            sendValidationEmail(savedToken.getUser());
+            throw new RuntimeException("Activation Token has Expired, a New Token Has Been Sent To Your Email");
+        }
 
+        var user = userRepository.findById(savedToken.getUser().getId())
+                .orElseThrow(() -> new UsernameNotFoundException("User was Not Found"));
+
+        user.setStatus(AccountStatus.ACTIVE);
+        userRepository.save(user);
+        savedToken.setValidatedAt(LocalDateTime.now());
+        tokensRepository.save(savedToken);
     }
 
 }
