@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Email Confirmation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            background-color: #f9f9f9;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        .email-container {
+            max-width: 600px;
+            margin: 30px auto;
+            padding: 20px;
+            background: #ffffff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .email-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .email-header h1 {
+            margin: 0;
+            color: #4CAF50;
+        }
+        .email-body {
+            margin-bottom: 20px;
+        }
+        .email-body p {
+            margin: 10px 0;
+        }
+        .email-footer {
+            text-align: center;
+            font-size: 0.9em;
+            color: #999;
+        }
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            color: #ffffff;
+            background-color: #4CAF50;
+            text-decoration: none;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="email-header">
+            <h1>Welcome, <span th:text="${username}">User</span>!</h1>
+        </div>
+        <div class="email-body">
+            <p>Thank you for signing up for our Personal Finance Management App!</p>
+            <p>Please click the button below to confirm your email address:</p>
+            <p>
+                <a class="button" th:href="${confirmationURL}">Confirm Email</a>
+            </p>
+            <p>If the button above doesn't work, copy and paste the following URL into your browser:</p>
+            <p><span th:text="${confirmationURL}">[Confirmation URL]</span></p>
+            <p>Your activation code is: <strong th:text="${activation_code}">[Activation Code]</strong></p>
+        </div>
+        <div class="email-footer">
+            <p>&copy; 2025 Personal Finance Management App. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html>
