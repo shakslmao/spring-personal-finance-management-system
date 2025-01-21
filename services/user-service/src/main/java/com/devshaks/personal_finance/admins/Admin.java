@@ -45,7 +45,7 @@ public class Admin {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     @Builder.Default
-    private AccountStatus status = AccountStatus.ACTIVE;
+    private AccountStatus status = AccountStatus.ACTIVE_NON_AUTH;
 
     @Column(name = "date_of_birth", nullable = false)
     private LocalDate dateOfBirth;

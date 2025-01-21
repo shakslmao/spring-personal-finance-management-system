@@ -51,7 +51,7 @@ public class User implements UserDetails, Principal {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     @Builder.Default
-    private AccountStatus status = AccountStatus.ACTIVE;
+    private AccountStatus status = AccountStatus.ACTIVE_NON_AUTH;
 
     @Column(name = "date_of_birth", nullable = false)
     private LocalDate dateOfBirth;
@@ -115,7 +115,7 @@ public class User implements UserDetails, Principal {
 
     @Override
     public boolean isEnabled() {
-        return status == AccountStatus.ACTIVE;
+        return status == AccountStatus.ACTIVE_AUTHENTICATED;
     }
 
     @Override

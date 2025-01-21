@@ -2,6 +2,7 @@ package com.devshaks.personal_finance.auth;
 
 import java.net.URI;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,6 +22,7 @@ import jakarta.mail.MessagingException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/auth")
@@ -43,6 +45,7 @@ public class AuthenticationController {
     @PostMapping("/login")
     public ResponseEntity<AuthenticationResponse> authenticateUser(
             @RequestBody @Valid AuthenticationRequest authenticationRequest) {
+        log.info("Logging in User: {}", authenticationRequest);
         return ResponseEntity.ok(authenticationService.authenticateUser(authenticationRequest));
     }
 
