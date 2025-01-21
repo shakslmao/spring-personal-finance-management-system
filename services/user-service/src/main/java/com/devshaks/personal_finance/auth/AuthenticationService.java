@@ -52,7 +52,7 @@ public class AuthenticationService {
     private final AuthenticationManager authenticationManager;
 
     @Value("${application.mailing.frontend.activation-url}")
-    private String activiationURL;
+    private String activationURL;
 
     /**
      * Validates a user registration request.
@@ -115,7 +115,7 @@ public class AuthenticationService {
 
     private void sendValidationEmail(User user) throws MessagingException {
         var newToken = generateAndSaveActivationToken(user);
-        emailService.sendEmail(user.getEmail(), user.getName(), EmailTemplateName.ACTIVATE_ACCOUNT, activiationURL,
+        emailService.sendEmail(user.getEmail(), user.getName(), EmailTemplateName.ACTIVATE_ACCOUNT, activationURL,
                 newToken, "Account Activation");
     }
 
@@ -130,7 +130,7 @@ public class AuthenticationService {
     }
 
     private String generateAndSaveActivationToken(User user) {
-        String generatedToken = generateActiviateCode(6);
+        String generatedToken = generateActivationCode(6);
         var token = Tokens.builder()
                 .token(generatedToken)
                 .createdAt(LocalDateTime.now())
@@ -142,7 +142,7 @@ public class AuthenticationService {
         return generatedToken;
     }
 
-    private String generateActiviateCode(int length) {
+    private String generateActivationCode(int length) {
         String characters = "0123456789";
         StringBuilder codeBuilder = new StringBuilder();
         SecureRandom secureRandom = new SecureRandom();
@@ -167,7 +167,7 @@ public class AuthenticationService {
         var user = userRepository.findById(savedToken.getUser().getId())
                 .orElseThrow(() -> new UsernameNotFoundException("User was Not Found"));
 
-        user.setStatus(AccountStatus.ACTIVE);
+        user.setStatus(AccountStatus.ACTIVE_AUTHENTICATED);
         userRepository.save(user);
         savedToken.setValidatedAt(LocalDateTime.now());
         tokensRepository.save(savedToken);

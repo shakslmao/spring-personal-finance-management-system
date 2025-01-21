@@ -50,6 +50,11 @@ spring:
                     predicates:
                         - Path=/api/v1/notifications/**
 
+application:
+    security:
+        jwt:
+            secret-key: ${JWT_SECRET}
+
 logging:
     level:
         org.springframework.security.oauth2.server.resource: DEBUG

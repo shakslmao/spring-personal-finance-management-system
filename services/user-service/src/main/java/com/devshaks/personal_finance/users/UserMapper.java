@@ -11,11 +11,12 @@ public class UserMapper {
         if (userRegistrationRequest.dateOfBirth() == null) { throw new IllegalArgumentException("Date of Birth is Required"); }
         return User.builder()
                 .firstname(userRegistrationRequest.firstname())
+                .lastname(userRegistrationRequest.lastname())
                 .email(userRegistrationRequest.email())
                 .password(userRegistrationRequest.password())
                 .dateOfBirth(userRegistrationRequest.dateOfBirth())
                 .roles(UserRoles.USER)
-                .status(AccountStatus.ACTIVE)
+                .status(AccountStatus.ACTIVE_NON_AUTH)
                 .build();
         }
 

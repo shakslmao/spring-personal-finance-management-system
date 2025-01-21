@@ -17,7 +17,7 @@ public class AdminMapper {
                 .password(adminRegistrationRequest.password())
                 .adminCode(adminRegistrationRequest.adminCode())
                 .dateOfBirth(adminRegistrationRequest.dateOfBirth())
-                .status(AccountStatus.ACTIVE)
+                .status(AccountStatus.ACTIVE_NON_AUTH)
                 .roles(UserRoles.ADMIN)
                 .build();
     }

@@ -1,5 +1,6 @@
 package com.devshaks.personal_finance.security;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
@@ -15,6 +16,7 @@ import javax.crypto.spec.SecretKeySpec;
 @Configuration
 @EnableWebFluxSecurity
 public class SecurityConfiguration {
+    private final String secretKey = System.getenv("JWT_SECRET");
 
     @Bean
     SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity serverHttpSecurity) {
@@ -40,6 +42,7 @@ public class SecurityConfiguration {
     // add key here.
     @Bean
     public ReactiveJwtDecoder jwtDecoder() {
-        return NimbusReactiveJwtDecoder.withSecretKey(new SecretKeySpec("".getBytes(), "HmacSHA256")).build();
+        return NimbusReactiveJwtDecoder.withSecretKey(new SecretKeySpec(secretKey.getBytes(), "HmacSHA256")).build();
     }
 }
+
