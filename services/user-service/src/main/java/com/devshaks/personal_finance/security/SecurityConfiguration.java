@@ -3,6 +3,7 @@ package com.devshaks.personal_finance.security;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -29,6 +30,7 @@ public class SecurityConfiguration {
             configuration.addAllowedMethod("*");
             configuration.addAllowedHeader("*");
             configuration.setAllowCredentials(true);
+            configuration.addExposedHeader(HttpHeaders.SET_COOKIE);
             return  configuration;
         }))
                 .csrf(AbstractHttpConfigurer::disable)
