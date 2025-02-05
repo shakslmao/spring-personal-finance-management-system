@@ -1,6 +1,7 @@
 package com.devshaks.personal_finance.auth;
 
 import java.security.SecureRandom;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -8,6 +9,7 @@ import java.util.HashMap;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -128,7 +130,17 @@ public class AuthenticationService {
         var user = ((User) auth.getPrincipal());
         claims.put("name", user.getName());
         var jwtToken = jwtService.generateToken(claims, user);
-        return new AuthenticationResponse(jwtToken, user.getId());
+
+        ResponseCookie jwtCookie = ResponseCookie.from("jwt", jwtToken)
+                .httpOnly(true)
+                .secure(false) // false for local development
+                .sameSite("None") // ensures cookies are sent in a cross-origin reqeust.
+                .path("/")
+                .domain("localhost")
+                .maxAge(Duration.ofDays(7))
+                .build();
+
+        return new AuthenticationResponse(jwtToken, user.getId(), jwtCookie);
     }
 
     private String generateAndSaveActivationToken(User user) {
