@@ -34,7 +34,9 @@ public class AuthenticationController {
     @ResponseStatus(HttpStatus.ACCEPTED)
     @Operation(summary = "Register a new User")
     public ResponseEntity<UserDTO> registerUser(@RequestBody @Valid UserRegistrationRequest userRegistrationRequest) {
+        log.info("Received request to register a new User");
         UserDTO user = authenticationService.registerUser(userRegistrationRequest);
+        log.info("Registered new User: {}", user);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}")
                 .buildAndExpand(user.id())

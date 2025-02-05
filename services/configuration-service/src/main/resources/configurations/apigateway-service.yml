@@ -9,6 +9,7 @@ spring:
                     uri: lb://USER-SERVICE
                     predicates:
                         - Path=/api/v1/users/**
+                        - Path=/api/v1/auth/**
                     filters:
                         - RemoveRequestHeader=Cookie
                         - AddRequestHeader=Authorization, "${request.headers['Authorization']:default-token}"
@@ -53,7 +54,7 @@ spring:
 application:
     security:
         jwt:
-            secret-key: ${JWT_SECRET}
+            secret-key:
 
 logging:
     level:

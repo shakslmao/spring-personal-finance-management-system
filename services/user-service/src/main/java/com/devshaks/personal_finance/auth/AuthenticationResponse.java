@@ -1,5 +1,5 @@
 package com.devshaks.personal_finance.auth;
 
 public record AuthenticationResponse(
-        String token) {
+        String token, Long userId) {
 }
