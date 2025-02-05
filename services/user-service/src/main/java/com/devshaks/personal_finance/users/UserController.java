@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 @Tag(name = "User Controller", description = "Handles User-Related Operations")
 public class UserController {
     private final UserService userService;
+    private final UserRepository userRepository;
 
     @GetMapping("/{userId}")
     // @PreAuthorize("hasRole('')")
@@ -32,4 +33,5 @@ public class UserController {
         userService.changeUserPassword(userId, passwordRequest);
         return ResponseEntity.noContent().build();
     }
+
 }

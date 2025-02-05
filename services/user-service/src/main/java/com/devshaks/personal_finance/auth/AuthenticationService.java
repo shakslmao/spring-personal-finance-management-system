@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -36,6 +37,7 @@ import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AuthenticationService {
@@ -112,7 +114,7 @@ public class AuthenticationService {
             throw new RuntimeException("Error registering user", ex);
         }
     }
-
+    
     private void sendValidationEmail(User user) throws MessagingException {
         var newToken = generateAndSaveActivationToken(user);
         emailService.sendEmail(user.getEmail(), user.getName(), EmailTemplateName.ACTIVATE_ACCOUNT, activationURL,
@@ -126,7 +128,7 @@ public class AuthenticationService {
         var user = ((User) auth.getPrincipal());
         claims.put("name", user.getName());
         var jwtToken = jwtService.generateToken(claims, user);
-        return new AuthenticationResponse(jwtToken);
+        return new AuthenticationResponse(jwtToken, user.getId());
     }
 
     private String generateAndSaveActivationToken(User user) {
