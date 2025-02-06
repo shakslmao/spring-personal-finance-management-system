@@ -3,6 +3,8 @@ package com.devshaks.personal_finance.auth;
 import java.net.URI;
 import java.time.Duration;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -49,14 +51,7 @@ public class AuthenticationController {
     public ResponseEntity<AuthenticationResponse> authenticateUser(
             @RequestBody @Valid AuthenticationRequest authenticationRequest) {
         AuthenticationResponse authenticationResponse = authenticationService.authenticateUser(authenticationRequest);
-        ResponseCookie jwtCookie = ResponseCookie.from("jwt", authenticationResponse.token())
-                .httpOnly(true)
-                .secure(true)
-                .sameSite("None")
-                .domain("localhost")
-                .path("/")
-                .maxAge(Duration.ofDays(7))
-                .build();
+        ResponseCookie jwtCookie = authenticationService.generateJwtCookie(authenticationResponse.token());
         return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
                 .body(authenticationResponse);
     }
@@ -66,4 +61,11 @@ public class AuthenticationController {
         authenticationService.activateUserAccount(token);
     }
 
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout(HttpServletRequest request, HttpServletResponse response) {
+        log.info("Logging out user");
+        ResponseCookie jwtCookie = authenticationService.logoutUser(request);
+        response.addHeader(HttpHeaders.SET_COOKIE, jwtCookie.toString());
+        return ResponseEntity.noContent().build();
+    }
 }
