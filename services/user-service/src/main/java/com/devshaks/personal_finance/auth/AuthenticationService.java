@@ -130,17 +130,7 @@ public class AuthenticationService {
         var user = ((User) auth.getPrincipal());
         claims.put("name", user.getName());
         var jwtToken = jwtService.generateToken(claims, user);
-
-        ResponseCookie jwtCookie = ResponseCookie.from("jwt", jwtToken)
-                .httpOnly(true)
-                .secure(false) // false for local development
-                .sameSite("None") // ensures cookies are sent in a cross-origin reqeust.
-                .path("/")
-                .domain("localhost")
-                .maxAge(Duration.ofDays(7))
-                .build();
-
-        return new AuthenticationResponse(jwtToken, user.getId(), jwtCookie);
+        return new AuthenticationResponse(jwtToken, user.getId());
     }
 
     private String generateAndSaveActivationToken(User user) {
