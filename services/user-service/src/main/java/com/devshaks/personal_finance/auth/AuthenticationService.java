@@ -6,12 +6,17 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -54,6 +59,7 @@ public class AuthenticationService {
     private final TokensRepository tokensRepository;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
+    private final UserDetailsService userDetailsService;
 
     @Value("${application.mailing.frontend.activation-url}")
     private String activationURL;
@@ -133,6 +139,17 @@ public class AuthenticationService {
         return new AuthenticationResponse(jwtToken, user.getId());
     }
 
+    public ResponseCookie generateJwtCookie(String token) {
+        return ResponseCookie.from("jwt", token)
+                .httpOnly(true)
+                .secure(true)
+                .sameSite("None")
+                .domain("localhost")
+                .path("/")
+                .maxAge(Duration.ofDays(7))
+                .build();
+    }
+
     private String generateAndSaveActivationToken(User user) {
         String generatedToken = generateActivationCode(6);
         var token = Tokens.builder()
@@ -177,4 +194,35 @@ public class AuthenticationService {
         tokensRepository.save(savedToken);
     }
 
+    public ResponseCookie logoutUser(HttpServletRequest request) {
+        String token = extractTokenFromRequest(request);
+        if (token != null) {
+            tokensRepository.deleteByToken(token);
+        }
+
+        return ResponseCookie.from("jwt", "")
+                .httpOnly(true)
+                .secure(true)
+                .sameSite("None")
+                .domain("localhost")
+                .path("/")
+                .maxAge(0)
+                .build();
+    }
+
+    private String extractTokenFromRequest(HttpServletRequest request) {
+        String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            return authHeader.substring(7);
+        }
+
+        if (request.getCookies() != null) {
+            for (Cookie cookie : request.getCookies()) {
+                if ("jwt".equals(cookie.getName())) {
+                    return cookie.getValue();
+                }
+            }
+        }
+        return null;
+    }
 }
