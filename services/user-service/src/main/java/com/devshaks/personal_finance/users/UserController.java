@@ -5,9 +5,12 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @Slf4j
 @RestController
@@ -17,10 +20,13 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
     private final UserService userService;
 
-    @GetMapping("/userprofiles")
+    @GetMapping("/me")
     // @PreAuthorize("hasRole('')")
     @Operation(summary = "Response with User Profile Details")
     public ResponseEntity<UserDetailsResponse> getLoggedInUserProfile(@AuthenticationPrincipal User user) {
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
         UserDetailsResponse response = userService.getUserProfileDetails(user.getId());
         return ResponseEntity.ok(response);
     }
