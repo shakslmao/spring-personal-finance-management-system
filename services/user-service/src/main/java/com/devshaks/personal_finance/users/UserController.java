@@ -6,6 +6,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @Slf4j
@@ -15,13 +16,12 @@ import org.springframework.web.bind.annotation.*;
 @Tag(name = "User Controller", description = "Handles User-Related Operations")
 public class UserController {
     private final UserService userService;
-    private final UserRepository userRepository;
 
-    @GetMapping("/{userId}")
+    @GetMapping("/userprofiles")
     // @PreAuthorize("hasRole('')")
     @Operation(summary = "Response with User Profile Details")
-    public ResponseEntity<UserDetailsResponse> getUserProfileDetails(@PathVariable("userId") Long userId) {
-        UserDetailsResponse response = userService.getUserProfileDetails(userId);
+    public ResponseEntity<UserDetailsResponse> getLoggedInUserProfile(@AuthenticationPrincipal User user) {
+        UserDetailsResponse response = userService.getUserProfileDetails(user.getId());
         return ResponseEntity.ok(response);
     }
 
