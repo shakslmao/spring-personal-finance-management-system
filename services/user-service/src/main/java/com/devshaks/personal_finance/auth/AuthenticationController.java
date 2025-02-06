@@ -37,9 +37,7 @@ public class AuthenticationController {
     @ResponseStatus(HttpStatus.ACCEPTED)
     @Operation(summary = "Register a new User")
     public ResponseEntity<UserDTO> registerUser(@RequestBody @Valid UserRegistrationRequest userRegistrationRequest) {
-        log.info("Received request to register a new User");
         UserDTO user = authenticationService.registerUser(userRegistrationRequest);
-        log.info("Registered new User: {}", user);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}")
                 .buildAndExpand(user.id())
@@ -50,7 +48,6 @@ public class AuthenticationController {
     @PostMapping("/login")
     public ResponseEntity<AuthenticationResponse> authenticateUser(
             @RequestBody @Valid AuthenticationRequest authenticationRequest) {
-        log.info("Logging in User: {}", authenticationRequest);
         AuthenticationResponse authenticationResponse = authenticationService.authenticateUser(authenticationRequest);
         ResponseCookie jwtCookie = ResponseCookie.from("jwt", authenticationResponse.token())
                 .httpOnly(true)
@@ -60,7 +57,6 @@ public class AuthenticationController {
                 .path("/")
                 .maxAge(Duration.ofDays(7))
                 .build();
-        log.info("setting cookies: {}", jwtCookie);
         return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
                 .body(authenticationResponse);
     }
