@@ -1,10 +1,12 @@
 package com.devshaks.personal_finance.auth;
 
 import java.net.URI;
+import java.time.Duration;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -50,7 +52,17 @@ public class AuthenticationController {
             @RequestBody @Valid AuthenticationRequest authenticationRequest) {
         log.info("Logging in User: {}", authenticationRequest);
         AuthenticationResponse authenticationResponse = authenticationService.authenticateUser(authenticationRequest);
-        return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, authenticationResponse.jwtCookie().toString()).body(authenticationResponse);
+        ResponseCookie jwtCookie = ResponseCookie.from("jwt", authenticationResponse.token())
+                .httpOnly(true)
+                .secure(true)
+                .sameSite("None")
+                .domain("localhost")
+                .path("/")
+                .maxAge(Duration.ofDays(7))
+                .build();
+        log.info("setting cookies: {}", jwtCookie);
+        return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
+                .body(authenticationResponse);
     }
 
     @GetMapping("/activate")
