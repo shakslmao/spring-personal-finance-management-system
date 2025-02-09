@@ -3,6 +3,7 @@ package com.devshaks.personal_finance.security;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpHeaders;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
@@ -16,23 +17,26 @@ import javax.crypto.spec.SecretKeySpec;
 @Configuration
 @EnableWebFluxSecurity
 public class SecurityConfiguration {
-    private final String secretKey = System.getenv("JWT_SECRET");
+
+    @Value("${application.security.jwt.secret-key}")
+    private String secretKey;
 
     @Bean
     SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity serverHttpSecurity) {
         serverHttpSecurity
                 .cors(cors -> cors.configurationSource(request -> {
-                    CorsConfiguration config = new CorsConfiguration();
-                    config.addAllowedOrigin("http://localhost:3000");
-                    config.addAllowedMethod("*");
-                    config.addAllowedHeader("*");
-                    config.setAllowCredentials(true);
-                    return config;
+                    CorsConfiguration configuration = new CorsConfiguration();
+                    configuration.addAllowedOriginPattern("http://localhost:3000");
+                    configuration.addAllowedMethod("*");
+                    configuration.addAllowedHeader("*");
+                    configuration.setAllowCredentials(true);
+                    configuration.addExposedHeader(HttpHeaders.SET_COOKIE);
+                    return configuration;
                 }))
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .authorizeExchange(exchange -> exchange
                         .pathMatchers("/eureka/**").permitAll()
-                        .pathMatchers("/api/v1/auth/register", "/api/v1/auth/login").permitAll()
+                        .pathMatchers("/api/v1/auth/register", "/api/v1/auth/login", "/api/v1/auth/activate").permitAll()
                         .pathMatchers("/api/v1/**").authenticated()
                         .anyExchange().authenticated())
                 .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()));
@@ -45,4 +49,3 @@ public class SecurityConfiguration {
         return NimbusReactiveJwtDecoder.withSecretKey(new SecretKeySpec(secretKey.getBytes(), "HmacSHA256")).build();
     }
 }
-
