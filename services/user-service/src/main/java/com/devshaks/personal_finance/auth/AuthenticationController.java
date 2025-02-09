@@ -1,7 +1,8 @@
 package com.devshaks.personal_finance.auth;
 
 import java.net.URI;
-import java.time.Duration;
+import java.util.Collections;
+import java.util.Map;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -57,15 +58,35 @@ public class AuthenticationController {
     }
 
     @GetMapping("/activate")
-    public void confirmActivation(@RequestParam String token) throws MessagingException {
-        authenticationService.activateUserAccount(token);
+    public ResponseEntity<AccountActivationResponse> confirmActivation(@RequestParam AccountActivationRequest accountActivationRequest) throws MessagingException {
+        AccountActivationResponse response = authenticationService.activateUserAccount(accountActivationRequest.token());
+        return ResponseEntity.ok(response);
     }
+
+    @PostMapping("/request-new-token")
+    public ResponseEntity<RequestNewTokenResponse> requestNewActivationToken(
+            @RequestBody @Valid RequestNewActivationRequest newTokenRequest) throws MessagingException {
+
+        RequestNewTokenResponse response = authenticationService.requestNewActivationToken(newTokenRequest.email());
+        return ResponseEntity.ok(response);
+    }
+
 
     @PostMapping("/logout")
     public ResponseEntity<Void> logout(HttpServletRequest request, HttpServletResponse response) {
         log.info("Logging out user");
         ResponseCookie jwtCookie = authenticationService.logoutUser(request);
+        ResponseCookie refreshCookie = ResponseCookie.from("refresh_token", "")
+                .httpOnly(true)
+                .secure(true)
+                .sameSite("None")
+                .domain("localhost")
+                .path("/")
+                .maxAge(0)
+                .build();
+
         response.addHeader(HttpHeaders.SET_COOKIE, jwtCookie.toString());
+        response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
         return ResponseEntity.noContent().build();
     }
 }
