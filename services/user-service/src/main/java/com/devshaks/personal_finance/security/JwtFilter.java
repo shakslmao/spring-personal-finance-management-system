@@ -1,7 +1,11 @@
 package com.devshaks.personal_finance.security;
 
-import java.io.IOException;
 
+import java.io.IOException;
+import java.util.Optional;
+
+import com.devshaks.personal_finance.token.Tokens;
+import com.devshaks.personal_finance.token.TokensRepository;
 import jakarta.servlet.http.Cookie;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -27,6 +31,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
     private final UserDetailsService userDetailsService;
+    private final TokensRepository tokenRepository;
 
     @Override
     protected void doFilterInternal(
@@ -39,28 +44,20 @@ public class JwtFilter extends OncePerRequestFilter {
             return;
         }
 
-        String jwt = null;
-        String userEmail = null;
-
-        final String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
-        if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            jwt = authHeader.substring(7);
-        }
-
-        if (jwt == null) {
-            Cookie[] cookies = request.getCookies();
-            if (cookies != null) {
-                for (Cookie cookie : cookies) {
-                    if ("jwt".equals(cookie.getName())) {
-                        jwt = cookie.getValue();
-                        break;
-                    }
-                }
-            }
-        }
+        String jwt = extractJwtFromRequest(request);
 
         if (jwt != null) {
-            userEmail = jwtService.extractUsername(jwt);
+            Optional<Tokens> storedToken = tokenRepository.findByToken(jwt);
+
+            // Block authentication if the token is revoked
+            if (storedToken.isPresent() && storedToken.get().isRevoked()) {
+                log.warn("Blocked access: Token is revoked - {}", jwt);
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                return;
+            }
+
+            // Extract user details and authenticate
+            String userEmail = jwtService.extractUsername(jwt);
             log.info("Extracted JWT: {}", jwt);
             log.info("Extracted User Email: {}", userEmail);
 
@@ -85,5 +82,21 @@ public class JwtFilter extends OncePerRequestFilter {
 
         filterChain.doFilter(request, response);
     }
-}
 
+    private String extractJwtFromRequest(HttpServletRequest request) {
+        String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            return authHeader.substring(7);
+        }
+
+        if (request.getCookies() != null) {
+            for (Cookie cookie : request.getCookies()) {
+                if ("jwt".equals(cookie.getName())) {
+                    return cookie.getValue();
+                }
+            }
+        }
+
+        return null;
+    }
+}
