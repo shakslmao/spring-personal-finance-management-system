@@ -5,6 +5,7 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.Optional;
 
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -15,7 +16,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -177,7 +177,7 @@ public class AuthenticationService {
     }
 
     @Transactional
-    public void activateUserAccount(String token) throws MessagingException {
+    public AccountActivationResponse activateUserAccount(String token) throws MessagingException {
         Tokens savedToken = tokensRepository.findByToken(token)
                 .orElseThrow(() -> new RuntimeException("Invalid Token"));
         if (LocalDateTime.now().isAfter(savedToken.getExpiresAt())) {
@@ -185,22 +185,32 @@ public class AuthenticationService {
             throw new RuntimeException("Activation Token has Expired, a New Token Has Been Sent To Your Email");
         }
 
-        var user = userRepository.findById(savedToken.getUser().getId())
+        User user = userRepository.findById(savedToken.getUser().getId())
                 .orElseThrow(() -> new UsernameNotFoundException("User was Not Found"));
 
         user.setStatus(AccountStatus.ACTIVE_AUTHENTICATED);
         userRepository.save(user);
+
         savedToken.setValidatedAt(LocalDateTime.now());
+        savedToken.setRevoked(true);
         tokensRepository.save(savedToken);
+        tokensRepository.deleteByToken(token);
+        return new AccountActivationResponse(true, "Account Activated Successfully");
     }
 
     public ResponseCookie logoutUser(HttpServletRequest request) {
         String token = extractTokenFromRequest(request);
         if (token != null) {
-            tokensRepository.deleteByToken(token);
+            Optional<Tokens> storedToken = tokensRepository.findByToken(token);
+            if (storedToken.isPresent()) {
+                String refreshToken = storedToken.get().getRefreshToken();
+                tokensRepository.revokeTokens(token, refreshToken);
+                tokensRepository.deleteByToken(token);
+                tokensRepository.deleteByRefreshToken(refreshToken);
+            }
         }
 
-        return ResponseCookie.from("jwt", "")
+        ResponseCookie jwtCookie = ResponseCookie.from("jwt", "")
                 .httpOnly(true)
                 .secure(true)
                 .sameSite("None")
@@ -208,6 +218,17 @@ public class AuthenticationService {
                 .path("/")
                 .maxAge(0)
                 .build();
+
+        ResponseCookie refreshCookie = ResponseCookie.from("refresh_token", "")
+                .httpOnly(true)
+                .secure(true)
+                .sameSite("None")
+                .domain("localhost")
+                .path("/")
+                .maxAge(0)
+                .build();
+
+        return jwtCookie;
     }
 
     private String extractTokenFromRequest(HttpServletRequest request) {
@@ -225,4 +246,24 @@ public class AuthenticationService {
         }
         return null;
     }
+
+    @Transactional
+    public RequestNewTokenResponse requestNewActivationToken(String email) throws MessagingException {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
+        if (user.getStatus() == AccountStatus.ACTIVE_AUTHENTICATED) {
+            return new RequestNewTokenResponse("Account is already activated.");
+        }
+        tokensRepository.findAllValidTokensByUser(user.getId()).forEach(token -> {
+            token.setRevoked(true);
+        });
+        tokensRepository.deleteAllByUserId(user.getId());
+
+        String newToken = generateAndSaveActivationToken(user);
+        sendValidationEmail(user);
+
+        return new RequestNewTokenResponse("A new activation token has been sent to your email.");
+    }
+
 }
