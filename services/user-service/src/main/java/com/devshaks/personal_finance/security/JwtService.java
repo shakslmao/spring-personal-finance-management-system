@@ -80,11 +80,15 @@ public class JwtService {
     }
 
     private @NotNull Key getSignInKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(secretKey);
-        if (keyBytes.length * 8 < 256) {
-            throw new IllegalArgumentException(
-                    "Key Is Not Secure Enough, Less Than 256 Bits!");
+        try {
+            byte[] keyBytes = Decoders.BASE64URL.decode(secretKey);
+            if (keyBytes.length * 8 < 256) {
+                throw new IllegalArgumentException("Key Is Not Secure Enough, Less Than 256 Bits!");
+            }
+            return Keys.hmacShaKeyFor(keyBytes);
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Invalid Base64 URL-encoded secret key", e);
         }
-        return Keys.hmacShaKeyFor(keyBytes);
     }
+
 }
