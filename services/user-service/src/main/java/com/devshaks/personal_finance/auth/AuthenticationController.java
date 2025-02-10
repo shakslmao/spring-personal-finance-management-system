@@ -58,8 +58,8 @@ public class AuthenticationController {
     }
 
     @GetMapping("/activate")
-    public ResponseEntity<AccountActivationResponse> confirmActivation(@RequestParam AccountActivationRequest accountActivationRequest) throws MessagingException {
-        AccountActivationResponse response = authenticationService.activateUserAccount(accountActivationRequest.token());
+    public ResponseEntity<AccountActivationResponse> confirmActivation(@RequestParam String token) throws MessagingException {
+        AccountActivationResponse response = authenticationService.activateUserAccount(token);
         return ResponseEntity.ok(response);
     }
 
