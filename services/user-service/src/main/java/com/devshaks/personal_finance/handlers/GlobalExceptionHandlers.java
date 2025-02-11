@@ -47,9 +47,15 @@ public class GlobalExceptionHandlers {
     }
 
     @ExceptionHandler(BusinessException.class)
-    public ResponseEntity<String> handleException(BusinessException e) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(e.getMessage());
+    public ResponseEntity<ExceptionResponse> handleException(BusinessException e) {
+        BusinessErrorCodes errorCodes = e.getBusinessErrorCode();
+
+        return ResponseEntity.status(errorCodes.getHttpStatusCode())
+                .body(ExceptionResponse.builder()
+                        .businessErrorCode(errorCodes.getCode())
+                        .businessErrorDescription(errorCodes.getDescription())
+                        .error(e.getMessage())
+                        .build());
     }
 
     @ExceptionHandler(TransactionNotFoundException.class)
@@ -83,7 +89,7 @@ public class GlobalExceptionHandlers {
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<ExceptionResponse> handleException(BadCredentialsException exception) {
         return ResponseEntity
-                .status(HttpStatus.UNAUTHORIZED)
+                .status(HttpStatus.BAD_REQUEST)
                 .body(ExceptionResponse.builder()
                         .businessErrorCode(BusinessErrorCodes.BAD_CREDENTIALS.getCode())
                         .businessErrorDescription(BusinessErrorCodes.BAD_CREDENTIALS.getDescription())

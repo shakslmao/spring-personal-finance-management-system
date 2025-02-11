@@ -1,11 +1,20 @@
 package com.devshaks.personal_finance.exceptions;
 
+import com.devshaks.personal_finance.handlers.BusinessErrorCodes;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 
-@Data
-@EqualsAndHashCode(callSuper = true)
+@Getter
 public class BusinessException extends RuntimeException {
-    private final String exceptionMessage;
+    private final BusinessErrorCodes businessErrorCode;
 
+    public BusinessException(BusinessErrorCodes businessErrorCode) {
+        super(businessErrorCode.getDescription());
+        this.businessErrorCode = businessErrorCode;
+    }
+
+    public BusinessErrorCodes getBusinessErrorCode() {
+        return businessErrorCode;
+    }
 }
