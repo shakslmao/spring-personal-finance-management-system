@@ -10,8 +10,8 @@ public enum BusinessErrorCodes {
     INCORRECT_CURRENT_PASSWORD(300, HttpStatus.BAD_REQUEST, "Incorrect Current Password"),
     NEW_PASSWORD_DOES_NOT_MATCH(301, HttpStatus.BAD_REQUEST, "New Password Does Not Match"),
     ACCOUNT_LOCKED(302, HttpStatus.FORBIDDEN, "Account Is Locked"),
-    ACCOUNT_DISABLED(303, HttpStatus.FORBIDDEN, "Account Is Disabled Or Not Authenticated"),
-    BAD_CREDENTIALS(304, HttpStatus.FORBIDDEN, "Login And Or Password Credentials Are Incorrect");
+    ACCOUNT_DISABLED(303, HttpStatus.UNAUTHORIZED, "You need to authenticate your account."),
+    BAD_CREDENTIALS(304, HttpStatus.BAD_REQUEST, "Login And Or Password Credentials Are Incorrect");
 
     private final int code;
     private final String description;
@@ -23,3 +23,4 @@ public enum BusinessErrorCodes {
         this.httpStatusCode = httpStatusCode;
     }
 }
+
