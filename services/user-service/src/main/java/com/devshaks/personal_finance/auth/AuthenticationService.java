@@ -7,6 +7,8 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Optional;
 
+import com.devshaks.personal_finance.exceptions.BusinessException;
+import com.devshaks.personal_finance.handlers.BusinessErrorCodes;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
@@ -130,14 +132,24 @@ public class AuthenticationService {
     }
 
     public AuthenticationResponse authenticateUser(AuthenticationRequest authRequest) {
+        User user = userRepository.findByEmail(authRequest.email())
+                .orElseThrow(() -> new BusinessException(BusinessErrorCodes.BAD_CREDENTIALS));
+
+        if (user.getStatus() == AccountStatus.ACTIVE_NON_AUTH) {
+            throw new BusinessException(BusinessErrorCodes.ACCOUNT_DISABLED);
+        }
+
         var auth = authenticationManager
                 .authenticate(new UsernamePasswordAuthenticationToken(authRequest.email(), authRequest.password()));
+
         var claims = new HashMap<String, Object>();
-        var user = ((User) auth.getPrincipal());
-        claims.put("name", user.getName());
-        var jwtToken = jwtService.generateToken(claims, user);
-        return new AuthenticationResponse(jwtToken, user.getId());
+        var authenticatedUser = (User) auth.getPrincipal();
+        claims.put("name", authenticatedUser.getName());
+
+        var jwtToken = jwtService.generateToken(claims, authenticatedUser);
+        return new AuthenticationResponse(jwtToken, authenticatedUser.getId());
     }
+
 
     public ResponseCookie generateJwtCookie(String token) {
         return ResponseCookie.from("jwt", token)
