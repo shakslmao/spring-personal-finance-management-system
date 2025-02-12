@@ -40,7 +40,9 @@ public class UserMapper {
         return new UserDetailsResponse(
                 user.getId(),
                 user.getFirstname(),
+                user.getLastname(),
                 user.getUsername(),
+                user.getUserPin(),
                 user.getEmail(),
                 user.getRoles()
         );
