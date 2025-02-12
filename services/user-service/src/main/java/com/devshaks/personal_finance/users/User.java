@@ -36,7 +36,7 @@ public class User implements UserDetails, Principal {
     private String lastname;
 
     @Column(nullable = false, unique = true) // Pin Format Username
-    private String username;
+    private String userPin;
 
     @Column(nullable = false, unique = true, length = 100)
     private String email;

@@ -103,7 +103,7 @@ public class AuthenticationService {
             // Map request to user entity and generate additional fields.
             User user = userMapper.toUserRegistration(userRegistrationRequest);
             String generatedUsername = usernameGenerator.generateUsername(user.getDateOfBirth().getYear());
-            user.setUsername(generatedUsername);
+            user.setUserPin(generatedUsername);
             String encodedPassword = passwordEncoder.encode(user.getPassword());
             user.setPassword(encodedPassword);
 
