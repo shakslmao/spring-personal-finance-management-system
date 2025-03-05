@@ -1,7 +1,11 @@
-package com.devshaks.personal_finance.auth;
+package com.devshaks.personal_finance.auth.controller;
 
 import java.net.URI;
 
+import com.devshaks.personal_finance.auth.dto.*;
+import com.devshaks.personal_finance.auth.service.AuthenticationService;
+import com.devshaks.personal_finance.auth.service.RegistrationService;
+import com.devshaks.personal_finance.auth.service.TokenService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -33,12 +37,14 @@ import lombok.RequiredArgsConstructor;
 @Tag(name = "Authentication Controller", description = "Handles Authentication-Related Operations")
 public class AuthenticationController {
     private final AuthenticationService authenticationService;
+    private final RegistrationService registrationService;
+    private final TokenService tokenService;
 
     @PostMapping("/register")
     @ResponseStatus(HttpStatus.ACCEPTED)
     @Operation(summary = "Register a new User")
     public ResponseEntity<UserDTO> registerUser(@RequestBody @Valid UserRegistrationRequest userRegistrationRequest) {
-        UserDTO user = authenticationService.registerUser(userRegistrationRequest);
+        UserDTO user = registrationService.registerUser(userRegistrationRequest);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}")
                 .buildAndExpand(user.id())
@@ -50,7 +56,7 @@ public class AuthenticationController {
     public ResponseEntity<AuthenticationResponse> authenticateUser(
             @RequestBody @Valid AuthenticationRequest authenticationRequest) {
         AuthenticationResponse authenticationResponse = authenticationService.authenticateUser(authenticationRequest);
-        ResponseCookie jwtCookie = authenticationService.generateJwtCookie(authenticationResponse.token());
+        ResponseCookie jwtCookie = tokenService.generateJwtCookie(authenticationResponse.token());
         return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
                 .body(authenticationResponse);
     }
@@ -65,7 +71,7 @@ public class AuthenticationController {
     public ResponseEntity<RequestNewTokenResponse> requestNewActivationToken(
             @RequestBody @Valid RequestNewActivationRequest newTokenRequest) throws MessagingException {
 
-        RequestNewTokenResponse response = authenticationService.requestNewActivationToken(newTokenRequest.email());
+        RequestNewTokenResponse response = tokenService.requestNewActivationToken(newTokenRequest.email());
         return ResponseEntity.ok(response);
     }
 
