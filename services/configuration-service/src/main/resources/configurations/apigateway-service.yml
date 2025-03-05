@@ -54,7 +54,7 @@ spring:
 application:
     security:
         jwt:
-            secret-key:
+            secret-key: "1jF2jrFowvAoIZbiZMq_1mTrL-BQvuB2iYRp3sBcJHA"
 
 logging:
     level:

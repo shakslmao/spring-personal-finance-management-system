@@ -1,4 +1,4 @@
-package com.devshaks.personal_finance.auth;
+package com.devshaks.personal_finance.auth.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
