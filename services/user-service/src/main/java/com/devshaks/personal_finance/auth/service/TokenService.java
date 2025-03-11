@@ -1,10 +1,7 @@
 package com.devshaks.personal_finance.auth.service;
 
 import com.devshaks.personal_finance.auth.dto.AccountActivationResponse;
-import com.devshaks.personal_finance.auth.dto.AuthenticationResponse;
 import com.devshaks.personal_finance.auth.dto.RequestNewTokenResponse;
-import com.devshaks.personal_finance.exceptions.BusinessException;
-import com.devshaks.personal_finance.handlers.BusinessErrorCodes;
 import com.devshaks.personal_finance.token.Tokens;
 import com.devshaks.personal_finance.token.TokensRepository;
 import com.devshaks.personal_finance.users.AccountStatus;
@@ -13,14 +10,12 @@ import com.devshaks.personal_finance.users.UserRepository;
 import jakarta.mail.MessagingException;
 import jakarta.transaction.Transactional;
 import org.springframework.http.ResponseCookie;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.security.SecureRandom;
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.HashMap;
 
 @Service
 public class TokenService {
@@ -80,9 +75,11 @@ public class TokenService {
         if (user.getStatus() == AccountStatus.ACTIVE_AUTHENTICATED) {
             return new RequestNewTokenResponse("Account is already activated.");
         }
+
         tokensRepository.findAllValidTokensByUser(user.getId()).forEach(token -> {
             token.setRevoked(true);
         });
+
         tokensRepository.deleteAllByUserId(user.getId());
 
         generateAndSaveActivationToken(user);
