@@ -1,4 +1,4 @@
-package com.devshaks.personal_finance.auth;
+package com.devshaks.personal_finance.auth.token;
 
 
 import com.devshaks.personal_finance.auth.dto.RequestNewTokenResponse;
@@ -29,7 +29,7 @@ import static org.mockito.Mockito.*;
 
 
 @ExtendWith(MockitoExtension.class)
-public class TokenServiceTest {
+public class TokenServiceUnitTest {
 
     @Mock
     private TokensRepository tokensRepository;
